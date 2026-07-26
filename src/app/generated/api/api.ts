@@ -1,0 +1,15 @@
+export * from './inventory.service';
+import { InventoryService } from './inventory.service';
+export * from './items.service';
+import { ItemsService } from './items.service';
+export * from './purchaseReceipts.service';
+import { PurchaseReceiptsService } from './purchaseReceipts.service';
+export * from './salesController.service';
+import { SalesControllerService } from './salesController.service';
+export * from './suppliers.service';
+import { SuppliersService } from './suppliers.service';
+export * from './user.service';
+import { UserService } from './user.service';
+export * from './warehouses.service';
+import { WarehousesService } from './warehouses.service';
+export const APIS = [InventoryService, ItemsService, PurchaseReceiptsService, SalesControllerService, SuppliersService, UserService, WarehousesService];
