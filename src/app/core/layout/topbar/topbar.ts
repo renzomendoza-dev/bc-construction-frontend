@@ -2,6 +2,7 @@ import { Component, computed, inject, signal, ChangeDetectionStrategy } from '@a
 import { RouterLink } from '@angular/router';
 import { ThemeService } from '../../services/theme';
 import { LayoutService } from '../../services/layout';
+import { CurrentUserService } from '../../services/current-user';
 
 @Component({
   selector: 'app-topbar',
@@ -13,16 +14,25 @@ import { LayoutService } from '../../services/layout';
 export class Topbar {
   private readonly themeService = inject(ThemeService);
   private readonly layout = inject(LayoutService);
+
+  protected readonly currentUser = inject(CurrentUserService);
+  protected readonly userDisplayName = this.currentUser.fullName;
  
   readonly theme = this.themeService.theme;
   readonly isDark = computed(() => this.theme() === 'dark');
  
   readonly menuOpen = signal(false);
- 
-  // TODO: replace with the real signed-in user once UserSyncService /
-  // AppUser data is exposed to the frontend (via /me endpoint or JWT claims).
-  readonly userInitials = 'JR';
-  readonly userDisplayName = 'J. Rivera';
+
+  protected get userInitials(): string {
+    return this.userDisplayName
+      .split(' ')
+      .map(part => part[0])
+      .filter(Boolean)
+      .slice(0, 2)
+      .join('')
+      .toUpperCase();
+  }
+
  
   toggleSidebar(): void {
     this.layout.toggleSidebar();
@@ -41,8 +51,6 @@ export class Topbar {
   }
  
   logOut(): void {
-    // TODO: wire to Keycloak logout (redirect to the realm's end-session
-    // endpoint) once the frontend's auth integration is in place.
-    this.closeMenu();
+    this.currentUser.logout();
   }
 }
