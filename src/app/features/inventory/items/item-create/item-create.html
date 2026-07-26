@@ -1,0 +1,89 @@
+<div class="item-detail-page">
+
+  <button type="button" class="back-btn" (click)="backToList()">
+    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+      <path d="M19 12H5"></path>
+      <path d="m12 19-7-7 7-7"></path>
+    </svg>
+    Back to Items
+  </button>
+
+  <div class="item-detail-header">
+    <div>
+      <div class="item-detail-header__title-row">
+        <div class="item-detail-header__title">New Item</div>
+      </div>
+      <div class="item-detail-header__sku">Images and linked suppliers can be added after the item is created.</div>
+    </div>
+  </div>
+
+  <div class="detail-grid detail-grid--single">
+    <div class="card">
+      <div class="card__title">Details</div>
+
+      @if (errorMessage()) {
+        <div class="form-error">{{ errorMessage() }}</div>
+      }
+
+      <div class="form-grid">
+        <div class="form-field">
+          <label>SKU *</label>
+          <input
+            type="text"
+            [value]="form().sku"
+            (change)="onSkuChange($any($event.target).value)"
+            [class.form-field--invalid]="fieldErrors()['sku']"
+          />
+          @if (fieldErrors()['sku']) {
+            <div class="field-error">{{ fieldErrors()['sku'] }}</div>
+          }
+        </div>
+
+        <div class="form-field">
+          <label>Name *</label>
+          <input
+            type="text"
+            [value]="form().name"
+            (change)="onNameChange($any($event.target).value)"
+            [class.form-field--invalid]="fieldErrors()['name']"
+          />
+          @if (fieldErrors()['name']) {
+            <div class="field-error">{{ fieldErrors()['name'] }}</div>
+          }
+        </div>
+
+        <div class="form-field">
+          <label>Category</label>
+          <select [value]="form().category" (change)="onCategoryChange($any($event.target).value)">
+            @for (cat of categories; track cat) {
+              <option [value]="cat">{{ cat }}</option>
+            }
+          </select>
+        </div>
+
+        <div class="form-field">
+          <label>Unit of Measure</label>
+          <input type="text" placeholder="e.g. pcs, box, sheet" [value]="form().unitOfMeasure" (change)="onUnitChange($any($event.target).value)" />
+        </div>
+
+        <div class="form-field">
+          <label>Selling Price</label>
+          <input type="number" step="0.01" min="0" [value]="form().sellingPrice" (change)="onPriceChange($any($event.target).value)" />
+        </div>
+
+        <div class="form-field">
+          <label>Default Cost Price</label>
+          <input type="number" step="0.01" min="0" [value]="form().defaultCostPrice" (change)="onCostChange($any($event.target).value)" />
+        </div>
+      </div>
+
+      <div class="form-actions">
+        <button type="button" class="btn-primary" [disabled]="saving()" (click)="createItem()">
+          {{ saving() ? 'Creating…' : 'Create Item' }}
+        </button>
+        <button type="button" class="btn-secondary" [disabled]="saving()" (click)="backToList()">Cancel</button>
+      </div>
+    </div>
+  </div>
+
+</div>

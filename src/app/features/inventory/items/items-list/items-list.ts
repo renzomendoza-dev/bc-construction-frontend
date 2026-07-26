@@ -68,10 +68,6 @@ export class ItemsListComponent implements OnInit {
 }
  
   createItem(): void {
-    // No create-item modal existed in the original mockup — this route
-    // doesn't exist yet. Wire this to a real create flow when you design
-    // one; for now it's a placeholder so the button isn't dead-clickable
-    // without at least navigating somewhere sensible.
     this.router.navigate(['/inventory/items/new']);
   }
  
