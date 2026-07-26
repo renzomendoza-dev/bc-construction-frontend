@@ -1,0 +1,334 @@
+// Fonts: add these to your global index.html (or angular.json styles) —
+// this component intentionally doesn't ship @font-face rules itself.
+//
+// <link rel="preconnect" href="https://fonts.googleapis.com">
+// <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+// <link href="https://fonts.googleapis.com/css2?family=Archivo:wght@700&family=IBM+Plex+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+:host {
+  // ---- Light theme (default) ----
+  --sb-panel-bg: #ffffff;
+  --sb-page-bg: #f3f5f4;
+  --sb-border: #e2e7e5;
+  --sb-hover-bg: rgba(24, 32, 34, 0.04);
+  --sb-heading-text: #182022;
+  --sb-sub-text: #5c6866;
+  --sb-label-text: #3a4644;
+  --sb-disabled-text: #a3adab;
+  --sb-badge-bg: #e9edec;
+  --sb-teal: #1b6e76;
+  --sb-teal-tint: rgba(27, 110, 118, 0.08);
+  --sb-logo-border: #c3d1cd;
+  --sb-logo-bg: rgba(27, 110, 118, 0.03);
+
+  display: block;
+}
+
+:host([data-theme='dark']) {
+  --sb-panel-bg: #182022;
+  --sb-page-bg: #12181a;
+  --sb-border: #263030;
+  --sb-hover-bg: rgba(255, 255, 255, 0.04);
+  --sb-heading-text: #f2f0ec;
+  --sb-sub-text: #8a9694;
+  --sb-label-text: #c3ccca;
+  --sb-disabled-text: #4a5452;
+  --sb-badge-bg: #20292b;
+  --sb-teal-tint: rgba(27, 110, 118, 0.18);
+  --sb-logo-border: #3a4644;
+  --sb-logo-bg: rgba(255, 255, 255, 0.02);
+}
+
+.sidebar {
+  position: sticky;
+  top: 0;
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+  width: 240px;
+  min-width: 240px;
+  box-sizing: border-box;
+  background: var(--sb-panel-bg);
+  border-right: 1px solid var(--sb-border);
+  overflow-y: auto;
+  overflow-x: hidden;
+  transition: width 0.2s ease, min-width 0.2s ease;
+  font-family: 'IBM Plex Sans', sans-serif;
+
+  &::-webkit-scrollbar {
+    width: 6px;
+  }
+  &::-webkit-scrollbar-thumb {
+    background: transparent;
+    border-radius: 3px;
+  }
+}
+
+:host(.is-collapsed) .sidebar {
+  width: 72px;
+  min-width: 72px;
+}
+
+// ---- Header / logo -------------------------------------------------------
+
+.sidebar__header {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  height: 64px;
+  padding: 0 16px;
+  border-bottom: 1px solid var(--sb-border);
+  box-sizing: border-box;
+  flex-shrink: 0;
+}
+
+:host(.is-collapsed) .sidebar__header {
+  padding: 0 17px;
+}
+
+.sidebar__logo {
+  width: 36px;
+  height: 36px;
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  overflow: hidden; // safety net in case the image is ever taller/wider than the box
+}
+
+.sidebar__logo-img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  display: block;
+}
+
+.sidebar__title {
+  font-family: 'Archivo', sans-serif;
+  font-weight: 700;
+  font-size: 14.5px;
+  line-height: 1.25;
+  color: var(--sb-heading-text);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+// ---- Nav -------------------------------------------------------------------
+
+.sidebar__nav {
+  flex: 1;
+  padding: 16px 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.nav-item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  height: 40px;
+  padding: 0 12px;
+  border-radius: 8px;
+  border-left: 3px solid transparent;
+  text-decoration: none;
+  color: var(--sb-label-text);
+  font-size: 14px;
+  font-weight: 600;
+  font-family: 'IBM Plex Sans', sans-serif;
+  box-sizing: border-box;
+  background: transparent;
+  border-top: none;
+  border-right: none;
+  border-bottom: none;
+  cursor: pointer;
+  width: 100%;
+  text-align: left;
+  transition: background 0.12s;
+
+  &:hover {
+    background: var(--sb-hover-bg);
+  }
+
+  &.is-active {
+    color: var(--sb-teal);
+    background: var(--sb-teal-tint);
+    border-left-color: var(--sb-teal);
+  }
+}
+
+.nav-item--button {
+  border: none;
+}
+
+.nav-item--disabled {
+  color: var(--sb-disabled-text);
+  cursor: not-allowed;
+
+  &:hover {
+    background: transparent;
+  }
+}
+
+.nav-item__icon {
+  flex-shrink: 0;
+}
+
+.nav-item__label {
+  white-space: nowrap;
+}
+
+.nav-item__label--flex {
+  flex: 1;
+}
+
+.nav-badge {
+  font-size: 9.5px;
+  font-weight: 700;
+  letter-spacing: 0.4px;
+  text-transform: uppercase;
+  background: var(--sb-badge-bg);
+  color: var(--sb-disabled-text);
+  padding: 3px 7px;
+  border-radius: 999px;
+  white-space: nowrap;
+}
+
+.nav-group__chevron {
+  flex-shrink: 0;
+  transition: transform 0.15s;
+}
+
+.nav-group__chevron--open {
+  transform: rotate(90deg);
+}
+
+.nav-subgroup {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  margin-top: 2px;
+  padding-left: 30px;
+}
+
+:host(.is-collapsed) .nav-subgroup {
+  padding-left: 0;
+}
+
+.nav-subitem {
+  display: flex;
+  align-items: center;
+  height: 34px;
+  padding: 0 12px;
+  border-radius: 7px;
+  border-left: 3px solid transparent;
+  text-decoration: none;
+  color: var(--sb-label-text);
+  font-size: 13.5px;
+  font-weight: 500;
+  box-sizing: border-box;
+
+  &:hover {
+    background: var(--sb-hover-bg);
+  }
+
+  &.is-active {
+    color: var(--sb-teal);
+    background: var(--sb-teal-tint);
+    border-left-color: var(--sb-teal);
+  }
+}
+
+// ---- Footer / admin ----------------------------------------------------
+
+.sidebar__footer {
+  padding: 12px;
+  border-top: 1px solid var(--sb-border);
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.sidebar__footer-label {
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.6px;
+  text-transform: uppercase;
+  color: var(--sb-sub-text);
+  padding: 0 12px;
+  margin-bottom: 2px;
+}
+
+.collapse-btn {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  height: 38px;
+  padding: 0 12px;
+  border-radius: 8px;
+  background: transparent;
+  border: 1px solid var(--sb-border);
+  color: var(--sb-sub-text);
+  font-size: 13px;
+  font-weight: 600;
+  font-family: 'IBM Plex Sans', sans-serif;
+  cursor: pointer;
+  margin-top: 4px;
+  box-sizing: border-box;
+  justify-content: flex-start;
+
+  &:hover {
+    background: var(--sb-hover-bg);
+  }
+}
+
+.collapse-btn--collapsed {
+  justify-content: center;
+}
+
+.collapse-btn__icon {
+  flex-shrink: 0;
+  transform: rotate(180deg);
+  transition: transform 0.2s;
+}
+
+.collapse-btn__icon--collapsed {
+  transform: rotate(0deg);
+}
+
+// ---- Theme toggle --------------------------------------------------------
+// Floats over the page like the original mockup. If you already have (or
+// plan to add) a top bar / header component, this likely belongs there
+// instead of inside the sidebar — move it out whenever that lands.
+
+.theme-toggle {
+  position: fixed;
+  top: 20px;
+  right: 24px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background: var(--sb-panel-bg);
+  border: 1px solid var(--sb-border);
+  border-radius: 999px;
+  padding: 7px 14px 7px 7px;
+  cursor: pointer;
+  font-family: 'IBM Plex Sans', sans-serif;
+  font-size: 12.5px;
+  font-weight: 600;
+  color: var(--sb-label-text);
+  z-index: 10;
+}
+
+.theme-toggle__icon {
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  background: var(--sb-hover-bg);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 12px;
+}
