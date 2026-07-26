@@ -1,1 +1,38 @@
 /* You can add global styles to this file, and also import other style files */
+
+:root {
+  --panel-bg: #ffffff;
+  --page-bg: #f3f5f4;
+  --border: #e2e7e5;
+  --hover-bg: rgba(24, 32, 34, 0.04);
+  --heading-text: #182022;
+  --sub-text: #5c6866;
+  --label-text: #3a4644;
+  --disabled-text: #a3adab;
+  --badge-bg: #e9edec;
+  --teal: #1b6e76;
+  --teal-tint: rgba(27, 110, 118, 0.08);
+  --menu-shadow: 0 12px 30px rgba(20, 40, 35, 0.14);
+}
+ 
+:root[data-theme='dark'] {
+  --panel-bg: #182022;
+  --page-bg: #12181a;
+  --border: #263030;
+  --hover-bg: rgba(255, 255, 255, 0.04);
+  --heading-text: #f2f0ec;
+  --sub-text: #8a9694;
+  --label-text: #c3ccca;
+  --disabled-text: #4a5452;
+  --badge-bg: #20292b;
+  --teal-tint: rgba(27, 110, 118, 0.18);
+  --menu-shadow: 0 12px 30px rgba(0, 0, 0, 0.45);
+}
+ 
+body {
+  margin: 0;
+  font-family: 'IBM Plex Sans', sans-serif;
+  background: var(--page-bg);
+  transition: background 0.2s;
+}
+ 

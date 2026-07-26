@@ -1,1 +1,67 @@
-<p>topbar works!</p>
+<header class="top-bar">
+
+  <button
+    type="button"
+    class="icon-btn"
+    aria-label="Toggle sidebar"
+    (click)="toggleSidebar()"
+  >
+    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+      <path d="M4 6h16"></path>
+      <path d="M4 12h16"></path>
+      <path d="M4 18h16"></path>
+    </svg>
+  </button>
+
+  <div class="top-bar__actions">
+
+    <button type="button" class="theme-toggle" (click)="toggleTheme()">
+      <span class="theme-toggle__icon">{{ isDark() ? '☾' : '☀' }}</span>
+      {{ isDark() ? 'Dark' : 'Light' }}
+    </button>
+
+    <div class="divider"></div>
+
+    <div class="user-menu">
+      <button
+        type="button"
+        class="user-menu__trigger"
+        (click)="toggleMenu()"
+      >
+        <div class="user-menu__avatar">
+          <span>{{ userInitials }}</span>
+        </div>
+        <span class="user-menu__name">{{ userDisplayName }}</span>
+        <svg
+          class="user-menu__chevron"
+          [class.user-menu__chevron--open]="menuOpen()"
+          width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"
+        >
+          <path d="M6 9l6 6 6-6"></path>
+        </svg>
+      </button>
+
+      @if (menuOpen()) {
+        <div class="user-menu__dropdown">
+          <a routerLink="/profile" class="user-menu__item" (click)="closeMenu()">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <circle cx="12" cy="8" r="4"></circle>
+              <path d="M4 21v-1a7 7 0 0 1 14 0v1"></path>
+            </svg>
+            Profile
+          </a>
+          <div class="user-menu__separator"></div>
+          <button type="button" class="user-menu__item user-menu__item--danger" (click)="logOut()">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path>
+              <path d="M16 17l5-5-5-5"></path>
+              <path d="M21 12H9"></path>
+            </svg>
+            Log Out
+          </button>
+        </div>
+      }
+    </div>
+
+  </div>
+</header>

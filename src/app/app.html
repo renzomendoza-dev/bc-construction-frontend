@@ -1,7 +1,11 @@
-<!-- app.component.html -->
 <div class="app-shell">
   <app-sidebar></app-sidebar>
-  <main class="app-main">
-    <router-outlet></router-outlet>
-  </main>
+
+  <div class="app-shell__main">
+    <app-topbar></app-topbar>
+
+    <div class="app-shell__content">
+      <router-outlet></router-outlet>
+    </div>
+  </div>
 </div>
