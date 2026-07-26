@@ -1,0 +1,100 @@
+<div class="items-page">
+
+  <div class="items-page__header">
+    <div class="items-page__title">Items</div>
+    <button type="button" class="btn-primary" (click)="createItem()">+ New Item</button>
+  </div>
+
+  <div class="items-page__filters">
+    <input
+      type="text"
+      class="filter-input"
+      placeholder="Search by name or SKU…"
+      [value]="search()"
+      (change)="onSearchChange($any($event.target).value)"
+    />
+
+    <select
+      class="filter-select"
+      [value]="category()"
+      (change)="onCategoryChange($any($event.target).value)"
+    >
+      <option value="all">All Categories</option>
+      @for (cat of categories; track cat) {
+        <option [value]="cat">{{ cat }}</option>
+      }
+    </select>
+
+    <label class="filter-checkbox">
+      <input
+        type="checkbox"
+        [checked]="showInactive()"
+        (change)="onShowInactiveChange($any($event.target).checked)"
+      />
+      Show inactive
+    </label>
+  </div>
+
+  <div class="items-table">
+
+    <div class="items-table__head">
+      <div></div>
+      <div>Item</div>
+      <div>Category</div>
+      <div class="align-right">Status</div>
+    </div>
+
+    @if (loading()) {
+      <div class="items-table__state">Loading…</div>
+    } @else if (errorMessage()) {
+      <div class="items-table__state items-table__state--error">{{ errorMessage() }}</div>
+    } @else if (items().length > 0) {
+      @for (item of items(); track item.id) {
+        <div class="items-table__row" (click)="openItem(item.id)">
+          <div class="items-table__icon">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M21 8 12 3 3 8l9 5 9-5Z"></path>
+              <path d="M3 8v8l9 5 9-5V8"></path>
+              <path d="M12 13v8"></path>
+            </svg>
+          </div>
+          <div class="items-table__name">
+            <div class="items-table__name-text">{{ item.name }}</div>
+            <div class="items-table__sku">{{ item.sku }}</div>
+          </div>
+          <div class="items-table__category">{{ item.category }}</div>
+          <div class="align-right">
+            <span class="status-badge" [class.status-badge--inactive]="!item.active">
+              {{ statusLabel(item) }}
+            </span>
+          </div>
+        </div>
+      }
+    } @else {
+      <div class="items-table__empty">
+        <div class="items-table__empty-icon">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="11" cy="11" r="7"></circle>
+            <path d="m21 21-4.35-4.35"></path>
+          </svg>
+        </div>
+        <div class="items-table__empty-title">No items match your filters</div>
+        <div class="items-table__empty-subtitle">Try adjusting your search or category filter.</div>
+      </div>
+    }
+
+  </div>
+
+  @if (!loading() && items().length > 0) {
+    <div class="items-pagination">
+      <div class="items-pagination__summary">
+        Showing {{ page() * 20 + 1 }}–{{ page() * 20 + items().length }} of {{ totalElements() }}
+      </div>
+      <div class="items-pagination__controls">
+        <button type="button" [disabled]="page() === 0" (click)="prevPage()">Previous</button>
+        <button type="button" [disabled]="page() >= totalPages() - 1" (click)="nextPage()">Next</button>
+      </div>
+    </div>
+  }
+
+</div>

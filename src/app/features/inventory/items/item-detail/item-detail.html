@@ -1,0 +1,130 @@
+<div class="item-detail-page">
+
+  <button type="button" class="back-btn" (click)="backToList()">
+    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+      <path d="M19 12H5"></path>
+      <path d="m12 19-7-7 7-7"></path>
+    </svg>
+    Back to Items
+  </button>
+
+  @if (loading()) {
+    <div class="state-message">Loading…</div>
+  } @else if (errorMessage() && !item()) {
+    <div class="state-message state-message--error">{{ errorMessage() }}</div>
+  } @else if (item(); as currentItem) {
+
+    <div class="item-detail-header">
+      <div>
+        <div class="item-detail-header__title-row">
+          <div class="item-detail-header__title">{{ currentItem.name }}</div>
+          <span class="status-badge" [class.status-badge--inactive]="!currentItem.active">
+            {{ currentItem.active ? 'Active' : 'Inactive' }}
+          </span>
+        </div>
+        <div class="item-detail-header__sku">{{ currentItem.sku }}</div>
+      </div>
+
+      <button
+        type="button"
+        class="deactivate-btn"
+        [disabled]="!currentItem.active || deactivating()"
+        [title]="!currentItem.active ? 'Reactivation isn\'t supported by the API yet' : ''"
+        (click)="deactivateItem()"
+      >
+        {{ currentItem.active ? (deactivating() ? 'Deactivating…' : 'Deactivate') : 'Inactive' }}
+      </button>
+    </div>
+
+    <div class="section-title">Images</div>
+    <div class="image-grid">
+      @for (image of currentItem.images; track image.id) {
+        <div class="image-tile">
+          <img [src]="image.imageUrl" [alt]="currentItem.name" class="image-tile__img" />
+          @if (image.id !== undefined) {
+  <button type="button" class="image-tile__delete" (click)="deleteImage(image.id)" aria-label="Remove image">✕</button>
+}
+        </div>
+      }
+      <label class="image-upload-tile" [class.image-upload-tile--busy]="uploadingImage()">
+        <input type="file" accept="image/*" (change)="onImageFileSelected($event)" [disabled]="uploadingImage()" hidden />
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M12 5v14"></path>
+          <path d="M5 12h14"></path>
+        </svg>
+        {{ uploadingImage() ? 'Uploading…' : 'Upload' }}
+      </label>
+    </div>
+
+    <div class="detail-grid">
+
+      <div>
+        <div class="card">
+          <div class="card__title">Details</div>
+          <div class="form-grid">
+            <div class="form-field">
+              <label>Category</label>
+              <select [value]="form().category" (change)="onFormCategoryChange($any($event.target).value)">
+                @for (cat of categories; track cat) {
+                  <option [value]="cat">{{ cat }}</option>
+                }
+              </select>
+            </div>
+            <div class="form-field">
+              <label>Unit of Measure</label>
+              <input type="text" [value]="form().unitOfMeasure" (change)="onFormUnitChange($any($event.target).value)" />
+            </div>
+            <div class="form-field">
+              <label>Selling Price</label>
+              <input type="number" step="0.01" min="0" [value]="form().sellingPrice" (change)="onFormPriceChange($any($event.target).value)" />
+            </div>
+            <div class="form-field">
+              <label>Default Cost Price</label>
+              <input type="number" step="0.01" min="0" [value]="form().defaultCostPrice" (change)="onFormCostChange($any($event.target).value)" />
+            </div>
+          </div>
+          <div class="form-actions">
+            <button type="button" class="btn-primary" [disabled]="saving()" (click)="saveForm()">
+              {{ saving() ? 'Saving…' : 'Save Changes' }}
+            </button>
+            @if (savedMessage()) {
+              <span class="saved-message">{{ savedMessage() }}</span>
+            }
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="card__title">Linked Suppliers</div>
+          <div class="suppliers-head">
+            <div>Supplier</div>
+            <div>Supplier SKU</div>
+            <div class="align-right">Unit Cost</div>
+          </div>
+          @for (sup of suppliers(); track sup.id) {
+            <div class="suppliers-row">
+              <div class="suppliers-row__name">{{ sup.supplierName }}</div>
+              <div class="suppliers-row__sku">{{ sup.supplierSku || '—' }}</div>
+              <div class="suppliers-row__cost align-right">{{ '$' + (sup.unitCost?.toFixed(2) ?? '—') }}</div>
+            </div>
+          } @empty {
+            <div class="suppliers-empty">No suppliers linked yet.</div>
+          }
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card__title">History</div>
+        <div class="history-row">
+          Created
+          <span class="history-row__value">{{ currentItem.createdAt | date: 'medium' }}</span>
+        </div>
+        <div class="history-row">
+          Last Updated
+          <span class="history-row__value">{{ currentItem.updatedAt | date: 'medium' }}</span>
+        </div>
+      </div>
+
+    </div>
+  }
+
+</div>

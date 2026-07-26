@@ -1,27 +1,44 @@
 import { Routes } from '@angular/router';
 
 export const routes: Routes = [
-    {
+  {
     path: '',
     loadComponent: () =>
       import('./features/dashboard/dashboard').then((m) => m.Dashboard),
   },
- 
-  // Placeholder routes below — replace loadComponent target once each
-  // feature module exists. Left commented so the app compiles cleanly
-  // until you build them.
- 
-  // {
-  //   path: 'inventory',
-  //   loadChildren: () =>
-  //     import('./features/inventory/inventory.routes').then((m) => m.INVENTORY_ROUTES),
-  // },
-  // {
-  //   path: 'users',
-  //   loadChildren: () =>
-  //     import('./features/users/users.routes').then((m) => m.USERS_ROUTES),
-  // },
- 
+
+  {
+    path: 'inventory',
+    children: [
+      { path: '', redirectTo: 'items', pathMatch: 'full' },
+    {
+      path: 'items',
+      loadComponent: () =>
+        import('./features/inventory/items/items-list/items-list').then((m) => m.ItemsListComponent),
+    },
+    {
+      path: 'items/:id',
+      loadComponent: () =>
+        import('./features/inventory/items/item-detail/item-detail').then((m) => m.ItemDetailComponent),
+    },
+      // {
+      //   path: 'suppliers',
+      //   loadComponent: () =>
+      //     import('./features/inventory/suppliers/suppliers.component').then(m => m.SuppliersComponent),
+      // },
+      // {
+      //   path: 'warehouses',
+      //   loadComponent: () =>
+      //     import('./features/inventory/warehouses/warehouses.component').then(m => m.WarehousesComponent),
+      // },
+      // {
+      //   path: 'receipts',
+      //   loadComponent: () =>
+      //     import('./features/inventory/receipts/receipts.component').then(m => m.ReceiptsComponent),
+      // },
+    ],
+  },
+
   {
     path: '**',
     redirectTo: '',
