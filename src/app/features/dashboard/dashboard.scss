@@ -1,0 +1,265 @@
+.dashboard-page {
+  min-height: 100vh;
+  padding: 36px 40px 60px;
+  box-sizing: border-box;
+  transition: background 0.2s;
+
+  background: #f3f5f4;
+
+  &.dark {
+    background: #12181a;
+  }
+}
+
+.dashboard-inner {
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+.dashboard-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 20px;
+  margin-bottom: 32px;
+}
+
+.welcome-text {
+  font-family: 'Archivo', sans-serif;
+  font-weight: 700;
+  font-size: 26px;
+  color: #182022;
+  .dark & { color: #f2f0ec; }
+}
+
+.today-text {
+  font-size: 14px;
+  color: #5c6866;
+  margin-top: 8px;
+  .dark & { color: #8a9694; }
+}
+
+.theme-toggle {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background: #ffffff;
+  border: 1px solid #e2e7e5;
+  border-radius: 999px;
+  padding: 6px 14px 6px 6px;
+  cursor: pointer;
+  font-family: 'IBM Plex Sans', sans-serif;
+  font-size: 12.5px;
+  font-weight: 600;
+  color: #3a4644;
+  flex-shrink: 0;
+
+  .dark & {
+    background: #182022;
+    border-color: #263030;
+    color: #c3ccca;
+  }
+
+  &__icon {
+    width: 22px;
+    height: 22px;
+    border-radius: 50%;
+    background: rgba(24, 32, 34, 0.05);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 12px;
+
+    .dark & {
+      background: rgba(255, 255, 255, 0.05);
+    }
+  }
+}
+
+.card-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 20px;
+}
+
+.card {
+  display: block;
+  text-decoration: none;
+  position: relative;
+  background: #ffffff;
+  border: 1px solid #e2e7e5;
+  border-radius: 14px;
+  padding: 24px;
+  box-sizing: border-box;
+  box-shadow: 0 1px 3px rgba(20, 40, 35, 0.06);
+  transition: box-shadow 0.15s, transform 0.15s;
+
+  .dark & {
+    background: #182022;
+    border-color: #263030;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
+  }
+
+  &__header {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 20px;
+  }
+
+  &__icon {
+    width: 40px;
+    height: 40px;
+    border-radius: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+
+    &--teal {
+      background: rgba(27, 110, 118, 0.08);
+      .dark & { background: rgba(27, 110, 118, 0.18); }
+    }
+
+    &--muted {
+      background: #e9edec;
+      color: #5c6866;
+      .dark & { background: #20292b; color: #8a9694; }
+    }
+
+    &--small {
+      width: 34px;
+      height: 34px;
+      border-radius: 9px;
+    }
+  }
+
+  &__title {
+    font-family: 'Archivo', sans-serif;
+    font-weight: 700;
+    font-size: 16.5px;
+    color: #182022;
+    .dark & { color: #f2f0ec; }
+
+    &--muted {
+      color: #5c6866;
+      .dark & { color: #8a9694; }
+    }
+  }
+
+  &__stats {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+  }
+
+  &__description {
+    font-size: 13px;
+    color: #5c6866;
+    line-height: 1.5;
+    .dark & { color: #8a9694; }
+  }
+
+  &__badge {
+    position: absolute;
+    top: 16px;
+    right: 16px;
+    font-size: 9.5px;
+    font-weight: 700;
+    letter-spacing: 0.4px;
+    text-transform: uppercase;
+    background: #e9edec;
+    color: #5c6866;
+    padding: 3px 8px;
+    border-radius: 999px;
+
+    .dark & {
+      background: #20292b;
+      color: #8a9694;
+    }
+  }
+}
+
+// Active/clickable card (Inventory)
+.card--active {
+  cursor: pointer;
+
+  &:hover {
+    box-shadow: 0 12px 28px rgba(20, 40, 35, 0.12);
+    transform: translateY(-2px);
+  }
+
+  .dark &:hover {
+    box-shadow: 0 12px 28px rgba(0, 0, 0, 0.4);
+  }
+}
+
+// Disabled/placeholder card (Sales)
+.card--disabled {
+  opacity: 0.55;
+  cursor: not-allowed;
+}
+
+.stat-row {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+}
+
+.stat-label {
+  font-size: 13px;
+  color: #5c6866;
+  .dark & { color: #8a9694; }
+}
+
+.stat-value {
+  font-family: 'Archivo', sans-serif;
+  font-weight: 700;
+  font-size: 16px;
+  color: #182022;
+  .dark & { color: #f2f0ec; }
+
+  &--danger {
+    color: #b5493f;
+  }
+}
+
+// Compact link card (Admin Settings)
+.card--compact {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  background: #f3f5f4;
+  border: 1px dashed #e2e7e5;
+  padding: 20px;
+
+  .dark & {
+    background: #12181a;
+    border-color: #263030;
+  }
+
+  &__text {
+    flex: 1;
+  }
+
+  &__title {
+    font-family: 'Archivo', sans-serif;
+    font-weight: 600;
+    font-size: 14px;
+    color: #182022;
+    .dark & { color: #f2f0ec; }
+  }
+
+  &__subtitle {
+    font-size: 12px;
+    color: #5c6866;
+    margin-top: 2px;
+    .dark & { color: #8a9694; }
+  }
+
+  &__chevron {
+    flex-shrink: 0;
+    color: #5c6866;
+    .dark & { color: #8a9694; }
+  }
+}
