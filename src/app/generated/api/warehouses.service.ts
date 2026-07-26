@@ -190,6 +190,66 @@ export class WarehousesService extends BaseService {
     }
 
     /**
+     * Deactivate a storage location (soft delete) — does not affect existing stock or movement history referencing it
+     * Soft-disables a storage location by setting active to false. Historical InventoryStock and StockMovement rows referencing this location are left untouched; deactivation only affects whether the location should still be offered going forward, e.g. in \&quot;pick a location\&quot; UI pickers.
+     * @endpoint patch /api/warehouses/locations/{locationId}/deactivate
+     * @param locationId Identifier of the storage location to deactivate
+     * @param observe set whether or not to return the data Observable as the body, response or events. defaults to returning the body.
+     * @param reportProgress flag to report request and response progress.
+     * @param options additional options
+     */
+    public deactivateStorageLocation(locationId: number, observe?: 'body', reportProgress?: boolean, options?: {httpHeaderAccept?: 'application/json', context?: HttpContext, transferCache?: boolean}): Observable<any>;
+    public deactivateStorageLocation(locationId: number, observe?: 'response', reportProgress?: boolean, options?: {httpHeaderAccept?: 'application/json', context?: HttpContext, transferCache?: boolean}): Observable<HttpResponse<any>>;
+    public deactivateStorageLocation(locationId: number, observe?: 'events', reportProgress?: boolean, options?: {httpHeaderAccept?: 'application/json', context?: HttpContext, transferCache?: boolean}): Observable<HttpEvent<any>>;
+    public deactivateStorageLocation(locationId: number, observe: any = 'body', reportProgress: boolean = false, options?: {httpHeaderAccept?: 'application/json', context?: HttpContext, transferCache?: boolean}): Observable<any> {
+        if (locationId === null || locationId === undefined) {
+            throw new Error('Required parameter locationId was null or undefined when calling deactivateStorageLocation.');
+        }
+
+        let localVarHeaders = this.defaultHeaders;
+
+        // authentication (bearerAuth) required
+        localVarHeaders = this.configuration.addCredentialToHeaders('bearerAuth', 'Authorization', localVarHeaders, 'Bearer ');
+
+        const localVarHttpHeaderAcceptSelected: string | undefined = options?.httpHeaderAccept ?? this.configuration.selectHeaderAccept([
+            'application/json'
+        ]);
+        if (localVarHttpHeaderAcceptSelected !== undefined) {
+            localVarHeaders = localVarHeaders.set('Accept', localVarHttpHeaderAcceptSelected);
+        }
+
+        const localVarHttpContext: HttpContext = options?.context ?? new HttpContext();
+
+        const localVarTransferCache: boolean = options?.transferCache ?? true;
+
+
+        let responseType_: 'text' | 'json' | 'blob' = 'json';
+        if (localVarHttpHeaderAcceptSelected) {
+            if (localVarHttpHeaderAcceptSelected.startsWith('text')) {
+                responseType_ = 'text';
+            } else if (this.configuration.isJsonMime(localVarHttpHeaderAcceptSelected)) {
+                responseType_ = 'json';
+            } else {
+                responseType_ = 'blob';
+            }
+        }
+
+        let localVarPath = `/api/warehouses/locations/${this.configuration.encodeParam({name: "locationId", value: locationId, in: "path", style: "simple", explode: false, dataType: "number", dataFormat: "int64"})}/deactivate`;
+        const { basePath, withCredentials } = this.configuration;
+        return this.httpClient.request<any>('patch', `${basePath}${localVarPath}`,
+            {
+                context: localVarHttpContext,
+                responseType: <any>responseType_,
+                ...(withCredentials ? { withCredentials } : {}),
+                headers: localVarHeaders,
+                observe: observe,
+                ...(localVarTransferCache !== undefined ? { transferCache: localVarTransferCache } : {}),
+                reportProgress: reportProgress
+            }
+        );
+    }
+
+    /**
      * Deactivate a warehouse
      * Soft-disables a warehouse by setting active to false. The warehouse, its storage locations, and its history are preserved, not deleted.
      * @endpoint patch /api/warehouses/{warehouseId}/deactivate
@@ -251,20 +311,32 @@ export class WarehousesService extends BaseService {
 
     /**
      * List storage locations for a warehouse
-     * Returns every storage location defined within the given warehouse.
+     * Returns storage locations defined within the given warehouse. Omitting active defaults to true (active only) rather than returning everything — pass active&#x3D;false to see inactive locations instead. There is currently no single call that returns both together.
      * @endpoint get /api/warehouses/{warehouseId}/locations
      * @param warehouseId Identifier of the warehouse to list storage locations for
+     * @param active Filter by active status; defaults to true (active only) when omitted
      * @param observe set whether or not to return the data Observable as the body, response or events. defaults to returning the body.
      * @param reportProgress flag to report request and response progress.
      * @param options additional options
      */
-    public listStorageLocations(warehouseId: number, observe?: 'body', reportProgress?: boolean, options?: {httpHeaderAccept?: 'application/json', context?: HttpContext, transferCache?: boolean}): Observable<StorageLocationResponse>;
-    public listStorageLocations(warehouseId: number, observe?: 'response', reportProgress?: boolean, options?: {httpHeaderAccept?: 'application/json', context?: HttpContext, transferCache?: boolean}): Observable<HttpResponse<StorageLocationResponse>>;
-    public listStorageLocations(warehouseId: number, observe?: 'events', reportProgress?: boolean, options?: {httpHeaderAccept?: 'application/json', context?: HttpContext, transferCache?: boolean}): Observable<HttpEvent<StorageLocationResponse>>;
-    public listStorageLocations(warehouseId: number, observe: any = 'body', reportProgress: boolean = false, options?: {httpHeaderAccept?: 'application/json', context?: HttpContext, transferCache?: boolean}): Observable<any> {
+    public listStorageLocations(warehouseId: number, active?: boolean, observe?: 'body', reportProgress?: boolean, options?: {httpHeaderAccept?: 'application/json', context?: HttpContext, transferCache?: boolean}): Observable<StorageLocationResponse>;
+    public listStorageLocations(warehouseId: number, active?: boolean, observe?: 'response', reportProgress?: boolean, options?: {httpHeaderAccept?: 'application/json', context?: HttpContext, transferCache?: boolean}): Observable<HttpResponse<StorageLocationResponse>>;
+    public listStorageLocations(warehouseId: number, active?: boolean, observe?: 'events', reportProgress?: boolean, options?: {httpHeaderAccept?: 'application/json', context?: HttpContext, transferCache?: boolean}): Observable<HttpEvent<StorageLocationResponse>>;
+    public listStorageLocations(warehouseId: number, active?: boolean, observe: any = 'body', reportProgress: boolean = false, options?: {httpHeaderAccept?: 'application/json', context?: HttpContext, transferCache?: boolean}): Observable<any> {
         if (warehouseId === null || warehouseId === undefined) {
             throw new Error('Required parameter warehouseId was null or undefined when calling listStorageLocations.');
         }
+
+        let localVarQueryParameters = new OpenApiHttpParams(this.encoder);
+
+        localVarQueryParameters = this.addToHttpParams(
+            localVarQueryParameters,
+            'active',
+            <any>active,
+            QueryParamStyle.Form,
+            true,
+        );
+
 
         let localVarHeaders = this.defaultHeaders;
 
@@ -299,6 +371,7 @@ export class WarehousesService extends BaseService {
         return this.httpClient.request<StorageLocationResponse>('get', `${basePath}${localVarPath}`,
             {
                 context: localVarHttpContext,
+                params: localVarQueryParameters.toHttpParams(),
                 responseType: <any>responseType_,
                 ...(withCredentials ? { withCredentials } : {}),
                 headers: localVarHeaders,

@@ -1,0 +1,113 @@
+<div class="warehouses-page">
+
+  <div class="warehouses-page__header">
+    <div class="warehouses-page__title">Warehouses</div>
+    <button type="button" class="btn-primary" (click)="openNew()">+ New Warehouse</button>
+  </div>
+
+  @if (isNewOpen()) {
+    <div class="new-warehouse-form">
+      @if (newFormError()) {
+        <div class="form-error">{{ newFormError() }}</div>
+      }
+      <div class="new-warehouse-form__row">
+        <div class="form-field form-field--code">
+          <label>Code</label>
+          <input type="text" placeholder="e.g. WH-03" [value]="newForm().code" (change)="onNewCodeChange($any($event.target).value)" />
+        </div>
+        <div class="form-field form-field--name">
+          <label>Name</label>
+          <input type="text" placeholder="e.g. South Yard" [value]="newForm().name" (change)="onNewNameChange($any($event.target).value)" />
+        </div>
+        <button type="button" class="btn-primary" [disabled]="creatingWarehouse()" (click)="saveNewWarehouse()">
+          {{ creatingWarehouse() ? 'Creating…' : 'Create' }}
+        </button>
+        <button type="button" class="btn-secondary" [disabled]="creatingWarehouse()" (click)="closeNew()">Cancel</button>
+      </div>
+    </div>
+  }
+
+  @if (loading()) {
+    <div class="state-message">Loading…</div>
+  } @else if (errorMessage()) {
+    <div class="state-message state-message--error">{{ errorMessage() }}</div>
+  } @else {
+    <div class="warehouses-list">
+      @for (wh of warehouses(); track wh.id) {
+        @if (wh.id; as warehouseId) {
+          <div class="warehouse-card">
+
+            <div class="warehouse-card__row" (click)="toggleExpand(warehouseId)">
+              <svg
+                class="warehouse-card__chevron"
+                [class.warehouse-card__chevron--open]="isExpanded(warehouseId)"
+                width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"
+              >
+                <path d="M9 18l6-6-6-6"></path>
+              </svg>
+              <div class="warehouse-card__code">{{ wh.code }}</div>
+              <div class="warehouse-card__name">{{ wh.name }}</div>
+              <span class="status-badge" [class.status-badge--inactive]="!wh.active">
+                {{ wh.active ? 'Active' : 'Inactive' }}
+              </span>
+              <div class="warehouse-card__loc-count">{{ locationCount(warehouseId) }} locations</div>
+              <button
+                type="button"
+                class="deactivate-btn"
+                [disabled]="togglingActiveFor() === warehouseId"
+                (click)="toggleWarehouseActive(wh, $event)"
+              >
+                {{ togglingActiveFor() === warehouseId ? 'Updating…' : deactivateLabel(wh) }}
+              </button>
+            </div>
+
+            @if (isExpanded(warehouseId)) {
+              <div class="warehouse-card__expanded">
+                <div class="locations-header">
+                  <div class="locations-header__title">Storage Locations</div>
+                  <div class="locations-header__add" (click)="$event.stopPropagation()">
+                    <input
+                      type="text"
+                      placeholder="e.g. A1"
+                      [value]="newLocCodeFor(warehouseId)"
+                      (change)="onNewLocCodeChange(warehouseId, $any($event.target).value)"
+                    />
+                    <button
+                      type="button"
+                      class="btn-add-location"
+                      [disabled]="addingLocationFor() === warehouseId"
+                      (click)="addLocation(warehouseId, $event)"
+                    >
+                      {{ addingLocationFor() === warehouseId ? 'Adding…' : '+ Add Location' }}
+                    </button>
+                  </div>
+                </div>
+
+                @if (locationCount(warehouseId) > 0) {
+                  <div class="location-chips">
+                    @for (loc of locationsFor(warehouseId); track loc.id) {
+                      <div class="location-chip">
+                        {{ loc.code }}
+                        <button
+                          type="button"
+                          class="location-chip__remove"
+                          [disabled]="removingLocationId() === loc.id"
+                          (click)="removeLocation(warehouseId, loc.id, $event)"
+                          aria-label="Remove location"
+                        >✕</button>
+                      </div>
+                    }
+                  </div>
+                } @else {
+                  <div class="no-locations">No storage locations yet.</div>
+                }
+              </div>
+            }
+
+          </div>
+        }
+      }
+    </div>
+  }
+
+</div>

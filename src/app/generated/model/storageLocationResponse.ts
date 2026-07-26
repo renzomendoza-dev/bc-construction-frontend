@@ -19,6 +19,10 @@ export interface StorageLocationResponse {
      */
     warehouseId?: number;
     /**
+     * Whether this storage location is currently active
+     */
+    active?: boolean;
+    /**
      * Code identifying the location within its warehouse, e.g. a rack or box label
      */
     code?: string;
