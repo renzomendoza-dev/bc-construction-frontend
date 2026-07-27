@@ -1,0 +1,81 @@
+<div class="receipts-page">
+
+  <div class="receipts-page__header">
+    <div class="receipts-page__title">Purchase Receipts</div>
+    <button type="button" class="btn-primary" (click)="createNew()">+ New Receipt</button>
+  </div>
+
+  <div class="receipts-page__filters">
+    <select class="filter-select" [value]="statusFilter()" (change)="onStatusFilterChange($any($event.target).value)">
+      <option value="all">All Statuses</option>
+      <option value="draft">Draft</option>
+      <option value="confirmed">Confirmed</option>
+    </select>
+    <select class="filter-select" [value]="supplierFilter()" (change)="onSupplierFilterChange($any($event.target).value)">
+      <option value="all">All Suppliers</option>
+      @for (s of supplierNames(); track s) {
+        <option [value]="s">{{ s }}</option>
+      }
+    </select>
+    <select class="filter-select" [value]="warehouseFilter()" (change)="onWarehouseFilterChange($any($event.target).value)">
+      <option value="all">All Warehouses</option>
+      @for (w of warehouseNames(); track w) {
+        <option [value]="w">{{ w }}</option>
+      }
+    </select>
+  </div>
+
+  <div class="receipts-table">
+
+    @if (loading()) {
+      <div class="table-state">Loading…</div>
+    } @else if (errorMessage()) {
+      <div class="table-state table-state--error">{{ errorMessage() }}</div>
+    } @else if (hasResults()) {
+      <div class="receipts-table__head">
+        <div>Receipt #</div>
+        <div>Supplier</div>
+        <div>Warehouse</div>
+        <div>Date</div>
+        <div class="align-right">Total</div>
+        <div class="align-right">Status</div>
+      </div>
+
+      @for (r of pageItems(); track r.id) {
+        <div
+          class="receipts-table__row"
+          [class.receipts-table__row--confirmed]="r.confirmed"
+          (click)="openReceipt(r.id)"
+        >
+          <div class="receipts-table__number">{{ r.receiptNumber || ('#' + r.id) }}</div>
+          <div class="receipts-table__supplier">{{ r.supplierName }}</div>
+          <div class="receipts-table__warehouse">{{ r.warehouseName }}</div>
+          <div class="receipts-table__date">{{ r.purchaseDate }}</div>
+          <div class="align-right receipts-table__total">{{ formatPeso(receiptTotal(r)) }}</div>
+          <div class="align-right">
+            <span class="status-badge" [class.status-badge--confirmed]="r.confirmed">
+              {{ statusLabel(r) }}
+            </span>
+          </div>
+        </div>
+      }
+    } @else {
+      <div class="empty-state">
+        <div class="empty-state__title">No receipts match your filters</div>
+        <div class="empty-state__subtitle">Try adjusting status, supplier, or warehouse filters.</div>
+      </div>
+    }
+
+  </div>
+
+  @if (!loading() && hasResults()) {
+    <div class="receipts-pagination">
+      <div class="receipts-pagination__summary">{{ pageSummary() }}</div>
+      <div class="receipts-pagination__controls">
+        <button type="button" [disabled]="currentPage() <= 1" (click)="prevPage()">Previous</button>
+        <button type="button" [disabled]="currentPage() >= totalPages()" (click)="nextPage()">Next</button>
+      </div>
+    </div>
+  }
+
+</div>

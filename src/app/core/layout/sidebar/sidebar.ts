@@ -32,7 +32,7 @@ export class Sidebar {
     { path: '/inventory/items', label: 'Items' },
     { path: '/inventory/suppliers', label: 'Suppliers' },
     { path: '/inventory/warehouses', label: 'Warehouses' },
-    { path: '/inventory/receipts', label: 'Purchase Receipts' },
+    { path: '/inventory/purchase-receipts', label: 'Purchase Receipts' },
   ];
 
   // ---- Derived display state --------------------------------------------

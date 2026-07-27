@@ -1,0 +1,139 @@
+<div class="receipt-detail-page">
+
+  <button type="button" class="back-btn" (click)="backToList()">
+    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+      <path d="M19 12H5"></path>
+      <path d="m12 19-7-7 7-7"></path>
+    </svg>
+    Back to Purchase Receipts
+  </button>
+
+  @if (loading()) {
+    <div class="state-message">Loading…</div>
+  } @else if (errorMessage() && !receipt()) {
+    <div class="state-message state-message--error">{{ errorMessage() }}</div>
+  } @else if (receipt(); as r) {
+
+    <div class="receipt-header" [class.receipt-header--confirmed]="r.confirmed">
+      <div class="receipt-header__top">
+        <div class="receipt-header__number">{{ r.receiptNumber || ('#' + r.id) }}</div>
+        <span class="status-badge" [class.status-badge--confirmed]="r.confirmed">
+          {{ r.confirmed ? 'Confirmed' : 'Draft' }}
+        </span>
+      </div>
+      <div class="receipt-header__meta">
+        <div><span class="receipt-header__meta-label">Supplier:</span> {{ r.supplierName }}</div>
+        <div><span class="receipt-header__meta-label">Warehouse:</span> {{ r.warehouseName }}</div>
+        <div><span class="receipt-header__meta-label">Date:</span> {{ r.purchaseDate }}</div>
+      </div>
+      @if (r.confirmed) {
+        <div class="receipt-header__confirmed-by">
+          Confirmed by {{ r.confirmedByName }} on {{ r.confirmedAt }}
+        </div>
+      }
+    </div>
+
+    @if (!r.confirmed) {
+      <div class="draft-banner">
+        <div>
+          <div class="draft-banner__title">This receipt is still a draft</div>
+          <div class="draft-banner__subtitle">Confirming applies stock movement to {{ r.warehouseName }} and cannot be undone.</div>
+        </div>
+        <button type="button" class="btn-confirm" (click)="openConfirmDialog()">Confirm Receipt</button>
+      </div>
+    }
+
+    @if (errorMessage()) {
+      <div class="form-error">{{ errorMessage() }}</div>
+    }
+
+    <div class="detail-grid">
+
+      <div>
+        <div class="lines-card">
+          <div class="lines-head">
+            <div>Item</div>
+            <div class="align-right">Qty</div>
+            <div class="align-right">Unit Cost</div>
+            <div class="align-right">Line Total</div>
+          </div>
+          @for (line of r.lines; track line.id) {
+            <div class="lines-row">
+              <div class="lines-row__item">{{ line.itemName }}</div>
+              <div class="align-right">{{ line.quantity }}</div>
+              <div class="align-right">{{ formatPeso(line.unitCost) }}</div>
+              <div class="align-right lines-row__total">{{ formatPeso(lineTotal(line.quantity, line.unitCost)) }}</div>
+            </div>
+          }
+          <div class="lines-total">
+            <span class="lines-total__label">Total Amount</span>
+            <span class="lines-total__value">{{ formatPeso(receiptTotal(r)) }}</span>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="card__title">Notes</div>
+          @if (r.notes) {
+            <p class="notes-text">{{ r.notes }}</p>
+          } @else {
+            <p class="notes-empty">No notes recorded for this receipt.</p>
+          }
+          <!-- Read-only: there is no API endpoint to edit notes after
+               creation, only POST to create, confirm, and image upload. -->
+        </div>
+      </div>
+
+      <div>
+        <div class="card">
+          <div class="card__title">Receipt Image</div>
+          @if (r.imageUrl) {
+            <div class="image-preview" (click)="openImageViewer()">
+              <img [src]="r.imageUrl" alt="Receipt scan" />
+            </div>
+            <div class="image-preview__hint">Click to view full size</div>
+          } @else {
+            <label class="image-upload" [class.image-upload--busy]="uploadingImage()">
+              <input type="file" accept="image/*" (change)="onImageFileSelected($event)" [disabled]="uploadingImage()" hidden />
+              <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M12 5v14"></path>
+                <path d="M5 12h14"></path>
+              </svg>
+              {{ uploadingImage() ? 'Uploading…' : 'Upload Receipt Image' }}
+            </label>
+          }
+        </div>
+
+        <div class="card">
+          <div class="history-row">
+            Created
+            <span class="history-row__value">{{ r.createdAt | date: 'medium' }}</span>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  }
+
+  @if (confirmDialogOpen() && receipt(); as r) {
+    <div class="scrim" (click)="closeConfirmDialog()"></div>
+    <div class="dialog">
+      <div class="dialog__title">Confirm this receipt?</div>
+      <div class="dialog__body">
+        This will apply stock movement for {{ (r.lines ?? []).length }} line item(s) to {{ r.warehouseName }}. This action cannot be undone.
+      </div>
+      <div class="dialog__actions">
+        <button type="button" class="btn-secondary" [disabled]="confirming()" (click)="closeConfirmDialog()">Cancel</button>
+        <button type="button" class="btn-confirm" [disabled]="confirming()" (click)="confirmReceipt()">
+          {{ confirming() ? 'Confirming…' : 'Yes, Confirm Receipt' }}
+        </button>
+      </div>
+    </div>
+  }
+
+  @if (imageViewerOpen() && receipt(); as r) {
+    <div class="image-scrim" (click)="closeImageViewer()">
+      <img [src]="r.imageUrl" alt="Receipt scan full size" class="image-scrim__img" (click)="$event.stopPropagation()" />
+    </div>
+  }
+
+</div>

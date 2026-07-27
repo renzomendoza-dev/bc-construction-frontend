@@ -36,6 +36,27 @@ export const routes: Routes = [
         loadComponent: () =>
           import('./features/inventory/warehouses/warehouses-list/warehouses-list').then((m) => m.WarehousesListComponent),
       },
+      {
+        path: 'purchase-receipts',
+        loadComponent: () =>
+          import('./features/inventory/purchase-receipts/purchase-receipts-list/purchase-receipts-list').then(
+            (m) => m.PurchaseReceiptsListComponent,
+          ),
+      },
+      {
+        path: 'purchase-receipts/new',
+        loadComponent: () =>
+          import('./features/inventory/purchase-receipts/purchase-receipt-create/purchase-receipt-create').then(
+            (m) => m.PurchaseReceiptCreateComponent,
+          ),
+      },
+      {
+        path: 'purchase-receipts/:id',
+        loadComponent: () =>
+          import('./features/inventory/purchase-receipts/purchase-receipt-detail/purchase-receipt-detail').then(
+            (m) => m.PurchaseReceiptDetailComponent,
+          ),
+      },
       // {
       //   path: 'warehouses',
       //   loadComponent: () =>
