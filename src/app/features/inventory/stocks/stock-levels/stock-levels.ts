@@ -1,5 +1,6 @@
 import { ChangeDetectionStrategy, Component, OnInit, computed, inject, signal } from '@angular/core';
 import { DatePipe } from '@angular/common';
+import { RouterLink } from '@angular/router';
 import { forkJoin, of } from 'rxjs';
 import { catchError } from 'rxjs/operators';
 import {
@@ -28,6 +29,15 @@ interface FlatLocation {
   label: string;
 }
 
+interface ItemStockGroup {
+  itemId: number;
+  itemName: string;
+  sku: string;
+  totalQuantity: number;
+  isLow: boolean;
+  rows: StockLevelResponse[];
+}
+
 const LEVELS_PAGE_SIZE = 6;
 // GET /api/inventory has no search-by-name/sku param and no location
 // filter — only itemId/warehouseId. Fetching one large batch and
@@ -36,7 +46,7 @@ const FETCH_SIZE = 500;
 
 @Component({
   selector: 'app-stock-levels',
-  imports: [DatePipe],
+  imports: [DatePipe, RouterLink],
   templateUrl: './stock-levels.html',
   styleUrl: './stock-levels.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -87,18 +97,46 @@ export class StockLevelsComponent implements OnInit {
     });
   });
 
-  readonly totalPages = computed(() => Math.max(1, Math.ceil(this.filteredStock().length / LEVELS_PAGE_SIZE)));
+  // Groups filtered rows by item — an item appears if at least one of its
+  // locations matches the active filters, and its expanded breakdown
+  // only shows the matching locations, not every location it exists in.
+  readonly groupedItems = computed<ItemStockGroup[]>(() => {
+    const groups = new Map<number, ItemStockGroup>();
+    for (const row of this.filteredStock()) {
+      if (row.itemId === undefined) continue;
+      let group = groups.get(row.itemId);
+      if (!group) {
+        group = {
+          itemId: row.itemId,
+          itemName: row.itemName ?? '',
+          sku: row.sku ?? '',
+          totalQuantity: 0,
+          isLow: false,
+          rows: [],
+        };
+        groups.set(row.itemId, group);
+      }
+      group.totalQuantity += row.quantity ?? 0;
+      if (this.isRowLow(row)) group.isLow = true;
+      group.rows.push(row);
+    }
+    return Array.from(groups.values()).sort((a, b) => a.itemName.localeCompare(b.itemName));
+  });
+
+  readonly expandedItemIds = signal<Set<number>>(new Set());
+
+  readonly totalPages = computed(() => Math.max(1, Math.ceil(this.groupedItems().length / LEVELS_PAGE_SIZE)));
   readonly currentPage = computed(() => Math.min(this.page(), this.totalPages()));
   readonly pageItems = computed(() => {
     const start = (this.currentPage() - 1) * LEVELS_PAGE_SIZE;
-    return this.filteredStock().slice(start, start + LEVELS_PAGE_SIZE);
+    return this.groupedItems().slice(start, start + LEVELS_PAGE_SIZE);
   });
   readonly pageSummary = computed(() => {
-    const total = this.filteredStock().length;
+    const total = this.groupedItems().length;
     if (total === 0) return 'No results';
     const start = (this.currentPage() - 1) * LEVELS_PAGE_SIZE + 1;
     const end = Math.min(this.currentPage() * LEVELS_PAGE_SIZE, total);
-    return `Showing ${start}–${end} of ${total}`;
+    return `Showing ${start}–${end} of ${total} item(s)`;
   });
 
   // ---- Low stock tab ----
@@ -188,6 +226,18 @@ export class StockLevelsComponent implements OnInit {
 
   isRowLow(row: StockLevelResponse): boolean {
     return row.reorderThreshold !== undefined && row.reorderThreshold !== null && (row.quantity ?? 0) <= row.reorderThreshold;
+  }
+
+  isExpanded(itemId: number): boolean {
+    return this.expandedItemIds().has(itemId);
+  }
+
+  toggleExpand(itemId: number): void {
+    this.expandedItemIds.update((set) => {
+      const next = new Set(set);
+      next.has(itemId) ? next.delete(itemId) : next.add(itemId);
+      return next;
+    });
   }
 
   // ---- History filters ----

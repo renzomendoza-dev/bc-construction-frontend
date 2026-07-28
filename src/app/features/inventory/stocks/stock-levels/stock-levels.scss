@@ -176,10 +176,10 @@
   color: #b5493f;
 }
 
-.table__head--levels,
-.table__row--levels {
+.table__head--items,
+.table__row--items {
   display: grid;
-  grid-template-columns: 2fr 1.3fr 0.9fr 0.9fr 1fr;
+  grid-template-columns: 24px 2.3fr 1fr 0.8fr;
   gap: 12px;
 }
 
@@ -197,7 +197,7 @@
   gap: 10px;
 }
 
-.table__head--levels,
+.table__head--items,
 .table__head--lowstock,
 .table__head--history {
   align-items: center;
@@ -214,7 +214,25 @@
   background: rgba(181, 73, 63, 0.04);
 }
 
-.table__row--levels,
+.item-group {
+  border-bottom: 1px solid var(--border);
+
+  &:last-child {
+    border-bottom: none;
+  }
+}
+
+.table__row--items {
+  align-items: center;
+  padding: 11px 16px;
+  border-left: 3px solid transparent;
+  cursor: pointer;
+
+  &:hover {
+    background: var(--hover-bg);
+  }
+}
+
 .table__row--lowstock,
 .table__row--history {
   align-items: center;
@@ -233,6 +251,80 @@
 
 .table__row--lowstock {
   border-left-color: #b5493f;
+}
+
+.expand-chevron {
+  color: var(--sub-text);
+  transition: transform 0.15s;
+}
+
+.expand-chevron--open {
+  transform: rotate(90deg);
+}
+
+.low-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 10.5px;
+  font-weight: 700;
+  background: rgba(181, 73, 63, 0.12);
+  color: #b5493f;
+  padding: 3px 9px;
+  border-radius: 999px;
+}
+
+.item-group__expanded {
+  padding: 4px 16px 16px 50px;
+  background: var(--page-bg);
+}
+
+.item-detail-link {
+  display: inline-block;
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--teal);
+  text-decoration: none;
+  margin-bottom: 10px;
+
+  &:hover {
+    text-decoration: underline;
+  }
+}
+
+.location-breakdown {
+  background: var(--panel-bg);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  overflow: hidden;
+}
+
+.location-breakdown__head {
+  display: grid;
+  grid-template-columns: 1.4fr 1fr 0.8fr 0.9fr;
+  gap: 10px;
+  padding: 8px 14px;
+  border-bottom: 1px solid var(--border);
+  font-size: 10.5px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.3px;
+  color: var(--sub-text);
+}
+
+.location-breakdown__row {
+  display: grid;
+  grid-template-columns: 1.4fr 1fr 0.8fr 0.9fr;
+  gap: 10px;
+  align-items: center;
+  padding: 9px 14px;
+  border-bottom: 1px solid var(--border);
+  font-size: 12.5px;
+  color: var(--label-text);
+
+  &:last-child {
+    border-bottom: none;
+  }
 }
 
 .table__cell-item {

@@ -49,32 +49,70 @@
           <div class="table-state">Loading…</div>
         } @else if (stockError()) {
           <div class="table-state table-state--error">{{ stockError() }}</div>
+        } @else if (pageItems().length === 0) {
+          <div class="table-state">No items match your filters.</div>
         } @else {
-          <div class="table__head table__head--levels">
+          <div class="table__head table__head--items">
+            <div></div>
             <div>Item</div>
-            <div>Warehouse</div>
-            <div>Location</div>
-            <div class="align-right">Quantity</div>
-            <div class="align-right">Reorder At</div>
+            <div class="align-right">Total Quantity</div>
+            <div class="align-right">Status</div>
           </div>
-          @for (row of pageItems(); track row.itemId + '-' + row.warehouseId + '-' + row.locationId) {
-            <div class="table__row table__row--levels" [class.table__row--low]="isRowLow(row)">
-              <div class="table__cell-item">
-                <div class="table__cell-item-name">{{ row.itemName }}</div>
-                <div class="table__cell-sku">{{ row.sku }}</div>
+          @for (group of pageItems(); track group.itemId) {
+            <div class="item-group">
+              <div
+                class="table__row table__row--items"
+                [class.table__row--low]="group.isLow"
+                (click)="toggleExpand(group.itemId)"
+              >
+                <svg
+                  class="expand-chevron"
+                  [class.expand-chevron--open]="isExpanded(group.itemId)"
+                  width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"
+                >
+                  <path d="M9 18l6-6-6-6"></path>
+                </svg>
+                <div class="table__cell-item">
+                  <div class="table__cell-item-name">{{ group.itemName }}</div>
+                  <div class="table__cell-sku">{{ group.sku }}</div>
+                </div>
+                <div class="align-right qty-value" [class.qty-value--low]="group.isLow">{{ group.totalQuantity }}</div>
+                <div class="align-right">
+                  @if (group.isLow) {
+                    <span class="low-badge">
+                      <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#b5493f" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M12 9v4"></path><path d="M12 17h.01"></path>
+                        <path d="M10.29 3.86 1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0Z"></path>
+                      </svg>
+                      Low
+                    </span>
+                  }
+                </div>
               </div>
-              <div class="table__cell-mid">{{ row.warehouseName }}</div>
-              <div class="table__cell-code">{{ row.locationCode || '—' }}</div>
-              <div class="align-right qty-cell">
-                @if (isRowLow(row)) {
-                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#b5493f" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
-                    <path d="M12 9v4"></path><path d="M12 17h.01"></path>
-                    <path d="M10.29 3.86 1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0Z"></path>
-                  </svg>
-                }
-                <span class="qty-value" [class.qty-value--low]="isRowLow(row)">{{ row.quantity }}</span>
-              </div>
-              <div class="align-right table__cell-mid">{{ row.reorderThreshold ?? '—' }}</div>
+
+              @if (isExpanded(group.itemId)) {
+                <div class="item-group__expanded">
+                  <a class="item-detail-link" [routerLink]="['/inventory/items', group.itemId]" (click)="$event.stopPropagation()">
+                    View item details (category, price, cost) →
+                  </a>
+                  <div class="location-breakdown">
+                    <div class="location-breakdown__head">
+                      <div>Warehouse</div>
+                      <div>Location</div>
+                      <div class="align-right">Quantity</div>
+                      <div class="align-right">Reorder At</div>
+                    </div>
+                    @for (row of group.rows; track row.warehouseId + '-' + row.locationId) {
+                      <div class="location-breakdown__row">
+                        <div>{{ row.warehouseName }}</div>
+                        <div class="table__cell-code">{{ row.locationCode || '—' }}</div>
+                        <div class="align-right qty-value" [class.qty-value--low]="isRowLow(row)">{{ row.quantity }}</div>
+                        <div class="align-right table__cell-mid">{{ row.reorderThreshold ?? '—' }}</div>
+                      </div>
+                    }
+                  </div>
+                </div>
+              }
             </div>
           }
         }
