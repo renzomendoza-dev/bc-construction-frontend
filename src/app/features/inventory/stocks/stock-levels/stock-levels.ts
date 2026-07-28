@@ -22,10 +22,10 @@ type Tab = 'levels' | 'lowstock' | 'history';
 type MovementType = 'IN' | 'OUT' | 'TRANSFER' | 'ADJUSTMENT';
 
 interface FlatLocation {
-  key: string; // `${warehouseId}:${locationId}`
+  key: string; // `${warehouseId}:${locationId}`, or `${warehouseId}:none` for warehouse-level stock
   warehouseId: number;
   warehouseName: string;
-  locationId: number;
+  locationId: number | undefined;
   code: string;
   label: string;
 }
@@ -576,6 +576,22 @@ export class StockLevelsComponent implements OnInit {
     ).subscribe((results) => {
       const flat: FlatLocation[] = [];
       withIds.forEach((w, i) => {
+        // Warehouse-level stock has no location — this is exactly what a
+        // confirmed purchase receipt produces (confirmPurchaseReceipt
+        // records IN movements against the warehouse only, with no
+        // locationId on PurchaseReceiptLineRequest). Without this
+        // synthetic entry, that stock has no matching option in the
+        // picker at all and can't be selected as a Transfer source or
+        // Adjust target.
+        flat.push({
+          key: `${w.id}:none`,
+          warehouseId: w.id,
+          warehouseName: w.name,
+          locationId: undefined,
+          code: '(No location)',
+          label: `${w.name} · No location`,
+        });
+
         const locs = Array.isArray(results[i]) ? results[i] : [];
         for (const loc of locs) {
           if (loc.id === undefined || !loc.code) continue;
