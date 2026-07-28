@@ -25,15 +25,20 @@
         <div class="item-detail-header__sku">{{ currentItem.sku }}</div>
       </div>
 
-      <button
-        type="button"
-        class="deactivate-btn"
-        [disabled]="!currentItem.active || deactivating()"
-        [title]="!currentItem.active ? 'Reactivation isn\'t supported by the API yet' : ''"
-        (click)="deactivateItem()"
-      >
-        {{ currentItem.active ? (deactivating() ? 'Deactivating…' : 'Deactivate') : 'Inactive' }}
-      </button>
+      <div class="header-actions">
+        @if (mode() === 'view') {
+          <button type="button" class="edit-btn" (click)="enterEdit()">Edit</button>
+        }
+        <button
+          type="button"
+          class="deactivate-btn"
+          [disabled]="!currentItem.active || deactivating()"
+          [title]="!currentItem.active ? 'Reactivation isn\'t supported by the API yet' : ''"
+          (click)="deactivateItem()"
+        >
+          {{ currentItem.active ? (deactivating() ? 'Deactivating…' : 'Deactivate') : 'Inactive' }}
+        </button>
+      </div>
     </div>
 
     <div class="section-title">Images</div>
@@ -42,8 +47,8 @@
         <div class="image-tile">
           <img [src]="image.imageUrl" [alt]="currentItem.name" class="image-tile__img" />
           @if (image.id !== undefined) {
-  <button type="button" class="image-tile__delete" (click)="deleteImage(image.id)" aria-label="Remove image">✕</button>
-}
+            <button type="button" class="image-tile__delete" (click)="deleteImage(image.id)" aria-label="Remove image">✕</button>
+          }
         </div>
       }
       <label class="image-upload-tile" [class.image-upload-tile--busy]="uploadingImage()">
@@ -61,10 +66,41 @@
       <div>
         <div class="card">
           <div class="card__title">Details</div>
+
+          @if (errorMessage() && mode() === 'edit') {
+            <div class="form-error">{{ errorMessage() }}</div>
+          }
+
           <div class="form-grid">
             <div class="form-field">
+              <label>SKU</label>
+              <input
+                type="text"
+                [value]="form().sku"
+                [disabled]="mode() === 'view'"
+                (change)="onFormSkuChange($any($event.target).value)"
+                [class.form-field--invalid]="fieldErrors()['sku']"
+              />
+              @if (fieldErrors()['sku']) {
+                <div class="field-error">{{ fieldErrors()['sku'] }}</div>
+              }
+            </div>
+            <div class="form-field">
+              <label>Name</label>
+              <input
+                type="text"
+                [value]="form().name"
+                [disabled]="mode() === 'view'"
+                (change)="onFormNameChange($any($event.target).value)"
+                [class.form-field--invalid]="fieldErrors()['name']"
+              />
+              @if (fieldErrors()['name']) {
+                <div class="field-error">{{ fieldErrors()['name'] }}</div>
+              }
+            </div>
+            <div class="form-field">
               <label>Category</label>
-              <select [value]="form().category" (change)="onFormCategoryChange($any($event.target).value)">
+              <select [value]="form().category" [disabled]="mode() === 'view'" (change)="onFormCategoryChange($any($event.target).value)">
                 @for (cat of categories; track cat) {
                   <option [value]="cat">{{ cat }}</option>
                 }
@@ -72,21 +108,25 @@
             </div>
             <div class="form-field">
               <label>Unit of Measure</label>
-              <input type="text" [value]="form().unitOfMeasure" (change)="onFormUnitChange($any($event.target).value)" />
+              <input type="text" [value]="form().unitOfMeasure" [disabled]="mode() === 'view'" (change)="onFormUnitChange($any($event.target).value)" />
             </div>
             <div class="form-field">
               <label>Selling Price</label>
-              <input type="number" step="0.01" min="0" [value]="form().sellingPrice" (change)="onFormPriceChange($any($event.target).value)" />
+              <input type="number" step="0.01" min="0" [value]="form().sellingPrice" [disabled]="mode() === 'view'" (change)="onFormPriceChange($any($event.target).value)" />
             </div>
             <div class="form-field">
               <label>Default Cost Price</label>
-              <input type="number" step="0.01" min="0" [value]="form().defaultCostPrice" (change)="onFormCostChange($any($event.target).value)" />
+              <input type="number" step="0.01" min="0" [value]="form().defaultCostPrice" [disabled]="mode() === 'view'" (change)="onFormCostChange($any($event.target).value)" />
             </div>
           </div>
+
           <div class="form-actions">
-            <button type="button" class="btn-primary" [disabled]="saving()" (click)="saveForm()">
-              {{ saving() ? 'Saving…' : 'Save Changes' }}
-            </button>
+            @if (mode() === 'edit') {
+              <button type="button" class="btn-primary" [disabled]="saving()" (click)="saveForm()">
+                {{ saving() ? 'Saving…' : 'Save Changes' }}
+              </button>
+              <button type="button" class="btn-secondary" [disabled]="saving()" (click)="cancelEdit()">Cancel</button>
+            }
             @if (savedMessage()) {
               <span class="saved-message">{{ savedMessage() }}</span>
             }
@@ -104,7 +144,7 @@
             <div class="suppliers-row">
               <div class="suppliers-row__name">{{ sup.supplierName }}</div>
               <div class="suppliers-row__sku">{{ sup.supplierSku || '—' }}</div>
-              <div class="suppliers-row__cost align-right">{{ '$' + (sup.unitCost?.toFixed(2) ?? '—') }}</div>
+              <div class="suppliers-row__cost align-right">{{ '₱' + (sup.unitCost?.toFixed(2) ?? '—') }}</div>
             </div>
           } @empty {
             <div class="suppliers-empty">No suppliers linked yet.</div>
