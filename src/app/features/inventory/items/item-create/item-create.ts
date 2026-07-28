@@ -1,8 +1,9 @@
 import { ChangeDetectionStrategy, Component, inject, signal } from '@angular/core';
 import { Router } from '@angular/router';
 import { ItemCreateRequest, ItemsService } from '../../../../generated';
+import { FIRE_PROTECTION_CATEGORIES } from '../../../../core/constants/categories';
  
-const CATEGORIES = ['Framing', 'Concrete', 'Reinforcement', 'Insulation', 'Sheathing', 'Fasteners'];
+const CATEGORIES = FIRE_PROTECTION_CATEGORIES;
  
 interface CreateForm {
   sku: string;
