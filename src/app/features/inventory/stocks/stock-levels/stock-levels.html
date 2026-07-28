@@ -1,0 +1,291 @@
+<div class="stock-page">
+
+  <div class="stock-page__header">
+    <div class="stock-page__title">Stock Levels</div>
+    <div class="stock-page__actions">
+      <button type="button" class="btn-secondary" (click)="openAdjust()">Adjust Stock</button>
+      <button type="button" class="btn-primary" (click)="openTransfer()">Transfer Stock</button>
+    </div>
+  </div>
+
+  <div class="tabs">
+    <button type="button" class="tab" [class.tab--active]="tab() === 'levels'" (click)="selectTab('levels')">Stock Levels</button>
+    <button type="button" class="tab" [class.tab--active]="tab() === 'lowstock'" (click)="selectTab('lowstock')">
+      Low Stock
+      @if (lowStockCount() > 0) {
+        <span class="tab-badge">{{ lowStockCount() }}</span>
+      }
+    </button>
+    <button type="button" class="tab" [class.tab--active]="tab() === 'history'" (click)="selectTab('history')">Movement History</button>
+  </div>
+
+  <!-- ===== Levels tab ===== -->
+  @if (tab() === 'levels') {
+    <div>
+      <div class="filters">
+        <input
+          type="text"
+          class="filter-input"
+          placeholder="Search by item name or SKU…"
+          [value]="search()"
+          (change)="onSearchChange($any($event.target).value)"
+        />
+        <select class="filter-select" [value]="warehouseFilter()" (change)="onWarehouseFilterChange($any($event.target).value)">
+          <option value="all">All Warehouses</option>
+          @for (w of warehouseNames(); track w) {
+            <option [value]="w">{{ w }}</option>
+          }
+        </select>
+        <select class="filter-select" [value]="locationFilter()" (change)="onLocationFilterChange($any($event.target).value)">
+          <option value="all">All Locations</option>
+          @for (l of locationCodes(); track l) {
+            <option [value]="l">{{ l }}</option>
+          }
+        </select>
+      </div>
+
+      <div class="table">
+        @if (stockLoading()) {
+          <div class="table-state">Loading…</div>
+        } @else if (stockError()) {
+          <div class="table-state table-state--error">{{ stockError() }}</div>
+        } @else {
+          <div class="table__head table__head--levels">
+            <div>Item</div>
+            <div>Warehouse</div>
+            <div>Location</div>
+            <div class="align-right">Quantity</div>
+            <div class="align-right">Reorder At</div>
+          </div>
+          @for (row of pageItems(); track row.itemId + '-' + row.warehouseId + '-' + row.locationId) {
+            <div class="table__row table__row--levels" [class.table__row--low]="isRowLow(row)">
+              <div class="table__cell-item">
+                <div class="table__cell-item-name">{{ row.itemName }}</div>
+                <div class="table__cell-sku">{{ row.sku }}</div>
+              </div>
+              <div class="table__cell-mid">{{ row.warehouseName }}</div>
+              <div class="table__cell-code">{{ row.locationCode || '—' }}</div>
+              <div class="align-right qty-cell">
+                @if (isRowLow(row)) {
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#b5493f" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M12 9v4"></path><path d="M12 17h.01"></path>
+                    <path d="M10.29 3.86 1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0Z"></path>
+                  </svg>
+                }
+                <span class="qty-value" [class.qty-value--low]="isRowLow(row)">{{ row.quantity }}</span>
+              </div>
+              <div class="align-right table__cell-mid">{{ row.reorderThreshold ?? '—' }}</div>
+            </div>
+          }
+        }
+      </div>
+
+      @if (!stockLoading() && !stockError()) {
+        <div class="pagination">
+          <div class="pagination__summary">{{ pageSummary() }}</div>
+          <div class="pagination__controls">
+            <button type="button" [disabled]="currentPage() <= 1" (click)="prevPage()">Previous</button>
+            <button type="button" [disabled]="currentPage() >= totalPages()" (click)="nextPage()">Next</button>
+          </div>
+        </div>
+      }
+    </div>
+  }
+
+  <!-- ===== Low Stock tab ===== -->
+  @if (tab() === 'lowstock') {
+    <div class="table table--low-stock">
+      @if (lowStockLoading()) {
+        <div class="table-state">Loading…</div>
+      } @else if (lowStockError()) {
+        <div class="table-state table-state--error">{{ lowStockError() }}</div>
+      } @else if (lowStockRows().length > 0) {
+        <div class="table__head table__head--lowstock">
+          <div>Item</div>
+          <div>Warehouse</div>
+          <div>Quantity</div>
+          <div class="align-right">Reorder At</div>
+          <div class="align-right">Shortfall</div>
+        </div>
+        @for (row of lowStockRows(); track row.itemId + '-' + row.warehouseId) {
+          <div class="table__row table__row--lowstock">
+            <div class="table__cell-item">
+              <div class="table__cell-item-name">{{ row.itemName }}</div>
+              <div class="table__cell-sku">{{ row.sku }}</div>
+            </div>
+            <div class="table__cell-mid">{{ row.warehouseName }}</div>
+            <div class="qty-value qty-value--low">{{ row.quantity }}</div>
+            <div class="align-right table__cell-mid">{{ row.reorderThreshold }}</div>
+            <div class="align-right">
+              <span class="shortfall-badge">−{{ (row.reorderThreshold ?? 0) - (row.quantity ?? 0) }}</span>
+            </div>
+          </div>
+        }
+      } @else {
+        <div class="table-state">All items are above their reorder threshold.</div>
+      }
+    </div>
+  }
+
+  <!-- ===== Movement History tab ===== -->
+  @if (tab() === 'history') {
+    <div>
+      <div class="filters">
+        <input
+          type="text"
+          class="filter-input"
+          placeholder="Filter by item…"
+          [value]="historyItemFilter()"
+          (change)="onHistoryItemFilterChange($any($event.target).value)"
+        />
+        <select class="filter-select" [value]="historyWarehouseFilter()" (change)="onHistoryWarehouseFilterChange($any($event.target).value)">
+          <option value="all">All Warehouses</option>
+          @for (w of warehouseNames(); track w) {
+            <option [value]="w">{{ w }}</option>
+          }
+        </select>
+        <select class="filter-select" [value]="historyTypeFilter()" (change)="onHistoryTypeFilterChange($any($event.target).value)">
+          <option value="all">All Movement Types</option>
+          <option value="IN">IN</option>
+          <option value="OUT">OUT</option>
+          <option value="TRANSFER">TRANSFER</option>
+          <option value="ADJUSTMENT">ADJUSTMENT</option>
+        </select>
+      </div>
+
+      <div class="table">
+        @if (historyLoading()) {
+          <div class="table-state">Loading…</div>
+        } @else if (historyError()) {
+          <div class="table-state table-state--error">{{ historyError() }}</div>
+        } @else if (historyRows().length > 0) {
+          <div class="table__head table__head--history">
+            <div>Item</div>
+            <div>Warehouse</div>
+            <div>Type</div>
+            <div class="align-right">Qty</div>
+            <div>Reason</div>
+            <div>By</div>
+            <div class="align-right">When</div>
+          </div>
+          @for (h of historyRows(); track h.id) {
+            <div class="table__row table__row--history">
+              <div class="table__cell-item-name">{{ h.itemName }}</div>
+              <div class="table__cell-mid">{{ warehouseName(h.warehouseId) }}</div>
+              <div>
+                <span class="type-badge" [attr.data-type]="h.type">{{ h.type }}</span>
+              </div>
+              <div class="align-right qty-value" [class.qty-value--low]="h.type === 'OUT' || h.type === 'TRANSFER'">
+                {{ movementQtyLabel(h) }}
+              </div>
+              <div class="table__cell-mid table__cell-truncate">{{ h.reason || '—' }}</div>
+              <div class="table__cell-mid">{{ h.createdByName || 'System' }}</div>
+              <div class="align-right table__cell-mid">{{ h.createdAt | date: 'short' }}</div>
+            </div>
+          }
+        } @else {
+          <div class="table-state">No movements match your filters.</div>
+        }
+      </div>
+    </div>
+  }
+
+  <!-- ===== Adjust Stock modal ===== -->
+  @if (adjustOpen()) {
+    <div class="scrim" (click)="closeAdjust()"></div>
+    <div class="dialog">
+      <div class="dialog__title">Adjust Stock</div>
+
+      @if (adjustError()) {
+        <div class="form-error">{{ adjustError() }}</div>
+      }
+
+      <div class="dialog-form">
+        <div class="form-field">
+          <label>Item</label>
+          <select [value]="adjustItemId()" (change)="onAdjustItemChange($any($event.target).value)">
+            @for (it of items(); track it.id) {
+              <option [value]="it.id">{{ it.name }}</option>
+            }
+          </select>
+        </div>
+        <div class="form-field">
+          <label>Warehouse / Location</label>
+          <select [value]="adjustLocationKey()" (change)="onAdjustLocationChange($any($event.target).value)">
+            @for (l of locations(); track l.key) {
+              <option [value]="l.key">{{ l.label }}</option>
+            }
+          </select>
+        </div>
+        <div class="form-field">
+          <label>Quantity Change (+/-)</label>
+          <input type="text" placeholder="e.g. -5 or 20" [value]="adjustQty()" (change)="onAdjustQtyChange($any($event.target).value)" />
+        </div>
+        <div class="form-field">
+          <label>Reason</label>
+          <textarea placeholder="e.g. Cycle count correction" [value]="adjustReason()" (change)="onAdjustReasonChange($any($event.target).value)"></textarea>
+        </div>
+      </div>
+
+      <div class="dialog__actions">
+        <button type="button" class="btn-secondary" [disabled]="adjustSaving()" (click)="closeAdjust()">Cancel</button>
+        <button type="button" class="btn-primary" [disabled]="adjustSaving()" (click)="submitAdjust()">
+          {{ adjustSaving() ? 'Submitting…' : 'Submit Adjustment' }}
+        </button>
+      </div>
+    </div>
+  }
+
+  <!-- ===== Transfer Stock modal ===== -->
+  @if (transferOpen()) {
+    <div class="scrim" (click)="closeTransfer()"></div>
+    <div class="dialog">
+      <div class="dialog__title">Transfer Stock</div>
+
+      @if (transferError()) {
+        <div class="form-error">{{ transferError() }}</div>
+      }
+
+      <div class="dialog-form">
+        <div class="form-field">
+          <label>Item</label>
+          <select [value]="transferItemId()" (change)="onTransferItemChange($any($event.target).value)">
+            @for (it of items(); track it.id) {
+              <option [value]="it.id">{{ it.name }}</option>
+            }
+          </select>
+        </div>
+        <div class="form-field-row">
+          <div class="form-field">
+            <label>From Location</label>
+            <select [value]="transferFromKey()" (change)="onTransferFromChange($any($event.target).value)">
+              @for (l of locations(); track l.key) {
+                <option [value]="l.key">{{ l.label }}</option>
+              }
+            </select>
+          </div>
+          <div class="form-field">
+            <label>To Location</label>
+            <select [value]="transferToKey()" (change)="onTransferToChange($any($event.target).value)">
+              @for (l of locations(); track l.key) {
+                <option [value]="l.key">{{ l.label }}</option>
+              }
+            </select>
+          </div>
+        </div>
+        <div class="form-field">
+          <label>Quantity</label>
+          <input type="text" placeholder="e.g. 25" [value]="transferQty()" (change)="onTransferQtyChange($any($event.target).value)" />
+        </div>
+      </div>
+
+      <div class="dialog__actions">
+        <button type="button" class="btn-secondary" [disabled]="transferSaving()" (click)="closeTransfer()">Cancel</button>
+        <button type="button" class="btn-primary" [disabled]="transferSaving()" (click)="submitTransfer()">
+          {{ transferSaving() ? 'Submitting…' : 'Submit Transfer' }}
+        </button>
+      </div>
+    </div>
+  }
+
+</div>

@@ -33,6 +33,7 @@ export class Sidebar {
     { path: '/inventory/suppliers', label: 'Suppliers' },
     { path: '/inventory/warehouses', label: 'Warehouses' },
     { path: '/inventory/purchase-receipts', label: 'Purchase Receipts' },
+    { path: '/inventory/stock', label: 'Stock' },
   ];
 
   // ---- Derived display state --------------------------------------------

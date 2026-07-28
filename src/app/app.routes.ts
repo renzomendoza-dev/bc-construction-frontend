@@ -57,6 +57,13 @@ export const routes: Routes = [
             (m) => m.PurchaseReceiptDetailComponent,
           ),
       },
+      {
+        path: 'stock',
+        loadComponent: () =>
+          import('./features/inventory/stocks/stock-levels/stock-levels').then(
+            (m) => m.StockLevelsComponent,
+          ),
+      },
       // {
       //   path: 'warehouses',
       //   loadComponent: () =>
