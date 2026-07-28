@@ -8,6 +8,7 @@ import {
   ItemResponse,
   ItemsService,
   LowStockItemResponse,
+  ReorderThresholdRequest,
   StockAdjustmentRequest,
   StockLevelResponse,
   StockMovementResponse,
@@ -36,6 +37,12 @@ interface ItemStockGroup {
   totalQuantity: number;
   isLow: boolean;
   rows: StockLevelResponse[];
+}
+
+// Identifies one item+warehouse+location combination — used both for
+// @for tracking and for locating a row to patch after a threshold save.
+function rowKey(row: StockLevelResponse): string {
+  return `${row.itemId}-${row.warehouseId}-${row.locationId ?? 'none'}`;
 }
 
 const LEVELS_PAGE_SIZE = 6;
@@ -124,6 +131,12 @@ export class StockLevelsComponent implements OnInit {
   });
 
   readonly expandedItemIds = signal<Set<number>>(new Set());
+
+  // ---- Inline reorder-threshold editing ----
+  readonly editingThresholdKey = signal<string | null>(null);
+  readonly thresholdInputValue = signal('');
+  readonly savingThresholdKey = signal<string | null>(null);
+  readonly thresholdError = signal<string | null>(null);
 
   readonly totalPages = computed(() => Math.max(1, Math.ceil(this.groupedItems().length / LEVELS_PAGE_SIZE)));
   readonly currentPage = computed(() => Math.min(this.page(), this.totalPages()));
@@ -237,6 +250,62 @@ export class StockLevelsComponent implements OnInit {
       const next = new Set(set);
       next.has(itemId) ? next.delete(itemId) : next.add(itemId);
       return next;
+    });
+  }
+
+  // ---- Inline reorder-threshold editing ----
+
+  rowKey(row: StockLevelResponse): string {
+    return rowKey(row);
+  }
+
+  startEditThreshold(row: StockLevelResponse): void {
+    this.editingThresholdKey.set(rowKey(row));
+    this.thresholdInputValue.set(row.reorderThreshold !== undefined && row.reorderThreshold !== null ? String(row.reorderThreshold) : '');
+    this.thresholdError.set(null);
+  }
+
+  cancelEditThreshold(): void {
+    this.editingThresholdKey.set(null);
+    this.thresholdError.set(null);
+  }
+
+  onThresholdInputChange(value: string): void {
+    this.thresholdInputValue.set(value);
+  }
+
+  saveThreshold(row: StockLevelResponse): void {
+    if (row.itemId === undefined || row.warehouseId === undefined) return;
+
+    const parsed = parseInt(this.thresholdInputValue(), 10);
+    if (Number.isNaN(parsed) || parsed < 0) {
+      this.thresholdError.set('Enter a whole number of 0 or more.');
+      return;
+    }
+
+    const key = rowKey(row);
+    const body: ReorderThresholdRequest = {
+      itemId: row.itemId,
+      warehouseId: row.warehouseId,
+      locationId: row.locationId,
+      reorderThreshold: parsed,
+    };
+
+    this.savingThresholdKey.set(key);
+    this.thresholdError.set(null);
+
+    this.inventoryService.updateReorderThreshold(body).subscribe({
+      next: (updated) => {
+        this.savingThresholdKey.set(null);
+        this.editingThresholdKey.set(null);
+        this.allStock.update((rows) =>
+          rows.map((r) => (rowKey(r) === key ? { ...r, reorderThreshold: updated.reorderThreshold } : r)),
+        );
+      },
+      error: () => {
+        this.savingThresholdKey.set(null);
+        this.thresholdError.set('Could not save threshold. Please try again.');
+      },
     });
   }
 

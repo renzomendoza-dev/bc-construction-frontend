@@ -327,6 +327,97 @@
   }
 }
 
+.threshold-cell {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 6px;
+}
+
+.threshold-value-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  background: none;
+  border: none;
+  padding: 2px 4px;
+  border-radius: 5px;
+  color: var(--label-text);
+  font-size: 12.5px;
+  cursor: pointer;
+
+  svg {
+    color: var(--sub-text);
+    opacity: 0;
+    transition: opacity 0.1s;
+  }
+
+  &:hover {
+    background: var(--hover-bg);
+
+    svg {
+      opacity: 1;
+    }
+  }
+}
+
+.threshold-input {
+  width: 56px;
+  height: 26px;
+  border-radius: 6px;
+  border: 1px solid var(--teal);
+  background: var(--panel-bg);
+  color: var(--heading-text);
+  font-size: 12.5px;
+  padding: 0 6px;
+  box-sizing: border-box;
+  text-align: right;
+
+  &:focus {
+    outline: none;
+  }
+}
+
+.threshold-btn {
+  width: 22px;
+  height: 22px;
+  border-radius: 5px;
+  border: none;
+  font-size: 11px;
+  cursor: pointer;
+  flex-shrink: 0;
+
+  &:disabled {
+    opacity: 0.6;
+    cursor: default;
+  }
+}
+
+.threshold-btn--save {
+  background: var(--teal);
+  color: #ffffff;
+
+  &:hover:not(:disabled) {
+    filter: brightness(1.1);
+  }
+}
+
+.threshold-btn--cancel {
+  background: var(--badge-bg);
+  color: var(--sub-text);
+
+  &:hover:not(:disabled) {
+    background: var(--border);
+  }
+}
+
+.threshold-error {
+  padding: 4px 14px 8px;
+  font-size: 11px;
+  color: #b5493f;
+  text-align: right;
+}
+
 .table__cell-item {
   min-width: 0;
 }

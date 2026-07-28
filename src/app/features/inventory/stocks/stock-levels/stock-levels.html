@@ -102,13 +102,53 @@
                       <div class="align-right">Quantity</div>
                       <div class="align-right">Reorder At</div>
                     </div>
-                    @for (row of group.rows; track row.warehouseId + '-' + row.locationId) {
+                    @for (row of group.rows; track rowKey(row)) {
                       <div class="location-breakdown__row">
                         <div>{{ row.warehouseName }}</div>
                         <div class="table__cell-code">{{ row.locationCode || '—' }}</div>
                         <div class="align-right qty-value" [class.qty-value--low]="isRowLow(row)">{{ row.quantity }}</div>
-                        <div class="align-right table__cell-mid">{{ row.reorderThreshold ?? '—' }}</div>
+                        <div class="align-right threshold-cell">
+                          @if (editingThresholdKey() === rowKey(row)) {
+                            <input
+                              type="number"
+                              min="0"
+                              step="1"
+                              class="threshold-input"
+                              [value]="thresholdInputValue()"
+                              (change)="onThresholdInputChange($any($event.target).value)"
+                              (click)="$event.stopPropagation()"
+                            />
+                            <button
+                              type="button"
+                              class="threshold-btn threshold-btn--save"
+                              [disabled]="savingThresholdKey() === rowKey(row)"
+                              (click)="saveThreshold(row); $event.stopPropagation()"
+                            >
+                              {{ savingThresholdKey() === rowKey(row) ? '…' : '✓' }}
+                            </button>
+                            <button
+                              type="button"
+                              class="threshold-btn threshold-btn--cancel"
+                              [disabled]="savingThresholdKey() === rowKey(row)"
+                              (click)="cancelEditThreshold(); $event.stopPropagation()"
+                            >✕</button>
+                          } @else {
+                            <button
+                              type="button"
+                              class="threshold-value-btn"
+                              (click)="startEditThreshold(row); $event.stopPropagation()"
+                            >
+                              {{ row.reorderThreshold ?? '—' }}
+                              <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                <path d="M17 3a2.85 2.83 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5Z"></path>
+                              </svg>
+                            </button>
+                          }
+                        </div>
                       </div>
+                      @if (editingThresholdKey() === rowKey(row) && thresholdError()) {
+                        <div class="threshold-error">{{ thresholdError() }}</div>
+                      }
                     }
                   </div>
                 </div>
