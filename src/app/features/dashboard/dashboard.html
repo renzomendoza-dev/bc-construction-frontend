@@ -25,15 +25,15 @@
         <div class="card__stats">
           <div class="stat-row">
             <span class="stat-label">Items</span>
-            <span class="stat-value">{{ inventoryStats.items }}</span>
+            <span class="stat-value">{{ statsLoading() ? '—' : inventoryStats().items }}</span>
           </div>
           <div class="stat-row">
             <span class="stat-label">Low Stock</span>
-            <span class="stat-value stat-value--danger">{{ inventoryStats.lowStock }}</span>
+            <span class="stat-value stat-value--danger">{{ statsLoading() ? '—' : inventoryStats().lowStock }}</span>
           </div>
           <div class="stat-row">
             <span class="stat-label">Pending Receipts</span>
-            <span class="stat-value">{{ inventoryStats.pendingReceipts }}</span>
+            <span class="stat-value">{{ statsLoading() ? '—' : inventoryStats().pendingReceipts }}</span>
           </div>
         </div>
       </a>
