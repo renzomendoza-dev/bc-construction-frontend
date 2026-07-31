@@ -1,3 +1,5 @@
+export * from './equipment.service';
+import { EquipmentService } from './equipment.service';
 export * from './inventory.service';
 import { InventoryService } from './inventory.service';
 export * from './items.service';
@@ -12,4 +14,4 @@ export * from './user.service';
 import { UserService } from './user.service';
 export * from './warehouses.service';
 import { WarehousesService } from './warehouses.service';
-export const APIS = [InventoryService, ItemsService, PurchaseReceiptsService, SalesControllerService, SuppliersService, UserService, WarehousesService];
+export const APIS = [EquipmentService, InventoryService, ItemsService, PurchaseReceiptsService, SalesControllerService, SuppliersService, UserService, WarehousesService];

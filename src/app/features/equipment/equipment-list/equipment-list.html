@@ -1,0 +1,349 @@
+<div class="equipment-page">
+
+  <div class="equipment-page__header">
+    <div class="equipment-page__title">Equipment</div>
+    <button type="button" class="btn-primary" (click)="openNew()">+ New Equipment</button>
+  </div>
+
+  <div class="tabs">
+    <button type="button" class="tab" [class.tab--active]="tab() === 'all'" (click)="selectTab('all')">All Equipment</button>
+    <button type="button" class="tab" [class.tab--active]="tab() === 'overdue'" (click)="selectTab('overdue')">
+      Overdue Checkouts
+      @if (overdueCount() > 0) {
+        <span class="tab-badge">{{ overdueCount() }}</span>
+      }
+    </button>
+  </div>
+
+  <!-- ===== All Equipment tab ===== -->
+  @if (tab() === 'all') {
+    <div class="equipment-page__filters">
+      <input
+        type="text"
+        class="filter-input"
+        placeholder="Search by name, asset tag, or serial…"
+        [value]="search()"
+        (change)="onSearchChange($any($event.target).value)"
+      />
+      <select
+        class="filter-select"
+        [value]="statusFilter()"
+        (change)="onStatusFilterChange($any($event.target).value)"
+      >
+        <option value="all">All Statuses</option>
+        @for (s of statuses; track s) {
+          <option [value]="s">{{ statusLabel(s) }}</option>
+        }
+      </select>
+    </div>
+
+    <div class="table">
+      @if (loading()) {
+        <div class="table-state">Loading…</div>
+      } @else if (errorMessage()) {
+        <div class="table-state table-state--error">{{ errorMessage() }}</div>
+      } @else if (filteredEquipment().length > 0) {
+        <div class="table__head">
+          <div>Asset Tag</div>
+          <div>Name</div>
+          <div>Category</div>
+          <div>Holder / Site</div>
+          <div>Status</div>
+          <div class="align-right">Action</div>
+        </div>
+        @for (eq of filteredEquipment(); track eq.id) {
+          <div class="table__row">
+            <div class="table__cell-code">{{ eq.assetTag }}</div>
+            <div class="table__cell-name">{{ eq.name }}</div>
+            <div class="table__cell-mid">{{ eq.category || '—' }}</div>
+            <div class="table__cell-mid table__cell-truncate">{{ holderLabel(eq) }}</div>
+            <div>
+              <span class="status-badge" [ngClass]="statusBadgeClass(eq.status)">{{ statusLabel(eq.status) }}</span>
+            </div>
+            <div class="align-right row-actions">
+              <button type="button" class="icon-btn" title="Edit equipment" (click)="openEdit(eq)">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M17 3a2.85 2.83 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5Z"></path>
+                </svg>
+              </button>
+              @if (canCheckOut(eq)) {
+                <button type="button" class="btn-secondary btn-small" (click)="openCheckOut(eq)">Check Out</button>
+              } @else if (canCheckIn(eq)) {
+                <button type="button" class="btn-primary btn-small" (click)="openCheckIn(eq)">Check In</button>
+              }
+            </div>
+          </div>
+        }
+      } @else {
+        <div class="table-state">No equipment matches your filters.</div>
+      }
+    </div>
+  }
+
+  <!-- ===== Overdue Checkouts tab ===== -->
+  @if (tab() === 'overdue') {
+    <div class="equipment-page__filters">
+      <span class="filters-label">Show items checked out longer than</span>
+      <select
+        class="filter-select"
+        [value]="overdueDays()"
+        (change)="onOverdueDaysChange($any($event.target).value)"
+      >
+        @for (d of overdueDayOptions; track d) {
+          <option [value]="d">{{ d }} days</option>
+        }
+      </select>
+    </div>
+
+    <div class="table table--overdue">
+      @if (overdueLoading()) {
+        <div class="table-state">Loading…</div>
+      } @else if (overdueError()) {
+        <div class="table-state table-state--error">{{ overdueError() }}</div>
+      } @else if (overdueEquipment().length > 0) {
+        <div class="table__head table__head--overdue">
+          <div>Asset Tag</div>
+          <div>Name</div>
+          <div>Holder / Site</div>
+          <div>Checked Out</div>
+          <div class="align-right">Days Out</div>
+        </div>
+        @for (eq of overdueEquipment(); track eq.id) {
+          <div class="table__row table__row--overdue table__row--flag">
+            <div class="table__cell-code">{{ eq.assetTag }}</div>
+            <div class="table__cell-name">{{ eq.name }}</div>
+            <div class="table__cell-mid table__cell-truncate">{{ holderLabel(eq) }}</div>
+            <div class="table__cell-mid">{{ eq.checkedOutAt | date: 'mediumDate' }}</div>
+            <div class="align-right days-out">{{ daysOut(eq) }}d</div>
+          </div>
+        }
+      } @else {
+        <div class="table-state">No equipment is overdue at this threshold.</div>
+      }
+    </div>
+  }
+
+  <!-- ===== Check Out modal ===== -->
+  @if (checkOutOpen()) {
+    <div class="scrim" (click)="closeCheckOut()"></div>
+    <div class="dialog">
+      <div class="dialog__title">Check Out Equipment</div>
+      <div class="dialog__subtitle">{{ checkOutTarget()?.name }} · {{ checkOutTarget()?.assetTag }}</div>
+
+      @if (checkOutError()) {
+        <div class="form-error">{{ checkOutError() }}</div>
+      }
+
+      <div class="dialog-form">
+        <div class="form-field">
+          <label>User ID</label>
+          <input
+            type="number"
+            placeholder="e.g. 17"
+            [value]="checkOutUserId()"
+            (change)="onCheckOutUserIdChange($any($event.target).value)"
+          />
+        </div>
+        <div class="form-field">
+          <label>Site</label>
+          <input
+            type="text"
+            placeholder="e.g. Site B - Riverside"
+            [value]="checkOutSite()"
+            (change)="onCheckOutSiteChange($any($event.target).value)"
+          />
+        </div>
+        <div class="form-field">
+          <label>Condition Out (optional)</label>
+          <textarea
+            placeholder="e.g. Minor scuff on housing, fully functional"
+            [value]="checkOutCondition()"
+            (change)="onCheckOutConditionChange($any($event.target).value)"
+          ></textarea>
+        </div>
+      </div>
+
+      <div class="dialog__actions">
+        <button type="button" class="btn-secondary" [disabled]="checkOutSaving()" (click)="closeCheckOut()">Cancel</button>
+        <button type="button" class="btn-primary" [disabled]="checkOutSaving()" (click)="submitCheckOut()">
+          {{ checkOutSaving() ? 'Checking Out…' : 'Confirm Check Out' }}
+        </button>
+      </div>
+    </div>
+  }
+
+  <!-- ===== Check In modal ===== -->
+  @if (checkInOpen()) {
+    <div class="scrim" (click)="closeCheckIn()"></div>
+    <div class="dialog">
+      <div class="dialog__title">Check In Equipment</div>
+      <div class="dialog__subtitle">{{ checkInTarget()?.name }} · currently with {{ holderLabel(checkInTarget()!) }}</div>
+
+      @if (checkInError()) {
+        <div class="form-error">{{ checkInError() }}</div>
+      }
+
+      <div class="dialog-form">
+        <div class="form-field">
+          <label>Condition In (optional)</label>
+          <textarea
+            placeholder="e.g. Returned in working order, blade needs sharpening"
+            [value]="checkInCondition()"
+            (change)="onCheckInConditionChange($any($event.target).value)"
+          ></textarea>
+        </div>
+      </div>
+
+      <div class="dialog__actions">
+        <button type="button" class="btn-secondary" [disabled]="checkInSaving()" (click)="closeCheckIn()">Cancel</button>
+        <button type="button" class="btn-primary" [disabled]="checkInSaving()" (click)="submitCheckIn()">
+          {{ checkInSaving() ? 'Checking In…' : 'Confirm Check In' }}
+        </button>
+      </div>
+    </div>
+  }
+
+  <!-- ===== New Equipment modal ===== -->
+  @if (newOpen()) {
+    <div class="scrim" (click)="closeNew()"></div>
+    <div class="dialog dialog--wide">
+      <div class="dialog__title">New Equipment</div>
+
+      @if (newError()) {
+        <div class="form-error">{{ newError() }}</div>
+      }
+
+      <div class="dialog-form dialog-form--grid">
+        <div class="form-field form-field--full">
+          <label>Name</label>
+          <input
+            type="text"
+            placeholder="e.g. DeWalt 20V Cordless Drill"
+            [value]="newForm().name"
+            (change)="onNewFieldChange('name', $any($event.target).value)"
+          />
+        </div>
+        <div class="form-field">
+          <label>Asset Tag</label>
+          <input
+            type="text"
+            placeholder="e.g. EQ-2026-0042"
+            [value]="newForm().assetTag"
+            (change)="onNewFieldChange('assetTag', $any($event.target).value)"
+          />
+        </div>
+        <div class="form-field">
+          <label>Category</label>
+          <input
+            type="text"
+            placeholder="e.g. Power Tools"
+            [value]="newForm().category"
+            (change)="onNewFieldChange('category', $any($event.target).value)"
+          />
+        </div>
+        <div class="form-field">
+          <label>Serial Number</label>
+          <input
+            type="text"
+            placeholder="e.g. SN-88213A"
+            [value]="newForm().serialNumber"
+            (change)="onNewFieldChange('serialNumber', $any($event.target).value)"
+          />
+        </div>
+        <div class="form-field">
+          <label>Purchase Price</label>
+          <input
+            type="text"
+            placeholder="e.g. 249.99"
+            [value]="newForm().purchasePrice"
+            (change)="onNewFieldChange('purchasePrice', $any($event.target).value)"
+          />
+        </div>
+      </div>
+
+      <div class="dialog__actions">
+        <button type="button" class="btn-secondary" [disabled]="newSaving()" (click)="closeNew()">Cancel</button>
+        <button type="button" class="btn-primary" [disabled]="newSaving()" (click)="submitNew()">
+          {{ newSaving() ? 'Creating…' : 'Create Equipment' }}
+        </button>
+      </div>
+    </div>
+  }
+
+  <!-- ===== Edit Equipment modal ===== -->
+  @if (editOpen()) {
+    <div class="scrim" (click)="closeEdit()"></div>
+    <div class="dialog dialog--wide">
+      <div class="dialog__title">Edit Equipment</div>
+      <div class="dialog__subtitle">{{ editTarget()?.assetTag }}</div>
+
+      @if (editError()) {
+        <div class="form-error">{{ editError() }}</div>
+      }
+
+      <div class="dialog-form dialog-form--grid">
+        <div class="form-field form-field--full">
+          <label>Name</label>
+          <input
+            type="text"
+            placeholder="e.g. DeWalt 20V Cordless Drill"
+            [value]="editForm().name"
+            (change)="onEditFieldChange('name', $any($event.target).value)"
+          />
+        </div>
+        <div class="form-field">
+          <label>Category</label>
+          <input
+            type="text"
+            placeholder="e.g. Power Tools"
+            [value]="editForm().category"
+            (change)="onEditFieldChange('category', $any($event.target).value)"
+          />
+        </div>
+        <div class="form-field">
+          <label>Serial Number</label>
+          <input
+            type="text"
+            placeholder="e.g. SN-88213A"
+            [value]="editForm().serialNumber"
+            (change)="onEditFieldChange('serialNumber', $any($event.target).value)"
+          />
+        </div>
+        <div class="form-field">
+          <label>Purchase Price</label>
+          <input
+            type="text"
+            placeholder="e.g. 249.99"
+            [value]="editForm().purchasePrice"
+            (change)="onEditFieldChange('purchasePrice', $any($event.target).value)"
+          />
+        </div>
+        <div class="form-field">
+          <label>Purchase Date</label>
+          <input
+            type="date"
+            [value]="editForm().purchaseDate"
+            (change)="onEditFieldChange('purchaseDate', $any($event.target).value)"
+          />
+        </div>
+        <div class="form-field form-field--full">
+          <label>Purchase Vendor</label>
+          <input
+            type="text"
+            placeholder="e.g. Home Depot Pro"
+            [value]="editForm().purchaseVendor"
+            (change)="onEditFieldChange('purchaseVendor', $any($event.target).value)"
+          />
+        </div>
+      </div>
+
+      <div class="dialog__actions">
+        <button type="button" class="btn-secondary" [disabled]="editSaving()" (click)="closeEdit()">Cancel</button>
+        <button type="button" class="btn-primary" [disabled]="editSaving()" (click)="submitEdit()">
+          {{ editSaving() ? 'Saving…' : 'Save Changes' }}
+        </button>
+      </div>
+    </div>
+  }
+
+</div>

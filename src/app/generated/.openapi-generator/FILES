@@ -3,6 +3,7 @@ README.md
 api.base.service.ts
 api.module.ts
 api/api.ts
+api/equipment.service.ts
 api/inventory.service.ts
 api/items.service.ts
 api/purchaseReceipts.service.ts
@@ -14,6 +15,11 @@ configuration.ts
 encoder.ts
 git_push.sh
 index.ts
+model/equipmentCheckInRequest.ts
+model/equipmentCheckOutRequest.ts
+model/equipmentCreateRequest.ts
+model/equipmentResponse.ts
+model/equipmentUpdateRequest.ts
 model/errorResponse.ts
 model/itemCreateRequest.ts
 model/itemImageRequest.ts

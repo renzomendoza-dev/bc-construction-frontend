@@ -8,6 +8,12 @@ export const routes: Routes = [
   },
 
   {
+    path: 'equipment',
+    loadComponent: () =>
+      import('./features/equipment/equipment-list/equipment-list').then((m) => m.EquipmentListComponent),
+  },
+
+  {
     path: 'inventory',
     children: [
       { path: '', redirectTo: 'items', pathMatch: 'full' },
