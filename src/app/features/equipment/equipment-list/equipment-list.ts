@@ -7,6 +7,8 @@ import {
   EquipmentResponse,
   EquipmentService,
   EquipmentUpdateRequest,
+  UserResponse,
+  UserService,
 } from '../../../generated';
 
 type Tab = 'all' | 'overdue';
@@ -66,6 +68,7 @@ const EMPTY_EDIT_FORM: EditEquipmentForm = {
 })
 export class EquipmentListComponent implements OnInit {
   private readonly equipmentService = inject(EquipmentService);
+  private readonly userService = inject(UserService);
 
   // The Equipment endpoints declare their response content-type as `*/*` in
   // the OpenAPI spec (unlike the rest of the API, which uses
@@ -113,6 +116,11 @@ export class EquipmentListComponent implements OnInit {
 
   readonly overdueCount = computed(() => this.overdueEquipment().length);
 
+  // ---- Users (for the check-out picker) ----------------------------------
+  readonly users = signal<UserResponse[]>([]);
+  readonly usersLoading = signal(false);
+  readonly usersError = signal<string | null>(null);
+
   // ---- Check-out modal --------------------------------------------------
   readonly checkOutOpen = signal(false);
   readonly checkOutTarget = signal<EquipmentResponse | null>(null);
@@ -145,6 +153,7 @@ export class EquipmentListComponent implements OnInit {
   ngOnInit(): void {
     this.fetchEquipment();
     this.fetchOverdue();
+    this.fetchUsers();
   }
 
   // ---- Tabs -----------------------------------------------------------
@@ -242,7 +251,7 @@ export class EquipmentListComponent implements OnInit {
     const userId = Number(this.checkOutUserId());
     const site = this.checkOutSite().trim();
     if (!userId || Number.isNaN(userId)) {
-      this.checkOutError.set('Enter a valid user ID.');
+      this.checkOutError.set('Select a user.');
       return;
     }
     if (!site) {
@@ -460,6 +469,23 @@ export class EquipmentListComponent implements OnInit {
       error: () => {
         this.overdueError.set('Could not load overdue equipment. Please try again.');
         this.overdueLoading.set(false);
+      },
+    });
+  }
+
+  private fetchUsers(): void {
+    this.usersLoading.set(true);
+    this.usersError.set(null);
+    this.userService.findAll(undefined, undefined, this.jsonAccept).subscribe({
+      next: (result) => {
+        this.users.set(
+          [...(result ?? [])].sort((a, b) => (a.fullName ?? '').localeCompare(b.fullName ?? '')),
+        );
+        this.usersLoading.set(false);
+      },
+      error: () => {
+        this.usersError.set('Could not load users for the check-out picker.');
+        this.usersLoading.set(false);
       },
     });
   }

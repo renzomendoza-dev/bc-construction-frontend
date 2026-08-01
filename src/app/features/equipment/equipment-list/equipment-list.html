@@ -136,13 +136,24 @@
 
       <div class="dialog-form">
         <div class="form-field">
-          <label>User ID</label>
-          <input
-            type="number"
-            placeholder="e.g. 17"
-            [value]="checkOutUserId()"
-            (change)="onCheckOutUserIdChange($any($event.target).value)"
-          />
+          <label>User</label>
+          @if (usersLoading()) {
+            <select disabled>
+              <option>Loading users…</option>
+            </select>
+          } @else if (usersError()) {
+            <div class="field-error">{{ usersError() }}</div>
+          } @else {
+            <select
+              [value]="checkOutUserId()"
+              (change)="onCheckOutUserIdChange($any($event.target).value)"
+            >
+              <option value="">Select a user…</option>
+              @for (u of users(); track u.id) {
+                <option [value]="u.id">{{ u.fullName }}</option>
+              }
+            </select>
+          }
         </div>
         <div class="form-field">
           <label>Site</label>
