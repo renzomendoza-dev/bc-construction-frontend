@@ -1,3 +1,4 @@
+export * from './adminUserResponse';
 export * from './equipmentCheckInRequest';
 export * from './equipmentCheckOutRequest';
 export * from './equipmentCreateRequest';
@@ -20,6 +21,8 @@ export * from './purchaseReceiptLineRequest';
 export * from './purchaseReceiptLineResponse';
 export * from './purchaseReceiptResponse';
 export * from './reorderThresholdRequest';
+export * from './roleAssignmentRequest';
+export * from './roleResponse';
 export * from './stockAdjustmentRequest';
 export * from './stockLevelResponse';
 export * from './stockMovementResponse';

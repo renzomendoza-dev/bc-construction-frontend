@@ -1,0 +1,177 @@
+<div class="users-page">
+
+  <div class="users-page__header">
+    <div class="users-page__title">Admin · Users</div>
+  </div>
+
+  <div class="users-page__filters">
+    <input
+      type="text"
+      class="filter-input"
+      placeholder="Search by name…"
+      [value]="search()"
+      (change)="onSearchChange($any($event.target).value)"
+    />
+    <label class="filter-checkbox">
+      <input type="checkbox" [checked]="showInactive()" (change)="onShowInactiveChange($any($event.target).checked)" />
+      Show inactive
+    </label>
+  </div>
+
+  <div class="users-table">
+
+    @if (loading()) {
+      <div class="table-state">Loading…</div>
+    } @else if (errorMessage()) {
+      <div class="table-state table-state--error">{{ errorMessage() }}</div>
+    } @else if (hasResults()) {
+      <div class="users-table__head">
+        <div>Name</div>
+        <div>Status</div>
+        <div class="align-right">Created</div>
+        <div class="align-right">Updated</div>
+      </div>
+
+      @for (user of pageItems(); track user.id) {
+        <div class="users-table__row" (click)="openUser(user)">
+          <div class="users-table__name">{{ user.fullName || '—' }}</div>
+          <div>
+            <span class="status-badge" [class.status-badge--inactive]="!user.active">
+              {{ user.active ? 'Active' : 'Inactive' }}
+            </span>
+          </div>
+          <div class="align-right users-table__date">{{ user.createdAt | date: 'mediumDate' }}</div>
+          <div class="align-right users-table__date">{{ user.updatedAt | date: 'mediumDate' }}</div>
+        </div>
+      }
+    } @else {
+      <div class="empty-state">
+        <div class="empty-state__icon">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"></path>
+            <circle cx="9" cy="7" r="4"></circle>
+            <path d="M22 21v-2a4 4 0 0 0-3-3.87"></path>
+            <path d="M16 3.13a4 4 0 0 1 0 7.75"></path>
+          </svg>
+        </div>
+        @if (isFilteredEmpty()) {
+          <div class="empty-state__title">No users match your search</div>
+          <div class="empty-state__subtitle">Try adjusting your search or filters.</div>
+        } @else if (isTrulyEmpty()) {
+          <div class="empty-state__title">No users yet</div>
+          <div class="empty-state__subtitle">Users appear here once they've signed in at least once.</div>
+        }
+      </div>
+    }
+
+  </div>
+
+  @if (!loading() && hasResults()) {
+    <div class="users-pagination">
+      <div class="users-pagination__summary">{{ pageSummary() }}</div>
+      <div class="users-pagination__controls">
+        <button type="button" [disabled]="currentPage() <= 1" (click)="prevPage()">Previous</button>
+        <button type="button" [disabled]="currentPage() >= totalPages()" (click)="nextPage()">Next</button>
+      </div>
+    </div>
+  }
+
+  @if (drawerOpen()) {
+    <div class="drawer-scrim" (click)="closeDrawer()"></div>
+    <div class="drawer">
+
+      <div class="drawer__header">
+        <div class="drawer__title">{{ detail()?.fullName || 'User' }}</div>
+        <button type="button" class="drawer__close" (click)="closeDrawer()" aria-label="Close">✕</button>
+      </div>
+
+      <div class="drawer__body">
+        @if (detailError()) {
+          <div class="drawer-error">{{ detailError() }}</div>
+        }
+
+        @if (detailLoading() && !detail()) {
+          <div class="table-state">Loading…</div>
+        } @else if (detail(); as user) {
+
+          <div class="drawer-meta">
+            <span class="status-badge" [class.status-badge--inactive]="!user.active">
+              {{ user.active ? 'Active' : 'Inactive' }}
+            </span>
+            <span class="drawer-meta__created">Created {{ user.createdAt | date: 'mediumDate' }}</span>
+          </div>
+
+          <div class="drawer-section">
+            <div class="drawer-section__title">Account</div>
+            <div class="drawer-section__actions">
+              <button type="button" class="btn-danger-outline" [disabled]="toggling()" (click)="toggleActive()">
+                {{ toggling() ? 'Updating…' : deactivateLabel() }}
+              </button>
+              <button type="button" class="btn-secondary" [disabled]="resyncing()" (click)="resync()">
+                {{ resyncing() ? 'Syncing…' : 'Resync from Keycloak' }}
+              </button>
+            </div>
+          </div>
+
+          <div class="drawer-section">
+            <div class="drawer-section__title">Realm Roles</div>
+
+            @if ((user.realmRoles ?? []).length > 0) {
+              <div class="role-chips">
+                @for (role of user.realmRoles; track role) {
+                  <span class="role-chip">
+                    {{ role }}
+                    <button
+                      type="button"
+                      class="role-chip__remove"
+                      [disabled]="revokingRole() === role"
+                      (click)="revokeRole(role)"
+                      [attr.aria-label]="'Revoke ' + role"
+                    >✕</button>
+                  </span>
+                }
+              </div>
+            } @else {
+              <div class="drawer-section__empty">No roles assigned.</div>
+            }
+
+            @if (assignError()) {
+              <div class="drawer-error drawer-error--tight">{{ assignError() }}</div>
+            }
+
+            <div class="assign-role-row">
+              @if (rolesLoading()) {
+                <select disabled>
+                  <option>Loading roles…</option>
+                </select>
+              } @else if (rolesError()) {
+                <div class="field-error">{{ rolesError() }}</div>
+              } @else {
+                <select
+                  [value]="assignRoleName()"
+                  (change)="onAssignRoleNameChange($any($event.target).value)"
+                >
+                  <option value="">Select a role…</option>
+                  @for (role of availableRolesToAssign(); track role.id) {
+                    <option [value]="role.name">{{ role.name }}</option>
+                  }
+                </select>
+              }
+              <button type="button" class="btn-primary btn-small" [disabled]="assigning()" (click)="assignRole()">
+                {{ assigning() ? 'Assigning…' : 'Assign' }}
+              </button>
+            </div>
+          </div>
+
+        }
+      </div>
+
+      <div class="drawer__footer">
+        <div></div>
+        <button type="button" class="btn-secondary" (click)="closeDrawer()">Close</button>
+      </div>
+
+    </div>
+  }
+
+</div>

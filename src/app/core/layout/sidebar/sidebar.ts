@@ -1,6 +1,7 @@
 import { ChangeDetectionStrategy, Component, computed, inject, signal } from '@angular/core';
 import { RouterLink, RouterLinkActive } from '@angular/router';
 import { LayoutService } from '../../services/layout';
+import { CurrentUserService } from '../../services/current-user';
 
 interface InventorySubRoute {
   path: string;
@@ -20,12 +21,17 @@ interface InventorySubRoute {
 })
 export class Sidebar {
   private readonly layout = inject(LayoutService);
+  private readonly currentUser = inject(CurrentUserService);
 
   // ---- State ----------------------------------------------------------
   // expanded now comes from the shared service, so the top bar's hamburger
   // button and this component stay in sync.
   readonly expanded = this.layout.sidebarExpanded;
   readonly inventoryOpen = signal(true);
+
+  // Gates the Admin section below — mirrors the ADMIN check in adminGuard,
+  // so users without the role never see the entry point in the first place.
+  readonly isAdmin = computed(() => this.currentUser.roles.includes('ADMIN'));
 
   // ---- Static nav config ------------------------------------------------
   readonly inventoryRoutes: InventorySubRoute[] = [

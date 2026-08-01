@@ -2,6 +2,8 @@
 README.md
 api.base.service.ts
 api.module.ts
+api/adminRoles.service.ts
+api/adminUsers.service.ts
 api/api.ts
 api/equipment.service.ts
 api/inventory.service.ts
@@ -15,6 +17,7 @@ configuration.ts
 encoder.ts
 git_push.sh
 index.ts
+model/adminUserResponse.ts
 model/equipmentCheckInRequest.ts
 model/equipmentCheckOutRequest.ts
 model/equipmentCreateRequest.ts
@@ -38,6 +41,8 @@ model/purchaseReceiptLineRequest.ts
 model/purchaseReceiptLineResponse.ts
 model/purchaseReceiptResponse.ts
 model/reorderThresholdRequest.ts
+model/roleAssignmentRequest.ts
+model/roleResponse.ts
 model/stockAdjustmentRequest.ts
 model/stockLevelResponse.ts
 model/stockMovementResponse.ts

@@ -1,3 +1,7 @@
+export * from './adminRoles.service';
+import { AdminRolesService } from './adminRoles.service';
+export * from './adminUsers.service';
+import { AdminUsersService } from './adminUsers.service';
 export * from './equipment.service';
 import { EquipmentService } from './equipment.service';
 export * from './inventory.service';
@@ -14,4 +18,4 @@ export * from './user.service';
 import { UserService } from './user.service';
 export * from './warehouses.service';
 import { WarehousesService } from './warehouses.service';
-export const APIS = [EquipmentService, InventoryService, ItemsService, PurchaseReceiptsService, SalesControllerService, SuppliersService, UserService, WarehousesService];
+export const APIS = [AdminRolesService, AdminUsersService, EquipmentService, InventoryService, ItemsService, PurchaseReceiptsService, SalesControllerService, SuppliersService, UserService, WarehousesService];

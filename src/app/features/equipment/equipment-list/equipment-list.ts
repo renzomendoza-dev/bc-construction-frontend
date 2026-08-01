@@ -476,7 +476,7 @@ export class EquipmentListComponent implements OnInit {
   private fetchUsers(): void {
     this.usersLoading.set(true);
     this.usersError.set(null);
-    this.userService.findAll(undefined, undefined, this.jsonAccept).subscribe({
+    this.userService.findAll1(undefined, undefined, this.jsonAccept).subscribe({
       next: (result) => {
         this.users.set(
           [...(result ?? [])].sort((a, b) => (a.fullName ?? '').localeCompare(b.fullName ?? '')),

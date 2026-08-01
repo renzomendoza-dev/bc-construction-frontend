@@ -36,6 +36,10 @@ export class Dashboard implements OnInit {
   protected readonly isDark = computed(() => this.themeService.theme() === 'dark');
   protected readonly userName = this.currentUser.fullName;
 
+  // Mirrors the ADMIN check in adminGuard/Sidebar — hides the Admin Settings
+  // card for users who can't actually reach /users.
+  protected readonly isAdmin = computed(() => this.currentUser.roles.includes('ADMIN'));
+
   protected readonly todayLabel = computed(() =>
     new Date().toLocaleDateString('en-US', {
       weekday: 'long',
