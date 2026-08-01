@@ -1,0 +1,32 @@
+# No top-level `version:` key — deprecated by the Compose Specification;
+# modern `docker compose` ignores it.
+#
+# This is a single-service compose file for the frontend only, mirroring how
+# the backend repo owns its own compose file for its concerns (Postgres,
+# Keycloak). Run both stacks side by side for full local dev.
+#
+# IMPORTANT — environment.ts's apiBaseUrl/keycloak.url are baked into the JS
+# bundle at build time (see src/environments/environment.ts); there's no
+# runtime env injection yet, and environment.prod.ts/fileReplacements aren't
+# wired up in angular.json. The checked-in localhost:8080 / localhost:8082
+# values only work because this is meant to run on the same machine as the
+# backend/Keycloak containers, with their ports published to the host — the
+# *browser*, not this container, is what resolves "localhost". If you ever
+# deploy this somewhere the frontend and backend aren't reachable at the same
+# localhost (a real staging/prod host), you'll need runtime config injection
+# (e.g. an entrypoint that envsubst's an assets/env.js from container env
+# vars) instead of relying on these build-time values.
+
+services:
+  web:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    ports:
+      - "${FRONTEND_PORT:-4200}:80"
+    healthcheck:
+      test: ["CMD", "wget", "--no-verbose", "--tries=1", "--spider", "http://localhost/"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 10s
