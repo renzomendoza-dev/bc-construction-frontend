@@ -33,7 +33,7 @@
       }
     </div>
 
-    @if (!r.confirmed) {
+    @if (!r.confirmed && canConfirm) {
       <div class="draft-banner">
         <div>
           <div class="draft-banner__title">This receipt is still a draft</div>

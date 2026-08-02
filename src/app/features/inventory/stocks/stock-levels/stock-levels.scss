@@ -334,6 +334,14 @@
   gap: 6px;
 }
 
+.threshold-value-readonly {
+  display: inline-flex;
+  align-items: center;
+  padding: 2px 4px;
+  color: var(--label-text);
+  font-size: 12.5px;
+}
+
 .threshold-value-btn {
   display: inline-flex;
   align-items: center;

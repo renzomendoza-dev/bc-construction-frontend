@@ -1,7 +1,9 @@
 import { ChangeDetectionStrategy, Component, OnInit, inject, signal } from '@angular/core';
 import { Router } from '@angular/router';
 import { ItemResponse, ItemsService } from '../../../../generated';
- 
+import { CurrentUserService } from '../../../../core/services/current-user';
+import { Permission } from '../../../../core/constants/permissions';
+
 const CATEGORIES = ['Framing', 'Concrete', 'Reinforcement', 'Insulation', 'Sheathing', 'Fasteners'];
 const PAGE_SIZE = 20;
 
@@ -15,8 +17,10 @@ const PAGE_SIZE = 20;
 export class ItemsListComponent implements OnInit {
   private readonly itemsService = inject(ItemsService);
   private readonly router = inject(Router);
- 
+  private readonly currentUser = inject(CurrentUserService);
+
   readonly categories = CATEGORIES;
+  readonly canCreate = this.currentUser.hasPermission(Permission.ItemCreate);
  
   readonly search = signal('');
   readonly category = signal('all');

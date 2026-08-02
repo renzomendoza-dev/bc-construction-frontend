@@ -2,6 +2,8 @@ import { ChangeDetectionStrategy, Component, OnInit, computed, inject, signal } 
 import { Router } from '@angular/router';
 import { PurchaseReceiptResponse, PurchaseReceiptsService } from '../../../../generated';
 import { formatPeso } from '../../../../core/model.currency';
+import { CurrentUserService } from '../../../../core/services/current-user';
+import { Permission } from '../../../../core/constants/permissions';
 
 const PAGE_SIZE = 5;
 // GET /api/purchase-receipts has no warehouseId or status filter — only
@@ -22,8 +24,10 @@ type StatusFilter = 'all' | 'draft' | 'confirmed';
 export class PurchaseReceiptsListComponent implements OnInit {
   private readonly receiptsService = inject(PurchaseReceiptsService);
   private readonly router = inject(Router);
+  private readonly currentUser = inject(CurrentUserService);
 
   readonly formatPeso = formatPeso;
+  readonly canCreate = this.currentUser.hasPermission(Permission.PurchaseReceiptCreate);
 
   private readonly allReceipts = signal<PurchaseReceiptResponse[]>([]);
   readonly loading = signal(false);

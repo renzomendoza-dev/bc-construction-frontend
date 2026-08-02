@@ -21,6 +21,16 @@ export class CurrentUserService {
   }
 
   /**
+   * Checks for a fine-grained permission string (see core/constants/permissions.ts).
+   * Positions are composite Keycloak roles, so realm_access.roles already
+   * contains every permission the user's position(s) bundle — no separate
+   * position lookup or expansion needed here.
+   */
+  hasPermission(permission: string): boolean {
+    return this.roles.includes(permission);
+  }
+
+  /**
    * Logs out of the Keycloak session and redirects back to the app root.
    * This clears the SSO session server-side too, not just local app state -
    * a fresh visit afterwards will require login again.

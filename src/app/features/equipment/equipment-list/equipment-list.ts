@@ -10,6 +10,8 @@ import {
   UserResponse,
   UserService,
 } from '../../../generated';
+import { CurrentUserService } from '../../../core/services/current-user';
+import { Permission } from '../../../core/constants/permissions';
 
 type Tab = 'all' | 'overdue';
 
@@ -69,6 +71,14 @@ const EMPTY_EDIT_FORM: EditEquipmentForm = {
 export class EquipmentListComponent implements OnInit {
   private readonly equipmentService = inject(EquipmentService);
   private readonly userService = inject(UserService);
+  private readonly currentUser = inject(CurrentUserService);
+
+  // Prefixed to avoid colliding with the existing canCheckOut/canCheckIn
+  // methods below, which gate on equipment status rather than permission.
+  readonly canCreateEquipment = this.currentUser.hasPermission(Permission.EquipmentCreate);
+  readonly canEditEquipment = this.currentUser.hasPermission(Permission.EquipmentEdit);
+  readonly hasCheckoutPermission = this.currentUser.hasPermission(Permission.EquipmentCheckout);
+  readonly hasCheckinPermission = this.currentUser.hasPermission(Permission.EquipmentCheckin);
 
   // The Equipment endpoints declare their response content-type as `*/*` in
   // the OpenAPI spec (unlike the rest of the API, which uses

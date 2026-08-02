@@ -2,7 +2,9 @@
 
   <div class="equipment-page__header">
     <div class="equipment-page__title">Equipment</div>
-    <button type="button" class="btn-primary" (click)="openNew()">+ New Equipment</button>
+    @if (canCreateEquipment) {
+      <button type="button" class="btn-primary" (click)="openNew()">+ New Equipment</button>
+    }
   </div>
 
   <div class="tabs">
@@ -61,14 +63,16 @@
               <span class="status-badge" [ngClass]="statusBadgeClass(eq.status)">{{ statusLabel(eq.status) }}</span>
             </div>
             <div class="align-right row-actions">
-              <button type="button" class="icon-btn" title="Edit equipment" (click)="openEdit(eq)">
-                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                  <path d="M17 3a2.85 2.83 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5Z"></path>
-                </svg>
-              </button>
-              @if (canCheckOut(eq)) {
+              @if (canEditEquipment) {
+                <button type="button" class="icon-btn" title="Edit equipment" (click)="openEdit(eq)">
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M17 3a2.85 2.83 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5Z"></path>
+                  </svg>
+                </button>
+              }
+              @if (canCheckOut(eq) && hasCheckoutPermission) {
                 <button type="button" class="btn-secondary btn-small" (click)="openCheckOut(eq)">Check Out</button>
-              } @else if (canCheckIn(eq)) {
+              } @else if (canCheckIn(eq) && hasCheckinPermission) {
                 <button type="button" class="btn-primary btn-small" (click)="openCheckIn(eq)">Check In</button>
               }
             </div>

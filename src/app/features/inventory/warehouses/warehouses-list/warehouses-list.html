@@ -2,7 +2,9 @@
 
   <div class="warehouses-page__header">
     <div class="warehouses-page__title">Warehouses</div>
-    <button type="button" class="btn-primary" (click)="openNew()">+ New Warehouse</button>
+    @if (canCreate) {
+      <button type="button" class="btn-primary" (click)="openNew()">+ New Warehouse</button>
+    }
   </div>
 
   @if (isNewOpen()) {
@@ -51,36 +53,40 @@
                 {{ wh.active ? 'Active' : 'Inactive' }}
               </span>
               <div class="warehouse-card__loc-count">{{ locationCount(warehouseId) }} locations</div>
-              <button
-                type="button"
-                class="deactivate-btn"
-                [disabled]="togglingActiveFor() === warehouseId"
-                (click)="toggleWarehouseActive(wh, $event)"
-              >
-                {{ togglingActiveFor() === warehouseId ? 'Updating…' : deactivateLabel(wh) }}
-              </button>
+              @if (canToggleActive(wh)) {
+                <button
+                  type="button"
+                  class="deactivate-btn"
+                  [disabled]="togglingActiveFor() === warehouseId"
+                  (click)="toggleWarehouseActive(wh, $event)"
+                >
+                  {{ togglingActiveFor() === warehouseId ? 'Updating…' : deactivateLabel(wh) }}
+                </button>
+              }
             </div>
 
             @if (isExpanded(warehouseId)) {
               <div class="warehouse-card__expanded">
                 <div class="locations-header">
                   <div class="locations-header__title">Storage Locations</div>
-                  <div class="locations-header__add" (click)="$event.stopPropagation()">
-                    <input
-                      type="text"
-                      placeholder="e.g. A1"
-                      [value]="newLocCodeFor(warehouseId)"
-                      (change)="onNewLocCodeChange(warehouseId, $any($event.target).value)"
-                    />
-                    <button
-                      type="button"
-                      class="btn-add-location"
-                      [disabled]="addingLocationFor() === warehouseId"
-                      (click)="addLocation(warehouseId, $event)"
-                    >
-                      {{ addingLocationFor() === warehouseId ? 'Adding…' : '+ Add Location' }}
-                    </button>
-                  </div>
+                  @if (canManageLocations) {
+                    <div class="locations-header__add" (click)="$event.stopPropagation()">
+                      <input
+                        type="text"
+                        placeholder="e.g. A1"
+                        [value]="newLocCodeFor(warehouseId)"
+                        (change)="onNewLocCodeChange(warehouseId, $any($event.target).value)"
+                      />
+                      <button
+                        type="button"
+                        class="btn-add-location"
+                        [disabled]="addingLocationFor() === warehouseId"
+                        (click)="addLocation(warehouseId, $event)"
+                      >
+                        {{ addingLocationFor() === warehouseId ? 'Adding…' : '+ Add Location' }}
+                      </button>
+                    </div>
+                  }
                 </div>
 
                 @if (locationCount(warehouseId) > 0) {
@@ -88,13 +94,15 @@
                     @for (loc of locationsFor(warehouseId); track loc.id) {
                       <div class="location-chip">
                         {{ loc.code }}
-                        <button
-                          type="button"
-                          class="location-chip__remove"
-                          [disabled]="removingLocationId() === loc.id"
-                          (click)="removeLocation(warehouseId, loc.id, $event)"
-                          aria-label="Remove location"
-                        >✕</button>
+                        @if (canDeactivate) {
+                          <button
+                            type="button"
+                            class="location-chip__remove"
+                            [disabled]="removingLocationId() === loc.id"
+                            (click)="removeLocation(warehouseId, loc.id, $event)"
+                            aria-label="Remove location"
+                          >✕</button>
+                        }
                       </div>
                     }
                   </div>

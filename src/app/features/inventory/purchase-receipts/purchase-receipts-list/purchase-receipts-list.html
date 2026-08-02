@@ -2,7 +2,9 @@
 
   <div class="receipts-page__header">
     <div class="receipts-page__title">Purchase Receipts</div>
-    <button type="button" class="btn-primary" (click)="createNew()">+ New Receipt</button>
+    @if (canCreate) {
+      <button type="button" class="btn-primary" (click)="createNew()">+ New Receipt</button>
+    }
   </div>
 
   <div class="receipts-page__filters">

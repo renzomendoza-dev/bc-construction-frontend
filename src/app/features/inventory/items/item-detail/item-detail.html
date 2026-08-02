@@ -26,18 +26,20 @@
       </div>
 
       <div class="header-actions">
-        @if (mode() === 'view') {
+        @if (mode() === 'view' && canEdit) {
           <button type="button" class="edit-btn" (click)="enterEdit()">Edit</button>
         }
-        <button
-          type="button"
-          class="deactivate-btn"
-          [disabled]="!currentItem.active || deactivating()"
-          [title]="!currentItem.active ? 'Reactivation isn\'t supported by the API yet' : ''"
-          (click)="deactivateItem()"
-        >
-          {{ currentItem.active ? (deactivating() ? 'Deactivating…' : 'Deactivate') : 'Inactive' }}
-        </button>
+        @if (canDeactivate) {
+          <button
+            type="button"
+            class="deactivate-btn"
+            [disabled]="!currentItem.active || deactivating()"
+            [title]="!currentItem.active ? 'Reactivation isn\'t supported by the API yet' : ''"
+            (click)="deactivateItem()"
+          >
+            {{ currentItem.active ? (deactivating() ? 'Deactivating…' : 'Deactivate') : 'Inactive' }}
+          </button>
+        }
       </div>
     </div>
 
@@ -46,19 +48,21 @@
       @for (image of currentItem.images; track image.id) {
         <div class="image-tile">
           <img [src]="image.imageUrl" [alt]="currentItem.name" class="image-tile__img" />
-          @if (image.id !== undefined) {
+          @if (image.id !== undefined && canEdit) {
             <button type="button" class="image-tile__delete" (click)="deleteImage(image.id)" aria-label="Remove image">✕</button>
           }
         </div>
       }
-      <label class="image-upload-tile" [class.image-upload-tile--busy]="uploadingImage()">
-        <input type="file" accept="image/*" (change)="onImageFileSelected($event)" [disabled]="uploadingImage()" hidden />
-        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-          <path d="M12 5v14"></path>
-          <path d="M5 12h14"></path>
-        </svg>
-        {{ uploadingImage() ? 'Uploading…' : 'Upload' }}
-      </label>
+      @if (canEdit) {
+        <label class="image-upload-tile" [class.image-upload-tile--busy]="uploadingImage()">
+          <input type="file" accept="image/*" (change)="onImageFileSelected($event)" [disabled]="uploadingImage()" hidden />
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M12 5v14"></path>
+            <path d="M5 12h14"></path>
+          </svg>
+          {{ uploadingImage() ? 'Uploading…' : 'Upload' }}
+        </label>
+      }
     </div>
 
     <div class="detail-grid">

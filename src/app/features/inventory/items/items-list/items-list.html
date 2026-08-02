@@ -2,7 +2,9 @@
 
   <div class="items-page__header">
     <div class="items-page__title">Items</div>
-    <button type="button" class="btn-primary" (click)="createItem()">+ New Item</button>
+    @if (canCreate) {
+      <button type="button" class="btn-primary" (click)="createItem()">+ New Item</button>
+    }
   </div>
 
   <div class="items-page__filters">

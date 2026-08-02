@@ -3,6 +3,8 @@ import { DatePipe } from '@angular/common';
 import { ActivatedRoute, Router } from '@angular/router';
 import { ItemResponse, ItemsService, ItemSupplierResponse, SuppliersService } from '../../../../generated';
 import { FIRE_PROTECTION_CATEGORIES } from '../../../../core/constants/categories';
+import { CurrentUserService } from '../../../../core/services/current-user';
+import { Permission } from '../../../../core/constants/permissions';
 
 const CATEGORIES = FIRE_PROTECTION_CATEGORIES;
 
@@ -29,8 +31,11 @@ export class ItemDetailComponent implements OnInit {
   private readonly router = inject(Router);
   private readonly itemsService = inject(ItemsService);
   private readonly suppliersService = inject(SuppliersService);
+  private readonly currentUser = inject(CurrentUserService);
 
   readonly categories = CATEGORIES;
+  readonly canEdit = this.currentUser.hasPermission(Permission.ItemEdit);
+  readonly canDeactivate = this.currentUser.hasPermission(Permission.ItemDeactivate);
 
   readonly item = signal<ItemResponse | null>(null);
   readonly suppliers = signal<ItemSupplierResponse[]>([]);

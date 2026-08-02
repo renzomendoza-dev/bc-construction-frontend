@@ -3,8 +3,12 @@
   <div class="stock-page__header">
     <div class="stock-page__title">Stock Levels</div>
     <div class="stock-page__actions">
-      <button type="button" class="btn-secondary" (click)="openAdjust()">Adjust Stock</button>
-      <button type="button" class="btn-primary" (click)="openTransfer()">Transfer Stock</button>
+      @if (canAdjust) {
+        <button type="button" class="btn-secondary" (click)="openAdjust()">Adjust Stock</button>
+      }
+      @if (canTransfer) {
+        <button type="button" class="btn-primary" (click)="openTransfer()">Transfer Stock</button>
+      }
     </div>
   </div>
 
@@ -108,7 +112,7 @@
                         <div class="table__cell-code">{{ row.locationCode || '—' }}</div>
                         <div class="align-right qty-value" [class.qty-value--low]="isRowLow(row)">{{ row.quantity }}</div>
                         <div class="align-right threshold-cell">
-                          @if (editingThresholdKey() === rowKey(row)) {
+                          @if (editingThresholdKey() === rowKey(row) && canSetReorderThreshold) {
                             <input
                               type="number"
                               min="0"
@@ -132,7 +136,7 @@
                               [disabled]="savingThresholdKey() === rowKey(row)"
                               (click)="cancelEditThreshold(); $event.stopPropagation()"
                             >✕</button>
-                          } @else {
+                          } @else if (canSetReorderThreshold) {
                             <button
                               type="button"
                               class="threshold-value-btn"
@@ -143,6 +147,8 @@
                                 <path d="M17 3a2.85 2.83 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5Z"></path>
                               </svg>
                             </button>
+                          } @else {
+                            <span class="threshold-value-readonly">{{ row.reorderThreshold ?? '—' }}</span>
                           }
                         </div>
                       </div>

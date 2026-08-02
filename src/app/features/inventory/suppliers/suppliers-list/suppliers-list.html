@@ -2,7 +2,9 @@
 
   <div class="suppliers-page__header">
     <div class="suppliers-page__title">Suppliers</div>
-    <button type="button" class="btn-primary" (click)="openNew()">+ New Supplier</button>
+    @if (canCreate) {
+      <button type="button" class="btn-primary" (click)="openNew()">+ New Supplier</button>
+    }
   </div>
 
   <div class="suppliers-page__filters">
@@ -59,7 +61,9 @@
         } @else if (isTrulyEmpty()) {
           <div class="empty-state__title">No suppliers yet</div>
           <div class="empty-state__subtitle">Add your first supplier to start linking items and purchasing.</div>
-          <button type="button" class="btn-primary" (click)="openNew()">+ New Supplier</button>
+          @if (canCreate) {
+            <button type="button" class="btn-primary" (click)="openNew()">+ New Supplier</button>
+          }
         }
       </div>
     }
@@ -120,16 +124,18 @@
       </div>
 
       <div class="drawer__footer">
-        @if (isEditingExisting()) {
+        @if (isEditingExisting() && canToggleActive()) {
           <button type="button" class="btn-danger-outline" [disabled]="toggling()" (click)="toggleActive()">
             {{ toggling() ? 'Updating…' : deactivateLabel() }}
           </button>
         } @else {
           <div></div>
         }
-        <button type="button" class="btn-primary" [disabled]="saving()" (click)="saveForm()">
-          {{ saving() ? 'Saving…' : 'Save' }}
-        </button>
+        @if (canSave()) {
+          <button type="button" class="btn-primary" [disabled]="saving()" (click)="saveForm()">
+            {{ saving() ? 'Saving…' : 'Save' }}
+          </button>
+        }
       </div>
 
     </div>

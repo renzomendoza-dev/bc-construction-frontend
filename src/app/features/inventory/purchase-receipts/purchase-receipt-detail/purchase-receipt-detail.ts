@@ -3,6 +3,8 @@ import { DatePipe } from '@angular/common';
 import { ActivatedRoute, Router } from '@angular/router';
 import { PurchaseReceiptResponse, PurchaseReceiptsService } from '../../../../generated';
 import { formatPeso } from '../../../../core/model.currency';
+import { CurrentUserService } from '../../../../core/services/current-user';
+import { Permission } from '../../../../core/constants/permissions';
 
 
 @Component({
@@ -16,8 +18,10 @@ export class PurchaseReceiptDetailComponent implements OnInit {
   private readonly route = inject(ActivatedRoute);
   private readonly router = inject(Router);
   private readonly receiptsService = inject(PurchaseReceiptsService);
+  private readonly currentUser = inject(CurrentUserService);
 
   readonly formatPeso = formatPeso;
+  readonly canConfirm = this.currentUser.hasPermission(Permission.PurchaseReceiptConfirm);
 
   readonly receipt = signal<PurchaseReceiptResponse | null>(null);
   readonly loading = signal(true);

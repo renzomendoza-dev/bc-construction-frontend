@@ -6,7 +6,9 @@ import {
   SuppliersService,
   SupplierUpdateRequest,
 } from '../../../../generated';
- 
+import { CurrentUserService } from '../../../../core/services/current-user';
+import { Permission } from '../../../../core/constants/permissions';
+
 const PAGE_SIZE = 6;
 // Large enough to cover the realistic supplier count in one request.
 // GET /api/suppliers has no `search` param (unlike /api/items), so search
@@ -31,7 +33,12 @@ const EMPTY_FORM: SupplierForm = { name: '', contactInfo: '' };
 })
 export class SuppliersListComponent implements OnInit {
   private readonly suppliersService = inject(SuppliersService);
- 
+  private readonly currentUser = inject(CurrentUserService);
+
+  readonly canCreate = this.currentUser.hasPermission(Permission.SupplierCreate);
+  readonly canEdit = this.currentUser.hasPermission(Permission.SupplierEdit);
+  readonly canDeactivate = this.currentUser.hasPermission(Permission.SupplierDeactivate);
+
   // ---- Full dataset + client-side filter/paginate state ----
   private readonly allSuppliers = signal<SupplierResponse[]>([]);
   readonly loading = signal(false);
@@ -77,6 +84,7 @@ export class SuppliersListComponent implements OnInit {
     this.selectedId() ? (this.allSuppliers().find((s) => s.id === this.selectedId()) ?? null) : null,
   );
   readonly isEditingExisting = computed(() => this.selectedId() !== null);
+  readonly canSave = computed(() => (this.isEditingExisting() ? this.canEdit : this.canCreate));
  
   readonly form = signal<SupplierForm>({ ...EMPTY_FORM });
   readonly saving = signal(false);
@@ -193,6 +201,12 @@ export class SuppliersListComponent implements OnInit {
  
   deactivateLabel(): string {
     return this.selected()?.active ? 'Deactivate' : 'Reactivate';
+  }
+
+  // Deactivating hits PATCH /deactivate (SUPPLIER_DEACTIVATE); reactivating
+  // goes through PUT /{id} instead (SUPPLIER_EDIT), same split as Warehouses.
+  canToggleActive(): boolean {
+    return this.selected()?.active ? this.canDeactivate : this.canEdit;
   }
  
   private fetchSuppliers(): void {

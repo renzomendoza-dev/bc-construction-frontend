@@ -17,6 +17,8 @@ import {
   WarehouseResponse,
   WarehousesService,
 } from '../../../../generated';
+import { CurrentUserService } from '../../../../core/services/current-user';
+import { Permission } from '../../../../core/constants/permissions';
 
 type Tab = 'levels' | 'lowstock' | 'history';
 type MovementType = 'IN' | 'OUT' | 'TRANSFER' | 'ADJUSTMENT';
@@ -62,6 +64,11 @@ export class StockLevelsComponent implements OnInit {
   private readonly inventoryService = inject(InventoryService);
   private readonly warehousesService = inject(WarehousesService);
   private readonly itemsService = inject(ItemsService);
+  private readonly currentUser = inject(CurrentUserService);
+
+  readonly canAdjust = this.currentUser.hasPermission(Permission.StockAdjust);
+  readonly canTransfer = this.currentUser.hasPermission(Permission.StockTransfer);
+  readonly canSetReorderThreshold = this.currentUser.hasPermission(Permission.StockSetReorderThreshold);
 
   readonly tab = signal<Tab>('levels');
 

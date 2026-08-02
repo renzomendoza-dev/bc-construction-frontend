@@ -1,5 +1,7 @@
 import { Routes } from '@angular/router';
 import { adminGuard } from './core/guards/admin.guard';
+import { permissionGuard } from './core/guards/permission.guard';
+import { Permission } from './core/constants/permissions';
 
 export const routes: Routes = [
   {
@@ -25,6 +27,7 @@ export const routes: Routes = [
       },
       {
         path: 'items/new',
+        canActivate: [permissionGuard(Permission.ItemCreate, '/inventory/items')],
         loadComponent: () =>
           import('./features/inventory/items/item-create/item-create').then((m) => m.ItemCreateComponent),
       },
@@ -52,6 +55,7 @@ export const routes: Routes = [
       },
       {
         path: 'purchase-receipts/new',
+        canActivate: [permissionGuard(Permission.PurchaseReceiptCreate, '/inventory/purchase-receipts')],
         loadComponent: () =>
           import('./features/inventory/purchase-receipts/purchase-receipt-create/purchase-receipt-create').then(
             (m) => m.PurchaseReceiptCreateComponent,

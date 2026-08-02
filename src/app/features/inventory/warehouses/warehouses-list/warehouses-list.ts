@@ -9,7 +9,9 @@ import {
   WarehousesService,
   WarehouseUpdateRequest,
 } from '../../../../generated';
- 
+import { CurrentUserService } from '../../../../core/services/current-user';
+import { Permission } from '../../../../core/constants/permissions';
+
 interface NewWarehouseForm {
   code: string;
   name: string;
@@ -27,7 +29,13 @@ const EMPTY_FORM: NewWarehouseForm = { code: '', name: '' };
 })
 export class WarehousesListComponent implements OnInit {
   private readonly warehousesService = inject(WarehousesService);
- 
+  private readonly currentUser = inject(CurrentUserService);
+
+  readonly canCreate = this.currentUser.hasPermission(Permission.WarehouseCreate);
+  readonly canEdit = this.currentUser.hasPermission(Permission.WarehouseEdit);
+  readonly canDeactivate = this.currentUser.hasPermission(Permission.WarehouseDeactivate);
+  readonly canManageLocations = this.currentUser.hasPermission(Permission.WarehouseManageLocations);
+
   readonly warehouses = signal<WarehouseResponse[]>([]);
   readonly locationsByWarehouse = signal<Record<number, StorageLocationResponse[]>>({});
   readonly expandedIds = signal<Set<number>>(new Set());
@@ -71,6 +79,14 @@ export class WarehousesListComponent implements OnInit {
  
   deactivateLabel(warehouse: WarehouseResponse): string {
     return warehouse.active ? 'Deactivate' : 'Reactivate';
+  }
+
+  // Deactivating hits PATCH /deactivate (WAREHOUSE_DEACTIVATE); reactivating
+  // goes through PUT /{id} instead (WAREHOUSE_EDIT) since there's no
+  // separate reactivate route — so which permission gates this one button
+  // depends on the warehouse's current state.
+  canToggleActive(warehouse: WarehouseResponse): boolean {
+    return warehouse.active ? this.canDeactivate : this.canEdit;
   }
  
   // ---- Create warehouse ----
