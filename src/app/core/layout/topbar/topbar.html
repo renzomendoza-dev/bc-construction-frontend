@@ -17,7 +17,7 @@
 
     <button type="button" class="theme-toggle" (click)="toggleTheme()">
       <span class="theme-toggle__icon">{{ isDark() ? '☾' : '☀' }}</span>
-      {{ isDark() ? 'Dark' : 'Light' }}
+      <span class="theme-toggle__label">{{ isDark() ? 'Dark' : 'Light' }}</span>
     </button>
 
     <div class="divider"></div>

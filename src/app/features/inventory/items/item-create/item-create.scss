@@ -179,3 +179,13 @@
     cursor: default;
   }
 }
+
+@media (max-width: 640px) {
+  .item-detail-page {
+    padding: 20px 16px 40px;
+  }
+
+  .form-grid {
+    grid-template-columns: 1fr;
+  }
+}

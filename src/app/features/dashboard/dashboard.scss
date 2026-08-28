@@ -11,6 +11,20 @@
   }
 }
 
+@media (max-width: 640px) {
+  .dashboard-page {
+    padding: 20px 16px 40px;
+  }
+
+  .dashboard-header {
+    flex-wrap: wrap;
+  }
+
+  .card-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
 .dashboard-inner {
   max-width: 1200px;
   margin: 0 auto;

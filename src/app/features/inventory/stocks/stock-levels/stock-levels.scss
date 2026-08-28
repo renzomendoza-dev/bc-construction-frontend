@@ -657,3 +657,72 @@
   gap: 10px;
   margin-top: 20px;
 }
+
+@media (max-width: 640px) {
+  .stock-page {
+    padding: 20px 16px 40px;
+  }
+
+  .stock-page__header {
+    flex-wrap: wrap;
+  }
+
+  .stock-page__actions {
+    width: 100%;
+
+    .btn-primary,
+    .btn-secondary {
+      flex: 1;
+    }
+  }
+
+  .tabs {
+    overflow-x: auto;
+    flex-wrap: nowrap;
+  }
+
+  .tab {
+    flex-shrink: 0;
+  }
+
+  .table {
+    overflow-x: auto;
+  }
+
+  .table__head--items,
+  .table__row--items {
+    min-width: 480px;
+  }
+
+  .table__head--lowstock,
+  .table__row--lowstock {
+    min-width: 560px;
+  }
+
+  .table__head--history,
+  .table__row--history {
+    min-width: 780px;
+  }
+
+  .item-group__expanded {
+    padding: 4px 12px 16px 20px;
+  }
+
+  .location-breakdown {
+    overflow-x: auto;
+  }
+
+  .location-breakdown__head,
+  .location-breakdown__row {
+    min-width: 460px;
+  }
+
+  .dialog {
+    width: calc(100vw - 32px);
+    padding: 20px;
+  }
+
+  .form-field-row {
+    grid-template-columns: 1fr;
+  }
+}

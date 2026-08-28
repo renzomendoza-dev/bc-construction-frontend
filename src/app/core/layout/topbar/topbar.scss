@@ -181,3 +181,33 @@
   background: var(--border);
   margin: 4px 4px;
 }
+
+@media (max-width: 480px) {
+  .top-bar {
+    padding: 0 12px;
+  }
+
+  .top-bar__actions {
+    gap: 8px;
+  }
+
+  .theme-toggle {
+    padding: 6px;
+  }
+
+  .theme-toggle__label {
+    display: none;
+  }
+
+  .divider {
+    display: none;
+  }
+
+  .user-menu__name {
+    display: none;
+  }
+
+  .user-menu__trigger {
+    padding: 6px;
+  }
+}

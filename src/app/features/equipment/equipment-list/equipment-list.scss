@@ -450,3 +450,42 @@
   gap: 10px;
   margin-top: 20px;
 }
+
+@media (max-width: 640px) {
+  .equipment-page {
+    padding: 20px 16px 40px;
+  }
+
+  .equipment-page__header {
+    flex-wrap: wrap;
+  }
+
+  .tabs {
+    overflow-x: auto;
+  }
+
+  .table {
+    overflow-x: auto;
+  }
+
+  .table__head,
+  .table__row,
+  .table__head--overdue,
+  .table__row--overdue {
+    min-width: 640px;
+  }
+
+  .dialog {
+    width: calc(100vw - 32px);
+    max-width: 460px;
+    padding: 20px;
+  }
+
+  .dialog-form--grid {
+    grid-template-columns: 1fr;
+  }
+
+  .form-field--full {
+    grid-column: span 1;
+  }
+}

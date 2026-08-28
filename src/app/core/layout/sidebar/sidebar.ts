@@ -66,4 +66,13 @@ export class Sidebar {
     }
     this.inventoryOpen.update((open) => !open);
   }
+
+  // On mobile the expanded sidebar is a full-screen overlay (see
+  // sidebar.scss), so navigating should dismiss it — otherwise it stays
+  // open covering the page the link just navigated to.
+  closeOnMobileNav(): void {
+    if (this.expanded() && window.matchMedia('(max-width: 768px)').matches) {
+      this.toggleCollapse();
+    }
+  }
 }

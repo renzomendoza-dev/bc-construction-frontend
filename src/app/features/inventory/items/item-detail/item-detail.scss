@@ -423,3 +423,23 @@
 .history-row__value {
   color: var(--label-text);
 }
+
+@media (max-width: 640px) {
+  .item-detail-page {
+    padding: 20px 16px 40px;
+  }
+
+  .detail-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .form-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .image-tile,
+  .image-upload-tile {
+    width: 84px;
+    height: 84px;
+  }
+}

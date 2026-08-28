@@ -404,3 +404,27 @@
     cursor: default;
   }
 }
+
+@media (max-width: 640px) {
+  .suppliers-page {
+    padding: 20px 16px 40px;
+  }
+
+  .suppliers-page__header {
+    flex-wrap: wrap;
+    gap: 10px;
+  }
+
+  .suppliers-table {
+    overflow-x: auto;
+  }
+
+  .suppliers-table__head,
+  .suppliers-table__row {
+    min-width: 540px;
+  }
+
+  .drawer {
+    width: 100%;
+  }
+}

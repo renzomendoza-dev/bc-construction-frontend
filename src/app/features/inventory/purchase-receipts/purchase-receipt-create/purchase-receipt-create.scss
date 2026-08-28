@@ -276,3 +276,26 @@ textarea {
     cursor: default;
   }
 }
+
+@media (max-width: 640px) {
+  .create-page {
+    padding: 20px 16px 40px;
+  }
+
+  .form-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .card {
+    overflow-x: auto;
+  }
+
+  .lines-head,
+  .lines-row {
+    min-width: 560px;
+  }
+
+  .form-actions {
+    flex-wrap: wrap;
+  }
+}

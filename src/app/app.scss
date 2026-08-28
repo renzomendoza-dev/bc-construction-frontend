@@ -14,4 +14,11 @@
 .app-shell__content {
   flex: 1;
   padding: 32px;
+  min-width: 0; // lets wide children (tables) scroll internally instead of pushing the viewport
+}
+
+@media (max-width: 640px) {
+  .app-shell__content {
+    padding: 16px;
+  }
 }

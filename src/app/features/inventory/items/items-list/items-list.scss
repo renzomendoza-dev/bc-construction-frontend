@@ -273,3 +273,23 @@
     }
   }
 }
+
+@media (max-width: 640px) {
+  .items-page {
+    padding: 20px 16px 40px;
+  }
+
+  .items-page__header {
+    flex-wrap: wrap;
+    gap: 10px;
+  }
+
+  .items-table {
+    overflow-x: auto;
+  }
+
+  .items-table__head,
+  .items-table__row {
+    min-width: 460px;
+  }
+}

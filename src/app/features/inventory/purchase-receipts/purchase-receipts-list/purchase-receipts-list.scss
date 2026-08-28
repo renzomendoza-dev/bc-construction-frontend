@@ -230,3 +230,23 @@
     }
   }
 }
+
+@media (max-width: 640px) {
+  .receipts-page {
+    padding: 20px 16px 40px;
+  }
+
+  .receipts-page__header {
+    flex-wrap: wrap;
+    gap: 10px;
+  }
+
+  .receipts-table {
+    overflow-x: auto;
+  }
+
+  .receipts-table__head,
+  .receipts-table__row {
+    min-width: 680px;
+  }
+}
