@@ -31,6 +31,15 @@
           Confirmed by {{ r.confirmedByName }} on {{ r.confirmedAt }}
         </div>
       }
+      @if (r.fulfillsTransferBatchId) {
+        <div class="receipt-header__fulfills">
+          Fulfills stock shortfall for
+          <a [routerLink]="['/inventory/transfers', r.fulfillsTransferBatchId]">Transfer #{{ r.fulfillsTransferBatchId }}</a>
+          @if (!r.confirmed) {
+            — confirming this receipt will unblock it for resubmission.
+          }
+        </div>
+      }
     </div>
 
     @if (!r.confirmed && canConfirm) {

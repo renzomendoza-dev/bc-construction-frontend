@@ -1,14 +1,22 @@
 import { ChangeDetectionStrategy, Component, OnInit, computed, inject, signal } from '@angular/core';
 import { Router } from '@angular/router';
 import {
+  InventoryService,
   ItemResponse,
   ItemsService,
   MaterialRequestCreateRequest,
   MaterialRequestLineItemRequest,
   MaterialRequestsService,
+  StockLevelResponse,
   WarehouseResponse,
   WarehousesService,
 } from '../../../../generated';
+
+interface WarehouseAvailability {
+  warehouseId: number;
+  warehouseName: string;
+  quantity: number;
+}
 
 interface DraftLine {
   itemId: number | null;
@@ -31,7 +39,13 @@ export class MaterialRequestCreateComponent implements OnInit {
   private readonly materialRequestsService = inject(MaterialRequestsService);
   private readonly warehousesService = inject(WarehousesService);
   private readonly itemsService = inject(ItemsService);
+  private readonly inventoryService = inject(InventoryService);
   private readonly router = inject(Router);
+
+  // Per-item stock lookup, keyed by itemId, populated on demand as items are
+  // picked in a line — purely informational here (a request has no origin
+  // warehouse of its own to compare against, unlike a transfer batch).
+  private readonly stockByItemId = signal<Record<number, StockLevelResponse[]>>({});
 
   private readonly warehouses = signal<WarehouseResponse[]>([]);
   readonly items = signal<ItemResponse[]>([]);
@@ -74,9 +88,32 @@ export class MaterialRequestCreateComponent implements OnInit {
   }
 
   onLineItemChange(index: number, value: string): void {
-    this.lines.update((rows) =>
-      rows.map((r, i) => (i === index ? { ...r, itemId: value ? Number(value) : null } : r)),
-    );
+    const itemId = value ? Number(value) : null;
+    this.lines.update((rows) => rows.map((r, i) => (i === index ? { ...r, itemId } : r)));
+    if (itemId !== null) this.ensureStockLoaded(itemId);
+  }
+
+  // Aggregates that item's stock rows (per item+warehouse+location) up to
+  // one row per warehouse — the location breakdown is more detail than
+  // useful here.
+  warehouseAvailability(itemId: number | null): WarehouseAvailability[] {
+    if (itemId === null) return [];
+    const rows = this.stockByItemId()[itemId] ?? [];
+    const byWarehouse = new Map<number, WarehouseAvailability>();
+    for (const row of rows) {
+      if (row.warehouseId === undefined) continue;
+      const existing = byWarehouse.get(row.warehouseId);
+      if (existing) {
+        existing.quantity += row.quantity ?? 0;
+      } else {
+        byWarehouse.set(row.warehouseId, {
+          warehouseId: row.warehouseId,
+          warehouseName: row.warehouseName ?? `#${row.warehouseId}`,
+          quantity: row.quantity ?? 0,
+        });
+      }
+    }
+    return Array.from(byWarehouse.values()).sort((a, b) => b.quantity - a.quantity);
   }
 
   onLineQtyChange(index: number, value: string): void {
@@ -140,6 +177,19 @@ export class MaterialRequestCreateComponent implements OnInit {
               ? 'The site, or one of the items, could not be found.'
               : 'Could not create material request. Please check the form and try again.',
         );
+      },
+    });
+  }
+
+  private ensureStockLoaded(itemId: number): void {
+    if (itemId in this.stockByItemId()) return;
+    this.inventoryService.listStock(itemId, undefined, 0, 50, undefined).subscribe({
+      next: (result) => {
+        this.stockByItemId.update((map) => ({ ...map, [itemId]: (result.content ?? []) as StockLevelResponse[] }));
+      },
+      error: () => {
+        // Availability is a helpful hint, not a hard requirement — a failed
+        // lookup just means no hint is shown for this item.
       },
     });
   }

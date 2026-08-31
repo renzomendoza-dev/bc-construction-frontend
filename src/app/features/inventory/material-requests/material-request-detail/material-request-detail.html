@@ -101,6 +101,18 @@
             <input type="text" placeholder="optional" [value]="line.notes" (change)="onEditLineNotesChange($index, $any($event.target).value)" />
             <button type="button" class="line-remove" [disabled]="editLines().length <= 1" (click)="removeEditLine($index)" aria-label="Remove line">✕</button>
           </div>
+          @if (line.itemId; as itemId) {
+            <div class="availability-hint">
+              @if (warehouseAvailability(itemId).length > 0) {
+                Currently available:
+                @for (w of warehouseAvailability(itemId); track w.warehouseId; let last = $last) {
+                  {{ w.warehouseName }} ({{ w.quantity }}){{ last ? '' : ', ' }}
+                }
+              } @else {
+                No stock on record for this item at any warehouse.
+              }
+            </div>
+          }
         }
 
         <button type="button" class="btn-add-line" (click)="addEditLine()">+ Add Line</button>

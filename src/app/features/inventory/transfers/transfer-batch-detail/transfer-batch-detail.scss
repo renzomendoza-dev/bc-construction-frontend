@@ -84,6 +84,11 @@
     background: rgba(61, 143, 99, 0.1);
     color: #3d8f63;
   }
+
+  &[data-status='AWAITING_PURCHASE'] {
+    background: rgba(181, 73, 63, 0.1);
+    color: #b5493f;
+  }
 }
 
 :host-context([data-theme='dark']) .status-badge {
@@ -95,6 +100,11 @@
   &[data-status='COMPLETED'] {
     background: rgba(61, 143, 99, 0.18);
     color: #5fb87f;
+  }
+
+  &[data-status='AWAITING_PURCHASE'] {
+    background: rgba(181, 73, 63, 0.22);
+    color: #e08a7d;
   }
 }
 
@@ -144,7 +154,17 @@
   margin-top: 3px;
 }
 
+.draft-banner__actions {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-shrink: 0;
+}
+
 .btn-confirm {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
   height: 44px;
   padding: 0 22px;
   border-radius: 8px;
@@ -154,6 +174,7 @@
   font-family: 'Archivo', sans-serif;
   font-weight: 700;
   font-size: 14px;
+  text-decoration: none;
   cursor: pointer;
   flex-shrink: 0;
   box-shadow: 0 6px 16px rgba(27, 110, 118, 0.25);
@@ -166,6 +187,32 @@
     opacity: 0.7;
     cursor: default;
   }
+}
+
+.blocked-banner {
+  background: var(--panel-bg);
+  border: 1px solid rgba(181, 73, 63, 0.3);
+  border-radius: 12px;
+  padding: 20px 24px;
+  margin-bottom: 24px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  flex-wrap: wrap;
+}
+
+.blocked-banner__title {
+  font-family: 'Archivo', sans-serif;
+  font-weight: 700;
+  font-size: 14.5px;
+  color: #b5493f;
+}
+
+.blocked-banner__subtitle {
+  font-size: 12.5px;
+  color: var(--sub-text);
+  margin-top: 3px;
 }
 
 .form-error {

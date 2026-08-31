@@ -110,6 +110,8 @@ export class TransferBatchesListComponent implements OnInit {
         return 'Submitted';
       case TransferBatchResponse.StatusEnum.Completed:
         return 'Completed';
+      case TransferBatchResponse.StatusEnum.AwaitingPurchase:
+        return 'Awaiting Purchase';
       default:
         return '—';
     }

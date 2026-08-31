@@ -11,9 +11,9 @@ Angular frontend for BC Construction Services' inventory, equipment, and admin o
   - Warehouses & Sites — list/create, `MAIN`/`SITE` type, storage locations.
   - Purchase Receipts — draft → confirm workflow that applies stock on confirmation.
   - Stock Levels — grouped-by-item view with Low Stock and Movement History tabs, per-row Adjust/Transfer actions, inline reorder-threshold editing.
-  - Transfers — batched stock transfers between a warehouse and a site (pull-out or dispatch), draft → submit workflow.
-  - Material Requests — a site's request for materials, with edit-in-place support and a shortcut to create a fulfilling dispatch transfer.
-- **Equipment** — list, checkout/checkin, create/edit.
+  - Transfers — batched stock transfers between a warehouse and a site (pull-out or dispatch), draft → submit workflow, with per-line stock availability hints, deletable drafts, and an automatic `Awaiting Purchase` block (with a linked Purchase Receipt to resolve it) when submitting hits insufficient stock.
+  - Material Requests — a site's request for materials, with edit-in-place support, stock availability hints, and a shortcut to create a fulfilling dispatch transfer.
+- **Equipment** — list, checkout/checkin, create/edit, batch assignment/return (assign to a site or return to a warehouse), all linked to real Warehouse records instead of a free-text site.
 - **Admin** — user list with activate/deactivate and Keycloak realm-role assignment.
 - **Access control** — mutating UI actions are gated behind fine-grained permissions read from the authenticated user's Keycloak JWT.
 - Responsive layout (collapsible/overlay sidebar, scrollable tables, stacked forms on narrow screens).

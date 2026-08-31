@@ -42,12 +42,16 @@
       </div>
       <div class="form-field">
         <label>{{ direction() === 'PULL_OUT' ? 'Destination Warehouse *' : 'Destination Site *' }}</label>
-        <select [value]="destinationWarehouseId()" (change)="onDestinationChange($any($event.target).value)">
-          <option value="">Select…</option>
-          @for (w of destinationOptions(); track w.id) {
-            <option [value]="w.id">{{ w.name }}</option>
-          }
-        </select>
+        @if (fulfillingRequest(); as req) {
+          <div class="frozen-field">{{ req.siteWarehouseName }}</div>
+        } @else {
+          <select [value]="destinationWarehouseId()" (change)="onDestinationChange($any($event.target).value)">
+            <option value="">Select…</option>
+            @for (w of destinationOptions(); track w.id) {
+              <option [value]="w.id">{{ w.name }}</option>
+            }
+          </select>
+        }
       </div>
     </div>
   </div>
@@ -68,17 +72,36 @@
 
     @for (line of lines(); track $index) {
       <div class="lines-row">
-        <select [value]="line.itemId" (change)="onLineItemChange($index, $any($event.target).value)">
-          <option value="">Select item…</option>
-          @for (item of items(); track item.id) {
-            <option [value]="item.id">{{ item.name }} ({{ item.sku }})</option>
-          }
-        </select>
+        @if (line.fromRequest) {
+          <div class="frozen-field">{{ itemName(line.itemId) }}</div>
+        } @else {
+          <select [value]="line.itemId" (change)="onLineItemChange($index, $any($event.target).value)">
+            <option value="">Select item…</option>
+            @for (item of items(); track item.id) {
+              <option [value]="item.id">{{ item.name }} ({{ item.sku }})</option>
+            }
+          </select>
+        }
         <input type="number" min="0" class="align-right" placeholder="optional" [value]="line.expectedQuantity" (change)="onLineExpectedQtyChange($index, $any($event.target).value)" />
         <input type="number" min="1" class="align-right" [value]="line.quantity" (change)="onLineQtyChange($index, $any($event.target).value)" />
         <input type="text" placeholder="optional" [value]="line.notes" (change)="onLineNotesChange($index, $any($event.target).value)" />
         <button type="button" class="line-remove" [disabled]="lines().length <= 1" (click)="removeLine($index)" aria-label="Remove line">✕</button>
       </div>
+      @if (line.itemId; as itemId) {
+        <div class="availability-hint" [class.availability-hint--shortfall]="isShortfall(line)">
+          @if (warehouseAvailability(itemId).length > 0) {
+            Available:
+            @for (w of warehouseAvailability(itemId); track w.warehouseId; let last = $last) {
+              {{ w.warehouseName }} ({{ w.quantity }}){{ last ? '' : ', ' }}
+            }
+          } @else {
+            No stock on record for this item at any warehouse.
+          }
+          @if (isShortfall(line)) {
+            — only {{ originAvailability(itemId) }} available at the selected origin, short by {{ (line.quantity ?? 0) - originAvailability(itemId)! }}.
+          }
+        </div>
+      }
     }
 
     <button type="button" class="btn-add-line" (click)="addLine()">+ Add Line</button>
@@ -91,7 +114,7 @@
 
   <div class="card">
     <div class="card__title">Notes</div>
-    <textarea placeholder="Optional notes about this transfer…" (change)="onNotesChange($any($event.target).value)"></textarea>
+    <textarea placeholder="Optional notes about this transfer…" [value]="notes()" (change)="onNotesChange($any($event.target).value)"></textarea>
   </div>
 
   <div class="form-actions">

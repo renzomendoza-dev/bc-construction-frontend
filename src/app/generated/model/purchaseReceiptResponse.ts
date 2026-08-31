@@ -52,6 +52,10 @@ export interface PurchaseReceiptResponse {
      */
     notes?: string;
     /**
+     * Identifier of the TransferBatch this receipt is purchasing the shortfall for, if any
+     */
+    fulfillsTransferBatchId?: number;
+    /**
      * Line items purchased on this receipt
      */
     lines?: Array<PurchaseReceiptLineResponse>;

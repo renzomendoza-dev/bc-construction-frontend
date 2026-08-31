@@ -6,6 +6,7 @@ api/adminRoles.service.ts
 api/adminUsers.service.ts
 api/api.ts
 api/equipment.service.ts
+api/equipmentAssignmentBatches.service.ts
 api/inventory.service.ts
 api/items.service.ts
 api/materialRequests.service.ts
@@ -20,6 +21,10 @@ encoder.ts
 git_push.sh
 index.ts
 model/adminUserResponse.ts
+model/equipmentAssignmentBatchCreateRequest.ts
+model/equipmentAssignmentBatchLineRequest.ts
+model/equipmentAssignmentBatchLineResponse.ts
+model/equipmentAssignmentBatchResponse.ts
 model/equipmentCheckInRequest.ts
 model/equipmentCheckOutRequest.ts
 model/equipmentCreateRequest.ts

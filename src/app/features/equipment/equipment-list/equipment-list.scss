@@ -25,6 +25,13 @@
   color: var(--heading-text);
 }
 
+.equipment-page__header-actions {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
 .btn-primary {
   height: 38px;
   padding: 0 18px;
@@ -48,6 +55,9 @@
 }
 
 .btn-secondary {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
   height: 38px;
   padding: 0 16px;
   border-radius: 8px;
@@ -58,6 +68,7 @@
   font-weight: 600;
   font-size: 13px;
   cursor: pointer;
+  text-decoration: none;
 
   &:hover:not(:disabled) {
     background: var(--hover-bg);

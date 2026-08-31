@@ -31,13 +31,42 @@
       }
     </div>
 
-    @if (b.status === 'DRAFT' && canSubmit) {
+    @if (b.status === 'DRAFT' && (canSubmit || canDelete)) {
       <div class="draft-banner">
         <div>
           <div class="draft-banner__title">This transfer is still a draft</div>
           <div class="draft-banner__subtitle">Submitting moves stock from {{ b.originWarehouseName }} to {{ b.destinationWarehouseName }} and cannot be undone.</div>
         </div>
-        <button type="button" class="btn-confirm" (click)="openConfirmDialog()">Submit Transfer</button>
+        <div class="draft-banner__actions">
+          @if (canDelete) {
+            <button type="button" class="btn-secondary" (click)="openDeleteDialog()">Delete Draft</button>
+          }
+          @if (canSubmit) {
+            <button type="button" class="btn-confirm" (click)="openConfirmDialog()">Submit Transfer</button>
+          }
+        </div>
+      </div>
+    }
+
+    @if (b.status === 'AWAITING_PURCHASE') {
+      <div class="blocked-banner">
+        <div>
+          <div class="blocked-banner__title">Blocked — insufficient stock at {{ b.originWarehouseName }}</div>
+          <div class="blocked-banner__subtitle">
+            @if (linkedReceiptChecked() && linkedReceipt()) {
+              A Purchase Receipt already references this shortfall. Confirming it will unblock this transfer for resubmission.
+            } @else {
+              Create a Purchase Receipt for the shortfall item(s) — confirming it will flip this batch back to Draft so it can be resubmitted.
+            }
+          </div>
+        </div>
+        @if (linkedReceiptChecked() && linkedReceipt(); as receipt) {
+          <a class="btn-confirm" [routerLink]="['/inventory/purchase-receipts', receipt.id]">View Purchase Receipt</a>
+        } @else {
+          <a class="btn-confirm" [routerLink]="['/inventory/purchase-receipts/new']" [queryParams]="{ fulfillsTransferBatchId: b.id }">
+            Create Purchase Receipt for this Shortfall
+          </a>
+        }
       </div>
     }
 
@@ -64,6 +93,22 @@
       }
     </div>
 
+  }
+
+  @if (deleteDialogOpen() && batch(); as b) {
+    <div class="scrim" (click)="closeDeleteDialog()"></div>
+    <div class="dialog">
+      <div class="dialog__title">Delete this draft?</div>
+      <div class="dialog__body">
+        This will permanently remove this draft transfer from {{ b.originWarehouseName }} to {{ b.destinationWarehouseName }}. This action cannot be undone.
+      </div>
+      <div class="dialog__actions">
+        <button type="button" class="btn-secondary" [disabled]="deleting()" (click)="closeDeleteDialog()">Cancel</button>
+        <button type="button" class="btn-confirm" [disabled]="deleting()" (click)="deleteBatch()">
+          {{ deleting() ? 'Deleting…' : 'Yes, Delete Draft' }}
+        </button>
+      </div>
+    </div>
   }
 
   @if (confirmDialogOpen() && batch(); as b) {

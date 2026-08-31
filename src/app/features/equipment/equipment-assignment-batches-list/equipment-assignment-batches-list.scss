@@ -2,21 +2,23 @@
   display: block;
 }
 
-.transfers-page {
+.batches-page {
   padding: 32px 40px 60px;
   box-sizing: border-box;
   max-width: 1200px;
   margin: 0 auto;
 }
 
-.transfers-page__header {
+.batches-page__header {
   display: flex;
   align-items: center;
   justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 12px;
   margin-bottom: 22px;
 }
 
-.transfers-page__title {
+.batches-page__title {
   font-family: 'Archivo', sans-serif;
   font-weight: 700;
   font-size: 24px;
@@ -40,7 +42,7 @@
   }
 }
 
-.transfers-page__filters {
+.batches-page__filters {
   display: flex;
   gap: 12px;
   align-items: center;
@@ -59,16 +61,16 @@
   font-family: 'IBM Plex Sans', sans-serif;
 }
 
-.transfers-table {
+.batches-table {
   background: var(--panel-bg);
   border: 1px solid var(--border);
   border-radius: 12px;
   overflow: hidden;
 }
 
-.transfers-table__head {
+.batches-table__head {
   display: grid;
-  grid-template-columns: 1.3fr 1.3fr 0.9fr 1.1fr 1fr;
+  grid-template-columns: 0.8fr 1.3fr 1.1fr 0.9fr 1.1fr 1fr;
   gap: 12px;
   align-items: center;
   padding: 10px 16px;
@@ -80,9 +82,9 @@
   color: var(--sub-text);
 }
 
-.transfers-table__row {
+.batches-table__row {
   display: grid;
-  grid-template-columns: 1.3fr 1.3fr 0.9fr 1.1fr 1fr;
+  grid-template-columns: 0.8fr 1.3fr 1.1fr 0.9fr 1.1fr 1fr;
   gap: 12px;
   align-items: center;
   padding: 12px 16px;
@@ -98,7 +100,13 @@
   }
 }
 
-.transfers-table__warehouse {
+.batches-table__direction {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--heading-text);
+}
+
+.batches-table__warehouse {
   font-size: 13.5px;
   font-weight: 600;
   color: var(--heading-text);
@@ -107,7 +115,7 @@
   text-overflow: ellipsis;
 }
 
-.transfers-table__by {
+.batches-table__by {
   font-size: 13px;
   color: var(--label-text);
   white-space: nowrap;
@@ -115,7 +123,7 @@
   text-overflow: ellipsis;
 }
 
-.transfers-table__date {
+.batches-table__date {
   font-size: 12.5px;
   color: var(--sub-text);
 }
@@ -142,11 +150,6 @@
     background: rgba(61, 143, 99, 0.1);
     color: #3d8f63;
   }
-
-  &[data-status='AWAITING_PURCHASE'] {
-    background: rgba(181, 73, 63, 0.1);
-    color: #b5493f;
-  }
 }
 
 :host-context([data-theme='dark']) .status-badge {
@@ -158,11 +161,6 @@
   &[data-status='COMPLETED'] {
     background: rgba(61, 143, 99, 0.18);
     color: #5fb87f;
-  }
-
-  &[data-status='AWAITING_PURCHASE'] {
-    background: rgba(181, 73, 63, 0.22);
-    color: #e08a7d;
   }
 }
 
@@ -198,19 +196,19 @@
   color: var(--sub-text);
 }
 
-.transfers-pagination {
+.batches-pagination {
   display: flex;
   align-items: center;
   justify-content: space-between;
   margin-top: 16px;
 }
 
-.transfers-pagination__summary {
+.batches-pagination__summary {
   font-size: 12.5px;
   color: var(--sub-text);
 }
 
-.transfers-pagination__controls {
+.batches-pagination__controls {
   display: flex;
   gap: 8px;
 
@@ -237,21 +235,21 @@
 }
 
 @media (max-width: 640px) {
-  .transfers-page {
+  .batches-page {
     padding: 20px 16px 40px;
   }
 
-  .transfers-page__header {
+  .batches-page__header {
     flex-wrap: wrap;
     gap: 10px;
   }
 
-  .transfers-table {
+  .batches-table {
     overflow-x: auto;
   }
 
-  .transfers-table__head,
-  .transfers-table__row {
-    min-width: 620px;
+  .batches-table__head,
+  .batches-table__row {
+    min-width: 640px;
   }
 }

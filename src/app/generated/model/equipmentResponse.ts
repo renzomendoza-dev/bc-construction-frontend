@@ -27,7 +27,14 @@ export interface EquipmentResponse {
      * Resolved display name of the current holder, if checked out
      */
     currentHolderName?: string;
-    currentSite?: string;
+    /**
+     * Identifier of the warehouse this equipment currently sits at — a SITE warehouse while checked out, a MAIN warehouse once returned
+     */
+    currentWarehouseId?: number;
+    /**
+     * Resolved display name of the current warehouse
+     */
+    currentWarehouseName?: string;
     checkedOutAt?: string;
     purchasePrice?: number;
     purchaseDate?: string;

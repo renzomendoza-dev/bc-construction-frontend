@@ -18,9 +18,9 @@ export interface EquipmentCheckOutRequest {
      */
     userId: number;
     /**
-     * Job site or location the equipment is going to
+     * Identifier of the SITE-type warehouse the equipment is going to (400 if it isn\'t a SITE warehouse)
      */
-    site: string;
+    siteWarehouseId: number;
     /**
      * Condition notes recorded at checkout
      */

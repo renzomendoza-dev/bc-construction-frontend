@@ -12,6 +12,7 @@
       <option value="all">All Statuses</option>
       <option value="DRAFT">Draft</option>
       <option value="SUBMITTED">Submitted</option>
+      <option value="AWAITING_PURCHASE">Awaiting Purchase</option>
       <option value="COMPLETED">Completed</option>
     </select>
     <select class="filter-select" [value]="warehouseFilter()" (change)="onWarehouseFilterChange($any($event.target).value)">

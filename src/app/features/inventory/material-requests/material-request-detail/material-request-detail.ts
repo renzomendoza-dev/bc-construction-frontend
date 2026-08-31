@@ -2,13 +2,21 @@ import { ChangeDetectionStrategy, Component, OnInit, inject, signal } from '@ang
 import { DatePipe } from '@angular/common';
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import {
+  InventoryService,
   ItemResponse,
   ItemsService,
   MaterialRequestLineItemRequest,
   MaterialRequestResponse,
   MaterialRequestsService,
   MaterialRequestUpdateRequest,
+  StockLevelResponse,
 } from '../../../../generated';
+
+interface WarehouseAvailability {
+  warehouseId: number;
+  warehouseName: string;
+  quantity: number;
+}
 import { CurrentUserService } from '../../../../core/services/current-user';
 import { Permission } from '../../../../core/constants/permissions';
 
@@ -36,7 +44,12 @@ export class MaterialRequestDetailComponent implements OnInit {
   private readonly router = inject(Router);
   private readonly materialRequestsService = inject(MaterialRequestsService);
   private readonly itemsService = inject(ItemsService);
+  private readonly inventoryService = inject(InventoryService);
   private readonly currentUser = inject(CurrentUserService);
+
+  // Per-item stock lookup, keyed by itemId, populated on demand while
+  // editing — purely informational, same as on the create screen.
+  private readonly stockByItemId = signal<Record<number, StockLevelResponse[]>>({});
 
   readonly canCreateDispatch = this.currentUser.hasPermission(Permission.TransferBatchCreate);
   readonly canEdit = this.currentUser.hasPermission(Permission.MaterialRequestEdit);
@@ -107,19 +120,54 @@ export class MaterialRequestDetailComponent implements OnInit {
     return this.items().find((i) => i.id === itemId)?.name ?? '';
   }
 
+  // Aggregates that item's stock rows (per item+warehouse+location) up to
+  // one row per warehouse — the location breakdown is more detail than
+  // useful here.
+  warehouseAvailability(itemId: number | null): WarehouseAvailability[] {
+    if (itemId === null) return [];
+    const rows = this.stockByItemId()[itemId] ?? [];
+    const byWarehouse = new Map<number, WarehouseAvailability>();
+    for (const row of rows) {
+      if (row.warehouseId === undefined) continue;
+      const existing = byWarehouse.get(row.warehouseId);
+      if (existing) {
+        existing.quantity += row.quantity ?? 0;
+      } else {
+        byWarehouse.set(row.warehouseId, {
+          warehouseId: row.warehouseId,
+          warehouseName: row.warehouseName ?? `#${row.warehouseId}`,
+          quantity: row.quantity ?? 0,
+        });
+      }
+    }
+    return Array.from(byWarehouse.values()).sort((a, b) => b.quantity - a.quantity);
+  }
+
   // ---- Enter/cancel edit ----
 
   enterEdit(): void {
     const current = this.request();
     if (!current) return;
 
-    if (!this.itemsLoaded()) {
-      this.loadItems();
-    }
-
-    this.syncFormFromRequest(current);
     this.errorMessage.set(null);
     this.mode.set('edit');
+
+    // The line items' <select> is bound to items() for its <option>s — its
+    // [value] binding silently fails to select an option that doesn't
+    // exist in the DOM yet, and Angular won't retry once it does. So the
+    // form can only be populated once items() has actually loaded.
+    if (this.itemsLoaded()) {
+      this.applyEditForm(current);
+    } else {
+      this.loadItems(() => this.applyEditForm(current));
+    }
+  }
+
+  private applyEditForm(request: MaterialRequestResponse): void {
+    this.syncFormFromRequest(request);
+    for (const line of request.lines ?? []) {
+      if (line.itemId !== undefined) this.ensureStockLoaded(line.itemId);
+    }
   }
 
   cancelEdit(): void {
@@ -157,9 +205,9 @@ export class MaterialRequestDetailComponent implements OnInit {
   }
 
   onEditLineItemChange(index: number, value: string): void {
-    this.editLines.update((rows) =>
-      rows.map((r, i) => (i === index ? { ...r, itemId: value ? Number(value) : null } : r)),
-    );
+    const itemId = value ? Number(value) : null;
+    this.editLines.update((rows) => rows.map((r, i) => (i === index ? { ...r, itemId } : r)));
+    if (itemId !== null) this.ensureStockLoaded(itemId);
   }
 
   onEditLineQtyChange(index: number, value: string): void {
@@ -229,11 +277,25 @@ export class MaterialRequestDetailComponent implements OnInit {
     });
   }
 
-  private loadItems(): void {
+  private ensureStockLoaded(itemId: number): void {
+    if (itemId in this.stockByItemId()) return;
+    this.inventoryService.listStock(itemId, undefined, 0, 50, undefined).subscribe({
+      next: (result) => {
+        this.stockByItemId.update((map) => ({ ...map, [itemId]: (result.content ?? []) as StockLevelResponse[] }));
+      },
+      error: () => {
+        // Availability is a helpful hint, not a hard requirement — a failed
+        // lookup just means no hint is shown for this item.
+      },
+    });
+  }
+
+  private loadItems(onLoaded?: () => void): void {
     this.itemsService.listItems(undefined, true, undefined, 0, 300, undefined).subscribe({
       next: (result) => {
         this.items.set(result.content ?? []);
         this.itemsLoaded.set(true);
+        onLoaded?.();
       },
     });
   }

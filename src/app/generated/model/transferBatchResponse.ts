@@ -32,7 +32,7 @@ export interface TransferBatchResponse {
      */
     destinationWarehouseName?: string;
     /**
-     * Current status of the batch
+     * Current status of the batch. AWAITING_PURCHASE means the last submit attempt failed on insufficient stock (409) — see POST /{id}/submit — and this batch is blocked until a PurchaseReceipt with fulfillsTransferBatchId set to this batch\'s id is confirmed, which flips it back to DRAFT so it can be resubmitted.
      */
     status?: TransferBatchResponse.StatusEnum;
     /**
@@ -68,7 +68,8 @@ export namespace TransferBatchResponse {
     export const StatusEnum = {
         Draft: 'DRAFT',
         Submitted: 'SUBMITTED',
-        Completed: 'COMPLETED'
+        Completed: 'COMPLETED',
+        AwaitingPurchase: 'AWAITING_PURCHASE'
     } as const;
     export type StatusEnum = typeof StatusEnum[keyof typeof StatusEnum];
 }

@@ -1,0 +1,100 @@
+<div class="create-page">
+
+  <button type="button" class="back-btn" (click)="backToList()">
+    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+      <path d="M19 12H5"></path>
+      <path d="m12 19-7-7 7-7"></path>
+    </svg>
+    Back to Assignment Batches
+  </button>
+
+  <div class="create-page__title">New Equipment Batch</div>
+
+  <div class="tabs">
+    <button type="button" class="tab" [class.tab--active]="direction() === 'ASSIGN'" (click)="setDirection('ASSIGN')">
+      Assign to Site
+    </button>
+    <button type="button" class="tab" [class.tab--active]="direction() === 'RETURN'" (click)="setDirection('RETURN')">
+      Return to Warehouse
+    </button>
+  </div>
+
+  @if (errorMessage()) {
+    <div class="form-error">{{ errorMessage() }}</div>
+  }
+
+  <div class="card">
+    <div class="form-grid">
+      <div class="form-field">
+        <label>{{ direction() === 'ASSIGN' ? 'Destination Site *' : 'Destination Warehouse *' }}</label>
+        <select [value]="destinationWarehouseId()" (change)="onDestinationChange($any($event.target).value)">
+          <option value="">Select…</option>
+          @for (w of destinationOptions(); track w.id) {
+            <option [value]="w.id">{{ w.name }}</option>
+          }
+        </select>
+      </div>
+      @if (direction() === 'ASSIGN') {
+        <div class="form-field">
+          <label>Holder *</label>
+          <select [value]="holderId()" (change)="onHolderChange($any($event.target).value)">
+            <option value="">Select a user…</option>
+            @for (u of users(); track u.id) {
+              <option [value]="u.id">{{ u.fullName }}</option>
+            }
+          </select>
+        </div>
+      }
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card__title">Equipment</div>
+    <div class="lines-hint">
+      @if (direction() === 'ASSIGN') {
+        Only equipment currently Available is shown below.
+      } @else {
+        Only equipment currently Checked Out or In Use is shown below.
+      }
+    </div>
+
+    <div class="lines-head">
+      <div>Equipment</div>
+      <div>Condition Notes</div>
+      <div></div>
+    </div>
+
+    @for (line of lines(); track $index) {
+      <div class="lines-row">
+        <select [value]="line.equipmentId" (change)="onLineEquipmentChange($index, $any($event.target).value)">
+          <option value="">Select equipment…</option>
+          @for (eq of equipmentOptions(); track eq.id) {
+            <option [value]="eq.id">{{ equipmentLabel(eq) }}</option>
+          }
+        </select>
+        <input type="text" placeholder="optional" [value]="line.conditionNotes" (change)="onLineConditionChange($index, $any($event.target).value)" />
+        <button type="button" class="line-remove" [disabled]="lines().length <= 1" (click)="removeLine($index)" aria-label="Remove line">✕</button>
+      </div>
+    }
+
+    <button type="button" class="btn-add-line" (click)="addLine()">+ Add Equipment</button>
+
+    <div class="lines-total">
+      <span class="lines-total__label">Total Items</span>
+      <span class="lines-total__value">{{ totalLineCount() }}</span>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card__title">Notes</div>
+    <textarea placeholder="Optional notes about this batch…" [value]="notes()" (change)="onNotesChange($any($event.target).value)"></textarea>
+  </div>
+
+  <div class="form-actions">
+    <button type="button" class="btn-primary" [disabled]="saving() || loadingOptions()" (click)="saveDraft()">
+      {{ saving() ? 'Creating…' : 'Create Draft' }}
+    </button>
+    <button type="button" class="btn-secondary" [disabled]="saving()" (click)="backToList()">Cancel</button>
+  </div>
+
+</div>

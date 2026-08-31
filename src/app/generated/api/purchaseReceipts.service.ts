@@ -47,7 +47,7 @@ export class PurchaseReceiptsService extends BaseService {
 
     /**
      * Confirm a draft purchase receipt
-     * Applies a draft receipt to inventory: this is the step that actually changes stock quantities. For each line, an IN-type stock movement is recorded against the receipt\&#39;s warehouse, and that item+supplier\&#39;s most recent unit cost is updated to the line\&#39;s unitCost. The whole operation is one transaction — if any line fails, nothing is applied. A receipt can only be confirmed once; confirming an already-confirmed receipt is rejected with 422.
+     * Applies a draft receipt to inventory: this is the step that actually changes stock quantities. For each line, an IN-type stock movement is recorded against the receipt\&#39;s warehouse, and that item+supplier\&#39;s most recent unit cost is updated to the line\&#39;s unitCost. The whole operation is one transaction — if any line fails, nothing is applied. A receipt can only be confirmed once; confirming an already-confirmed receipt is rejected with 422. If fulfillsTransferBatchId was set on this receipt and that batch is still AWAITING_PURCHASE, confirming also flips that batch back to DRAFT — resubmitting it (POST /api/inventory/transfer-batches/{id}/submit) remains a separate, manual step.
      * @endpoint post /api/purchase-receipts/{receiptId}/confirm
      * @param receiptId Identifier of the purchase receipt to confirm
      * @param observe set whether or not to return the data Observable as the body, response or events. defaults to returning the body.
@@ -107,7 +107,7 @@ export class PurchaseReceiptsService extends BaseService {
 
     /**
      * Create a draft purchase receipt
-     * Records a purchase receipt and its line items as a draft. lineTotal and totalAmount are always computed from quantity/unitCost. This step does NOT affect stock — the receipt must be confirmed via POST /{receiptId}/confirm before it changes inventory.
+     * Records a purchase receipt and its line items as a draft. lineTotal and totalAmount are always computed from quantity/unitCost. This step does NOT affect stock — the receipt must be confirmed via POST /{receiptId}/confirm before it changes inventory. If fulfillsTransferBatchId is set, the referenced batch must currently be status AWAITING_PURCHASE (422 if not) — confirming this receipt later flips that batch back to DRAFT (see POST /api/inventory/transfer-batches/{id}/submit).
      * @endpoint post /api/purchase-receipts
      * @param purchaseReceiptCreateRequest 
      * @param observe set whether or not to return the data Observable as the body, response or events. defaults to returning the body.
@@ -297,11 +297,12 @@ export class PurchaseReceiptsService extends BaseService {
 
     /**
      * List purchase receipts
-     * Returns a paged list of purchase receipts (both draft and confirmed), optionally filtered by supplier and/or a purchaseDate range. fromDate and toDate are both inclusive.
+     * Returns a paged list of purchase receipts (both draft and confirmed), optionally filtered by supplier, a purchaseDate range, and/or fulfillsTransferBatchId. fromDate and toDate are both inclusive. fulfillsTransferBatchId is how to find \&quot;the receipt resolving batch #Y\&quot; from a blocked TransferBatch — TransferBatchResponse doesn\&#39;t embed the reverse reference itself.
      * @endpoint get /api/purchase-receipts
      * @param supplierId Filter by supplier id
      * @param fromDate Only include receipts purchased on or after this date (inclusive)
      * @param toDate Only include receipts purchased on or before this date (inclusive)
+     * @param fulfillsTransferBatchId Filter to the receipt(s) that fulfill this transfer batch id
      * @param page Zero-based page index (0..N)
      * @param size The size of the page to be returned
      * @param sort Sorting criteria in the format: property,(asc|desc). Default sort order is ascending. Multiple sort criteria are supported.
@@ -309,10 +310,10 @@ export class PurchaseReceiptsService extends BaseService {
      * @param reportProgress flag to report request and response progress.
      * @param options additional options
      */
-    public listPurchaseReceipts(supplierId?: number, fromDate?: string, toDate?: string, page?: number, size?: number, sort?: Array<string>, observe?: 'body', reportProgress?: boolean, options?: {httpHeaderAccept?: 'application/json', context?: HttpContext, transferCache?: boolean}): Observable<PageResponse>;
-    public listPurchaseReceipts(supplierId?: number, fromDate?: string, toDate?: string, page?: number, size?: number, sort?: Array<string>, observe?: 'response', reportProgress?: boolean, options?: {httpHeaderAccept?: 'application/json', context?: HttpContext, transferCache?: boolean}): Observable<HttpResponse<PageResponse>>;
-    public listPurchaseReceipts(supplierId?: number, fromDate?: string, toDate?: string, page?: number, size?: number, sort?: Array<string>, observe?: 'events', reportProgress?: boolean, options?: {httpHeaderAccept?: 'application/json', context?: HttpContext, transferCache?: boolean}): Observable<HttpEvent<PageResponse>>;
-    public listPurchaseReceipts(supplierId?: number, fromDate?: string, toDate?: string, page?: number, size?: number, sort?: Array<string>, observe: any = 'body', reportProgress: boolean = false, options?: {httpHeaderAccept?: 'application/json', context?: HttpContext, transferCache?: boolean}): Observable<any> {
+    public listPurchaseReceipts(supplierId?: number, fromDate?: string, toDate?: string, fulfillsTransferBatchId?: number, page?: number, size?: number, sort?: Array<string>, observe?: 'body', reportProgress?: boolean, options?: {httpHeaderAccept?: 'application/json', context?: HttpContext, transferCache?: boolean}): Observable<PageResponse>;
+    public listPurchaseReceipts(supplierId?: number, fromDate?: string, toDate?: string, fulfillsTransferBatchId?: number, page?: number, size?: number, sort?: Array<string>, observe?: 'response', reportProgress?: boolean, options?: {httpHeaderAccept?: 'application/json', context?: HttpContext, transferCache?: boolean}): Observable<HttpResponse<PageResponse>>;
+    public listPurchaseReceipts(supplierId?: number, fromDate?: string, toDate?: string, fulfillsTransferBatchId?: number, page?: number, size?: number, sort?: Array<string>, observe?: 'events', reportProgress?: boolean, options?: {httpHeaderAccept?: 'application/json', context?: HttpContext, transferCache?: boolean}): Observable<HttpEvent<PageResponse>>;
+    public listPurchaseReceipts(supplierId?: number, fromDate?: string, toDate?: string, fulfillsTransferBatchId?: number, page?: number, size?: number, sort?: Array<string>, observe: any = 'body', reportProgress: boolean = false, options?: {httpHeaderAccept?: 'application/json', context?: HttpContext, transferCache?: boolean}): Observable<any> {
 
         let localVarQueryParameters = new OpenApiHttpParams(this.encoder);
 
@@ -338,6 +339,15 @@ export class PurchaseReceiptsService extends BaseService {
             localVarQueryParameters,
             'toDate',
             <any>toDate,
+            QueryParamStyle.Form,
+            true,
+        );
+
+
+        localVarQueryParameters = this.addToHttpParams(
+            localVarQueryParameters,
+            'fulfillsTransferBatchId',
+            <any>fulfillsTransferBatchId,
             QueryParamStyle.Form,
             true,
         );

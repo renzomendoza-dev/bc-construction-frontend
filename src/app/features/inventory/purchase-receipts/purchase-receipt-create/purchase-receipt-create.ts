@@ -1,5 +1,6 @@
 import { ChangeDetectionStrategy, Component, OnInit, computed, inject, signal } from '@angular/core';
-import { Router } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
+import { forkJoin } from 'rxjs';
 import {
   ItemResponse,
   ItemsService,
@@ -8,6 +9,8 @@ import {
   PurchaseReceiptsService,
   SupplierResponse,
   SuppliersService,
+  TransferBatchResponse,
+  TransferBatchesService,
   WarehouseResponse,
   WarehousesService,
 } from '../../../../generated';
@@ -17,10 +20,16 @@ interface DraftLine {
   itemId: number | null;
   quantity: number | null;
   unitCost: number | null;
+  // True for a line pre-filled from a fulfilling TransferBatch shortfall —
+  // its item is shown as locked text instead of a <select>. Same rationale
+  // as transfer-batch-create.ts's DraftLine.fromRequest: a native <select>'s
+  // [value] binding isn't reliable for a row that didn't exist in the DOM
+  // until the batch loaded, and the item isn't meant to change here anyway.
+  fromBatch: boolean;
 }
 
 function emptyLine(): DraftLine {
-  return { itemId: null, quantity: null, unitCost: null };
+  return { itemId: null, quantity: null, unitCost: null, fromBatch: false };
 }
 
 @Component({
@@ -35,7 +44,9 @@ export class PurchaseReceiptCreateComponent implements OnInit {
   private readonly suppliersService = inject(SuppliersService);
   private readonly warehousesService = inject(WarehousesService);
   private readonly itemsService = inject(ItemsService);
+  private readonly transferBatchesService = inject(TransferBatchesService);
   private readonly router = inject(Router);
+  private readonly route = inject(ActivatedRoute);
 
   readonly formatPeso = formatPeso;
 
@@ -54,12 +65,20 @@ export class PurchaseReceiptCreateComponent implements OnInit {
   readonly saving = signal(false);
   readonly errorMessage = signal<string | null>(null);
 
+  // Set when arriving via "Create Purchase Receipt for this Shortfall" on a
+  // blocked (AWAITING_PURCHASE) TransferBatch's detail page
+  // (?fulfillsTransferBatchId=). Confirming this receipt later flips that
+  // batch back to DRAFT so it can be resubmitted.
+  readonly fulfillsTransferBatchId = signal<number | null>(null);
+  readonly fulfillingBatch = signal<TransferBatchResponse | null>(null);
+
   readonly total = computed(() =>
     this.lines().reduce((sum, l) => sum + (l.quantity ?? 0) * (l.unitCost ?? 0), 0),
   );
 
   ngOnInit(): void {
-    this.loadOptions();
+    const batchId = Number(this.route.snapshot.queryParamMap.get('fulfillsTransferBatchId'));
+    this.loadOptions(batchId || null);
   }
 
   backToList(): void {
@@ -144,6 +163,7 @@ export class PurchaseReceiptCreateComponent implements OnInit {
       purchaseDate,
       receiptNumber: this.receiptNumber().trim() || undefined,
       notes: this.notes().trim() || undefined,
+      fulfillsTransferBatchId: this.fulfillsTransferBatchId() ?? undefined,
       lines: validLines.map(
         (l): PurchaseReceiptLineRequest => ({
           itemId: l.itemId!,
@@ -160,16 +180,54 @@ export class PurchaseReceiptCreateComponent implements OnInit {
       },
       error: (err) => {
         this.saving.set(false);
+        // 422 now covers three distinct causes (no lines / invalid item /
+        // the linked batch is no longer AWAITING_PURCHASE) — surface the
+        // backend's own message rather than guess which one applies.
         this.errorMessage.set(
-          err?.status === 422
-            ? 'Every line must reference a valid, existing item.'
-            : 'Could not create receipt. Please check the form and try again.',
+          err?.error?.message ||
+            (err?.status === 404
+              ? 'Supplier, warehouse, or the transfer batch being fulfilled could not be found.'
+              : 'Could not create receipt. Please check the form and try again.'),
         );
       },
     });
   }
 
-  private loadOptions(): void {
+  private loadFulfillingBatch(batchId: number): void {
+    this.transferBatchesService.getById1(batchId).subscribe({
+      next: (batch) => {
+        this.fulfillingBatch.set(batch);
+        this.fulfillsTransferBatchId.set(batch.id ?? null);
+        // The shortfall happened at the batch's origin — that's the
+        // warehouse this purchase needs to land in.
+        this.warehouseId.set(batch.originWarehouseId ?? null);
+
+        const batchLines = batch.lines ?? [];
+        if (batchLines.length > 0) {
+          this.lines.set(
+            batchLines.map(
+              (l): DraftLine => ({
+                itemId: l.itemId ?? null,
+                quantity: l.quantity ?? null,
+                unitCost: null,
+                fromBatch: true,
+              }),
+            ),
+          );
+        }
+      },
+      error: () => {
+        this.errorMessage.set('Could not load the transfer batch to fulfill. You can still create a plain receipt below.');
+      },
+    });
+  }
+
+  // Loads suppliers/warehouses/items and only *then* applies the
+  // fulfilling-batch pre-fill (if any) — see the comment on the equivalent
+  // method in transfer-batch-create.ts for why the ordering matters: a
+  // native <select>'s [value] binding silently fails to select an <option>
+  // that doesn't exist in the DOM yet, and Angular won't retry once it does.
+  private loadOptions(fulfillsBatchId: number | null): void {
     this.loadingOptions.set(true);
 
     this.suppliersService.listSuppliers(true, 0, 200, undefined).subscribe({
@@ -177,18 +235,20 @@ export class PurchaseReceiptCreateComponent implements OnInit {
       error: () => this.errorMessage.set('Could not load suppliers.'),
     });
 
-    this.warehousesService.listWarehouses(true, 0, 200, undefined).subscribe({
-      next: (result) => this.warehouses.set(result.content ?? []),
-      error: () => this.errorMessage.set('Could not load warehouses.'),
-    });
-
-    this.itemsService.listItems(undefined, true, undefined, 0, 300, undefined).subscribe({
-      next: (result) => {
-        this.items.set(result.content ?? []);
+    forkJoin({
+      warehouses: this.warehousesService.listWarehouses(true, 0, 200, undefined),
+      items: this.itemsService.listItems(undefined, true, undefined, 0, 300, undefined),
+    }).subscribe({
+      next: ({ warehouses, items }) => {
+        this.warehouses.set(warehouses.content ?? []);
+        this.items.set(items.content ?? []);
         this.loadingOptions.set(false);
+        if (fulfillsBatchId) {
+          this.loadFulfillingBatch(fulfillsBatchId);
+        }
       },
       error: () => {
-        this.errorMessage.set('Could not load items.');
+        this.errorMessage.set('Could not load warehouses or items.');
         this.loadingOptions.set(false);
       },
     });

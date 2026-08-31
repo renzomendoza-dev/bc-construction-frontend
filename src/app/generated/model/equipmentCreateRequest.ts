@@ -30,6 +30,10 @@ export interface EquipmentCreateRequest {
      */
     serialNumber?: string;
     /**
+     * Identifier of the MAIN-type warehouse this equipment is currently stored at (400 if it isn\'t a MAIN warehouse) — equipment.currentWarehouseId is always populated, so this is required even for newly-registered equipment that\'s never been checked out
+     */
+    warehouseId: number;
+    /**
      * Purchase price
      */
     purchasePrice?: number;

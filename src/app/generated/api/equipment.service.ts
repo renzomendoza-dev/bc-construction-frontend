@@ -26,6 +26,8 @@ import { EquipmentCreateRequest } from '../model/equipmentCreateRequest';
 import { EquipmentResponse } from '../model/equipmentResponse';
 // @ts-ignore
 import { EquipmentUpdateRequest } from '../model/equipmentUpdateRequest';
+// @ts-ignore
+import { ErrorResponse } from '../model/errorResponse';
 
 // @ts-ignore
 import { BASE_PATH, COLLECTION_FORMATS }                     from '../variables';
@@ -45,6 +47,7 @@ export class EquipmentService extends BaseService {
 
     /**
      * Check in equipment, closing the open assignment
+     * destinationWarehouseId must reference a MAIN-type warehouse — a check-in targeting a SITE warehouse is rejected with 400. For returning many pieces of equipment in one action, see POST /api/equipment/assignment-batches instead.
      * @endpoint post /api/equipment/{id}/checkin
      * @param id 
      * @param equipmentCheckInRequest 
@@ -118,6 +121,7 @@ export class EquipmentService extends BaseService {
 
     /**
      * Check out equipment to a user at a site
+     * siteWarehouseId must reference a SITE-type warehouse — a checkout targeting a MAIN warehouse is rejected with 400. For processing many pieces of equipment to one holder in one action, see POST /api/equipment/assignment-batches instead.
      * @endpoint post /api/equipment/{id}/checkout
      * @param id 
      * @param equipmentCheckOutRequest 
@@ -191,6 +195,7 @@ export class EquipmentService extends BaseService {
 
     /**
      * Create new equipment
+     * Registers a new piece of equipment at a MAIN-type warehouse. warehouseId is required -  equipment.currentWarehouseId is always populated, so even newly-registered equipment that\&#39;s never been checked out needs a starting location.
      * @endpoint post /api/equipment
      * @param equipmentCreateRequest 
      * @param observe set whether or not to return the data Observable as the body, response or events. defaults to returning the body.
@@ -266,9 +271,9 @@ export class EquipmentService extends BaseService {
      * @param reportProgress flag to report request and response progress.
      * @param options additional options
      */
-    public findAll(status?: 'AVAILABLE' | 'CHECKED_OUT' | 'IN_REPAIR' | 'RETIRED' | 'LOST' | 'MAINTENANCE' | 'IN_USE', observe?: 'body', reportProgress?: boolean, options?: {httpHeaderAccept?: '*/*', context?: HttpContext, transferCache?: boolean}): Observable<Array<EquipmentResponse>>;
-    public findAll(status?: 'AVAILABLE' | 'CHECKED_OUT' | 'IN_REPAIR' | 'RETIRED' | 'LOST' | 'MAINTENANCE' | 'IN_USE', observe?: 'response', reportProgress?: boolean, options?: {httpHeaderAccept?: '*/*', context?: HttpContext, transferCache?: boolean}): Observable<HttpResponse<Array<EquipmentResponse>>>;
-    public findAll(status?: 'AVAILABLE' | 'CHECKED_OUT' | 'IN_REPAIR' | 'RETIRED' | 'LOST' | 'MAINTENANCE' | 'IN_USE', observe?: 'events', reportProgress?: boolean, options?: {httpHeaderAccept?: '*/*', context?: HttpContext, transferCache?: boolean}): Observable<HttpEvent<Array<EquipmentResponse>>>;
+    public findAll(status?: 'AVAILABLE' | 'CHECKED_OUT' | 'IN_REPAIR' | 'RETIRED' | 'LOST' | 'MAINTENANCE' | 'IN_USE', observe?: 'body', reportProgress?: boolean, options?: {httpHeaderAccept?: '*/*', context?: HttpContext, transferCache?: boolean}): Observable<EquipmentResponse>;
+    public findAll(status?: 'AVAILABLE' | 'CHECKED_OUT' | 'IN_REPAIR' | 'RETIRED' | 'LOST' | 'MAINTENANCE' | 'IN_USE', observe?: 'response', reportProgress?: boolean, options?: {httpHeaderAccept?: '*/*', context?: HttpContext, transferCache?: boolean}): Observable<HttpResponse<EquipmentResponse>>;
+    public findAll(status?: 'AVAILABLE' | 'CHECKED_OUT' | 'IN_REPAIR' | 'RETIRED' | 'LOST' | 'MAINTENANCE' | 'IN_USE', observe?: 'events', reportProgress?: boolean, options?: {httpHeaderAccept?: '*/*', context?: HttpContext, transferCache?: boolean}): Observable<HttpEvent<EquipmentResponse>>;
     public findAll(status?: 'AVAILABLE' | 'CHECKED_OUT' | 'IN_REPAIR' | 'RETIRED' | 'LOST' | 'MAINTENANCE' | 'IN_USE', observe: any = 'body', reportProgress: boolean = false, options?: {httpHeaderAccept?: '*/*', context?: HttpContext, transferCache?: boolean}): Observable<any> {
 
         let localVarQueryParameters = new OpenApiHttpParams(this.encoder);
@@ -312,7 +317,7 @@ export class EquipmentService extends BaseService {
 
         let localVarPath = `/api/equipment`;
         const { basePath, withCredentials } = this.configuration;
-        return this.httpClient.request<Array<EquipmentResponse>>('get', `${basePath}${localVarPath}`,
+        return this.httpClient.request<EquipmentResponse>('get', `${basePath}${localVarPath}`,
             {
                 context: localVarHttpContext,
                 params: localVarQueryParameters.toHttpParams(),
@@ -393,9 +398,9 @@ export class EquipmentService extends BaseService {
      * @param reportProgress flag to report request and response progress.
      * @param options additional options
      */
-    public findOverdue(days: number, observe?: 'body', reportProgress?: boolean, options?: {httpHeaderAccept?: '*/*', context?: HttpContext, transferCache?: boolean}): Observable<Array<EquipmentResponse>>;
-    public findOverdue(days: number, observe?: 'response', reportProgress?: boolean, options?: {httpHeaderAccept?: '*/*', context?: HttpContext, transferCache?: boolean}): Observable<HttpResponse<Array<EquipmentResponse>>>;
-    public findOverdue(days: number, observe?: 'events', reportProgress?: boolean, options?: {httpHeaderAccept?: '*/*', context?: HttpContext, transferCache?: boolean}): Observable<HttpEvent<Array<EquipmentResponse>>>;
+    public findOverdue(days: number, observe?: 'body', reportProgress?: boolean, options?: {httpHeaderAccept?: '*/*', context?: HttpContext, transferCache?: boolean}): Observable<EquipmentResponse>;
+    public findOverdue(days: number, observe?: 'response', reportProgress?: boolean, options?: {httpHeaderAccept?: '*/*', context?: HttpContext, transferCache?: boolean}): Observable<HttpResponse<EquipmentResponse>>;
+    public findOverdue(days: number, observe?: 'events', reportProgress?: boolean, options?: {httpHeaderAccept?: '*/*', context?: HttpContext, transferCache?: boolean}): Observable<HttpEvent<EquipmentResponse>>;
     public findOverdue(days: number, observe: any = 'body', reportProgress: boolean = false, options?: {httpHeaderAccept?: '*/*', context?: HttpContext, transferCache?: boolean}): Observable<any> {
         if (days === null || days === undefined) {
             throw new Error('Required parameter days was null or undefined when calling findOverdue.');
@@ -442,7 +447,7 @@ export class EquipmentService extends BaseService {
 
         let localVarPath = `/api/equipment/overdue`;
         const { basePath, withCredentials } = this.configuration;
-        return this.httpClient.request<Array<EquipmentResponse>>('get', `${basePath}${localVarPath}`,
+        return this.httpClient.request<EquipmentResponse>('get', `${basePath}${localVarPath}`,
             {
                 context: localVarHttpContext,
                 params: localVarQueryParameters.toHttpParams(),
@@ -458,6 +463,7 @@ export class EquipmentService extends BaseService {
 
     /**
      * Update equipment details (name, category, serial, purchase info)
+     * Status, holder, and current warehouse are not editable here — they change only via checkout/checkin (or a batch that delegates to them).
      * @endpoint patch /api/equipment/{id}
      * @param id 
      * @param equipmentUpdateRequest 

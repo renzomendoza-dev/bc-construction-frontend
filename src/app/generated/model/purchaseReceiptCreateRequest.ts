@@ -36,6 +36,10 @@ export interface PurchaseReceiptCreateRequest {
      */
     notes?: string;
     /**
+     * Identifier of the TransferBatch this receipt is purchasing the shortfall for, if any. The referenced batch must currently be status AWAITING_PURCHASE (422 if not); confirming this receipt flips that batch back to DRAFT so it can be resubmitted. Omit or send null for a receipt with no such origin.
+     */
+    fulfillsTransferBatchId?: number;
+    /**
      * Line items purchased on this receipt; at least one is required
      */
     lines: Array<PurchaseReceiptLineRequest>;

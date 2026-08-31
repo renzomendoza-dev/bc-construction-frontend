@@ -2,6 +2,13 @@
 
 All notable changes to this project are documented here, newest first. Dates are when the change was committed.
 
+## 2026-09-01
+- Add Material Request ↔ Purchasing linkage: a Transfer Batch that fails submit for insufficient stock automatically becomes `AWAITING_PURCHASE` and is blocked in the UI until a linked Purchase Receipt (`fulfillsTransferBatchId`) is confirmed, which flips it back to Draft for resubmission.
+- Add per-line stock availability hints (and an origin-shortfall warning) to Transfer Batch and Material Request create/edit screens.
+- Add a Delete action for draft Transfer Batches.
+- Add batch equipment assignment/return (Assign to Site / Return to Warehouse) with new list/create/detail pages, and link Equipment to real Warehouse records (`currentWarehouseId`) instead of a free-text site.
+- Fix pre-filled dropdowns (destination site, line items, warehouse) not displaying correctly when populated asynchronously from a fulfilling Material Request or Transfer Batch — replaced with locked read-only text for those fields.
+
 ## 2026-08-31
 - Add Site ↔ Warehouse Transfers and Material Requests: `Warehouse.type` (MAIN/SITE), Transfer Batches (list/create/detail/submit, with a pull-out-from-site vs dispatch-to-site direction toggle), Material Requests (list/create/detail/edit), and a "Create Dispatch from this Request" shortcut linking the two.
 - Add this changelog and a proper Features section to the README.

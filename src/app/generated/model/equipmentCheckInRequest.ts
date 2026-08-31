@@ -14,6 +14,10 @@
  */
 export interface EquipmentCheckInRequest { 
     /**
+     * Identifier of the MAIN-type warehouse the equipment is being returned to (400 if it isn\'t a MAIN warehouse)
+     */
+    destinationWarehouseId: number;
+    /**
      * Condition notes recorded at check-in
      */
     conditionIn?: string;

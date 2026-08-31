@@ -2,9 +2,12 @@
 
   <div class="equipment-page__header">
     <div class="equipment-page__title">Equipment</div>
-    @if (canCreateEquipment) {
-      <button type="button" class="btn-primary" (click)="openNew()">+ New Equipment</button>
-    }
+    <div class="equipment-page__header-actions">
+      <a class="btn-secondary" routerLink="/equipment/assignment-batches">Assignment Batches</a>
+      @if (canCreateEquipment) {
+        <button type="button" class="btn-primary" (click)="openNew()">+ New Equipment</button>
+      }
+    </div>
   </div>
 
   <div class="tabs">
@@ -161,12 +164,15 @@
         </div>
         <div class="form-field">
           <label>Site</label>
-          <input
-            type="text"
-            placeholder="e.g. Site B - Riverside"
-            [value]="checkOutSite()"
-            (change)="onCheckOutSiteChange($any($event.target).value)"
-          />
+          <select
+            [value]="checkOutSiteWarehouseId()"
+            (change)="onCheckOutSiteWarehouseIdChange($any($event.target).value)"
+          >
+            <option value="">Select a site…</option>
+            @for (w of siteWarehouses(); track w.id) {
+              <option [value]="w.id">{{ w.name }}</option>
+            }
+          </select>
         </div>
         <div class="form-field">
           <label>Condition Out (optional)</label>
@@ -199,6 +205,18 @@
       }
 
       <div class="dialog-form">
+        <div class="form-field">
+          <label>Return to Warehouse</label>
+          <select
+            [value]="checkInDestinationWarehouseId()"
+            (change)="onCheckInDestinationWarehouseIdChange($any($event.target).value)"
+          >
+            <option value="">Select a warehouse…</option>
+            @for (w of mainWarehouses(); track w.id) {
+              <option [value]="w.id">{{ w.name }}</option>
+            }
+          </select>
+        </div>
         <div class="form-field">
           <label>Condition In (optional)</label>
           <textarea
@@ -273,6 +291,18 @@
             [value]="newForm().purchasePrice"
             (change)="onNewFieldChange('purchasePrice', $any($event.target).value)"
           />
+        </div>
+        <div class="form-field">
+          <label>Warehouse</label>
+          <select
+            [value]="newForm().warehouseId"
+            (change)="onNewFieldChange('warehouseId', $any($event.target).value)"
+          >
+            <option value="">Select a warehouse…</option>
+            @for (w of mainWarehouses(); track w.id) {
+              <option [value]="w.id">{{ w.name }}</option>
+            }
+          </select>
         </div>
       </div>
 

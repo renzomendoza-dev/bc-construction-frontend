@@ -12,8 +12,35 @@ export const routes: Routes = [
 
   {
     path: 'equipment',
-    loadComponent: () =>
-      import('./features/equipment/equipment-list/equipment-list').then((m) => m.EquipmentListComponent),
+    children: [
+      {
+        path: '',
+        pathMatch: 'full',
+        loadComponent: () =>
+          import('./features/equipment/equipment-list/equipment-list').then((m) => m.EquipmentListComponent),
+      },
+      {
+        path: 'assignment-batches',
+        loadComponent: () =>
+          import('./features/equipment/equipment-assignment-batches-list/equipment-assignment-batches-list').then(
+            (m) => m.EquipmentAssignmentBatchesListComponent,
+          ),
+      },
+      {
+        path: 'assignment-batches/new',
+        loadComponent: () =>
+          import('./features/equipment/equipment-assignment-batch-create/equipment-assignment-batch-create').then(
+            (m) => m.EquipmentAssignmentBatchCreateComponent,
+          ),
+      },
+      {
+        path: 'assignment-batches/:id',
+        loadComponent: () =>
+          import('./features/equipment/equipment-assignment-batch-detail/equipment-assignment-batch-detail').then(
+            (m) => m.EquipmentAssignmentBatchDetailComponent,
+          ),
+      },
+    ],
   },
 
   {

@@ -1,0 +1,66 @@
+<div class="batches-page">
+
+  <div class="batches-page__header">
+    <div class="batches-page__title">Equipment Assignment Batches</div>
+    @if (canCreate) {
+      <button type="button" class="btn-primary" (click)="createNew()">+ New Batch</button>
+    }
+  </div>
+
+  <div class="batches-page__filters">
+    <select class="filter-select" [value]="statusFilter()" (change)="onStatusFilterChange($any($event.target).value)">
+      <option value="all">All Statuses</option>
+      <option value="DRAFT">Draft</option>
+      <option value="SUBMITTED">Submitted</option>
+      <option value="COMPLETED">Completed</option>
+    </select>
+  </div>
+
+  <div class="batches-table">
+
+    @if (loading()) {
+      <div class="table-state">Loading…</div>
+    } @else if (errorMessage()) {
+      <div class="table-state table-state--error">{{ errorMessage() }}</div>
+    } @else if (hasResults()) {
+      <div class="batches-table__head">
+        <div>Direction</div>
+        <div>Destination</div>
+        <div>Holder</div>
+        <div>Status</div>
+        <div>Initiated By</div>
+        <div class="align-right">Created</div>
+      </div>
+
+      @for (b of pageItems(); track b.id) {
+        <div class="batches-table__row" (click)="openBatch(b.id)">
+          <div class="batches-table__direction">{{ directionLabel(b) }}</div>
+          <div class="batches-table__warehouse">{{ b.destinationWarehouseName }}</div>
+          <div class="batches-table__by">{{ b.holderName || '—' }}</div>
+          <div>
+            <span class="status-badge" [attr.data-status]="b.status">{{ statusLabel(b) }}</span>
+          </div>
+          <div class="batches-table__by">{{ b.initiatedByName || '—' }}</div>
+          <div class="align-right batches-table__date">{{ b.createdAt | date: 'mediumDate' }}</div>
+        </div>
+      }
+    } @else {
+      <div class="empty-state">
+        <div class="empty-state__title">No assignment batches match your filters</div>
+        <div class="empty-state__subtitle">Try adjusting the status filter.</div>
+      </div>
+    }
+
+  </div>
+
+  @if (!loading() && hasResults()) {
+    <div class="batches-pagination">
+      <div class="batches-pagination__summary">{{ pageSummary() }}</div>
+      <div class="batches-pagination__controls">
+        <button type="button" [disabled]="currentPage() <= 1" (click)="prevPage()">Previous</button>
+        <button type="button" [disabled]="currentPage() >= totalPages()" (click)="nextPage()">Next</button>
+      </div>
+    </div>
+  }
+
+</div>

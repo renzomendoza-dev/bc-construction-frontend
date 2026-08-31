@@ -1,6 +1,6 @@
 import { ChangeDetectionStrategy, Component, OnInit, inject, signal } from '@angular/core';
 import { DatePipe } from '@angular/common';
-import { ActivatedRoute, Router } from '@angular/router';
+import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { PurchaseReceiptResponse, PurchaseReceiptsService } from '../../../../generated';
 import { formatPeso } from '../../../../core/model.currency';
 import { CurrentUserService } from '../../../../core/services/current-user';
@@ -9,7 +9,7 @@ import { Permission } from '../../../../core/constants/permissions';
 
 @Component({
   selector: 'app-purchase-receipt-detail',
-  imports: [DatePipe],
+  imports: [DatePipe, RouterLink],
   templateUrl: './purchase-receipt-detail.html',
   styleUrl: './purchase-receipt-detail.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,

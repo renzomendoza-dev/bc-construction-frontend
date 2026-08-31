@@ -1,5 +1,6 @@
 import { ChangeDetectionStrategy, Component, OnInit, computed, inject, signal } from '@angular/core';
 import { DatePipe, NgClass } from '@angular/common';
+import { RouterLink } from '@angular/router';
 import {
   EquipmentCheckInRequest,
   EquipmentCheckOutRequest,
@@ -9,6 +10,8 @@ import {
   EquipmentUpdateRequest,
   UserResponse,
   UserService,
+  WarehouseResponse,
+  WarehousesService,
 } from '../../../generated';
 import { CurrentUserService } from '../../../core/services/current-user';
 import { Permission } from '../../../core/constants/permissions';
@@ -33,6 +36,7 @@ interface NewEquipmentForm {
   category: string;
   serialNumber: string;
   purchasePrice: string;
+  warehouseId: string;
 }
 
 const EMPTY_NEW_FORM: NewEquipmentForm = {
@@ -41,6 +45,7 @@ const EMPTY_NEW_FORM: NewEquipmentForm = {
   category: '',
   serialNumber: '',
   purchasePrice: '',
+  warehouseId: '',
 };
 
 interface EditEquipmentForm {
@@ -63,7 +68,7 @@ const EMPTY_EDIT_FORM: EditEquipmentForm = {
 
 @Component({
   selector: 'app-equipment-list',
-  imports: [DatePipe, NgClass],
+  imports: [DatePipe, NgClass, RouterLink],
   templateUrl: './equipment-list.html',
   styleUrl: './equipment-list.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -71,6 +76,7 @@ const EMPTY_EDIT_FORM: EditEquipmentForm = {
 export class EquipmentListComponent implements OnInit {
   private readonly equipmentService = inject(EquipmentService);
   private readonly userService = inject(UserService);
+  private readonly warehousesService = inject(WarehousesService);
   private readonly currentUser = inject(CurrentUserService);
 
   // Prefixed to avoid colliding with the existing canCheckOut/canCheckIn
@@ -131,11 +137,20 @@ export class EquipmentListComponent implements OnInit {
   readonly usersLoading = signal(false);
   readonly usersError = signal<string | null>(null);
 
+  // ---- Warehouses (for the site/destination pickers) ----------------------
+  readonly warehouses = signal<WarehouseResponse[]>([]);
+  readonly siteWarehouses = computed(() =>
+    this.warehouses().filter((w) => w.type === WarehouseResponse.TypeEnum.Site),
+  );
+  readonly mainWarehouses = computed(() =>
+    this.warehouses().filter((w) => w.type === WarehouseResponse.TypeEnum.Main),
+  );
+
   // ---- Check-out modal --------------------------------------------------
   readonly checkOutOpen = signal(false);
   readonly checkOutTarget = signal<EquipmentResponse | null>(null);
   readonly checkOutUserId = signal('');
-  readonly checkOutSite = signal('');
+  readonly checkOutSiteWarehouseId = signal('');
   readonly checkOutCondition = signal('');
   readonly checkOutSaving = signal(false);
   readonly checkOutError = signal<string | null>(null);
@@ -143,6 +158,7 @@ export class EquipmentListComponent implements OnInit {
   // ---- Check-in modal -----------------------------------------------------
   readonly checkInOpen = signal(false);
   readonly checkInTarget = signal<EquipmentResponse | null>(null);
+  readonly checkInDestinationWarehouseId = signal('');
   readonly checkInCondition = signal('');
   readonly checkInSaving = signal(false);
   readonly checkInError = signal<string | null>(null);
@@ -164,6 +180,7 @@ export class EquipmentListComponent implements OnInit {
     this.fetchEquipment();
     this.fetchOverdue();
     this.fetchUsers();
+    this.fetchWarehouses();
   }
 
   // ---- Tabs -----------------------------------------------------------
@@ -210,7 +227,7 @@ export class EquipmentListComponent implements OnInit {
 
   holderLabel(eq: EquipmentResponse): string {
     if (!eq.currentHolderName) return '—';
-    return eq.currentSite ? `${eq.currentHolderName} · ${eq.currentSite}` : eq.currentHolderName;
+    return eq.currentWarehouseName ? `${eq.currentHolderName} · ${eq.currentWarehouseName}` : eq.currentHolderName;
   }
 
   canCheckOut(eq: EquipmentResponse): boolean {
@@ -232,7 +249,7 @@ export class EquipmentListComponent implements OnInit {
   openCheckOut(eq: EquipmentResponse): void {
     this.checkOutTarget.set(eq);
     this.checkOutUserId.set('');
-    this.checkOutSite.set('');
+    this.checkOutSiteWarehouseId.set('');
     this.checkOutCondition.set('');
     this.checkOutError.set(null);
     this.checkOutOpen.set(true);
@@ -246,8 +263,8 @@ export class EquipmentListComponent implements OnInit {
     this.checkOutUserId.set(value);
   }
 
-  onCheckOutSiteChange(value: string): void {
-    this.checkOutSite.set(value);
+  onCheckOutSiteWarehouseIdChange(value: string): void {
+    this.checkOutSiteWarehouseId.set(value);
   }
 
   onCheckOutConditionChange(value: string): void {
@@ -259,19 +276,19 @@ export class EquipmentListComponent implements OnInit {
     if (!target?.id) return;
 
     const userId = Number(this.checkOutUserId());
-    const site = this.checkOutSite().trim();
+    const siteWarehouseId = Number(this.checkOutSiteWarehouseId());
     if (!userId || Number.isNaN(userId)) {
       this.checkOutError.set('Select a user.');
       return;
     }
-    if (!site) {
-      this.checkOutError.set('Site is required.');
+    if (!siteWarehouseId || Number.isNaN(siteWarehouseId)) {
+      this.checkOutError.set('Select a site.');
       return;
     }
 
     const request: EquipmentCheckOutRequest = {
       userId,
-      site,
+      siteWarehouseId,
       conditionOut: this.checkOutCondition().trim() || undefined,
     };
 
@@ -294,6 +311,7 @@ export class EquipmentListComponent implements OnInit {
   // ---- Check-in ---------------------------------------------------------
   openCheckIn(eq: EquipmentResponse): void {
     this.checkInTarget.set(eq);
+    this.checkInDestinationWarehouseId.set('');
     this.checkInCondition.set('');
     this.checkInError.set(null);
     this.checkInOpen.set(true);
@@ -301,6 +319,10 @@ export class EquipmentListComponent implements OnInit {
 
   closeCheckIn(): void {
     this.checkInOpen.set(false);
+  }
+
+  onCheckInDestinationWarehouseIdChange(value: string): void {
+    this.checkInDestinationWarehouseId.set(value);
   }
 
   onCheckInConditionChange(value: string): void {
@@ -311,7 +333,14 @@ export class EquipmentListComponent implements OnInit {
     const target = this.checkInTarget();
     if (!target?.id) return;
 
+    const destinationWarehouseId = Number(this.checkInDestinationWarehouseId());
+    if (!destinationWarehouseId || Number.isNaN(destinationWarehouseId)) {
+      this.checkInError.set('Select a destination warehouse.');
+      return;
+    }
+
     const request: EquipmentCheckInRequest = {
+      destinationWarehouseId,
       conditionIn: this.checkInCondition().trim() || undefined,
     };
 
@@ -361,12 +390,19 @@ export class EquipmentListComponent implements OnInit {
       return;
     }
 
+    const warehouseId = Number(form.warehouseId);
+    if (!warehouseId || Number.isNaN(warehouseId)) {
+      this.newError.set('Select the warehouse this equipment is stored at.');
+      return;
+    }
+
     const request: EquipmentCreateRequest = {
       name,
       assetTag,
       category: form.category.trim() || undefined,
       serialNumber: form.serialNumber.trim() || undefined,
       purchasePrice,
+      warehouseId,
     };
 
     this.newSaving.set(true);
@@ -453,9 +489,14 @@ export class EquipmentListComponent implements OnInit {
   private fetchEquipment(): void {
     this.loading.set(true);
     this.errorMessage.set(null);
+    // The live OpenAPI spec currently documents this endpoint's response as
+    // a single EquipmentResponse rather than an array (likely a springdoc
+    // regression introduced alongside the new assignment-batches controller
+    // — flagged to the backend, not an intentional contract change). The
+    // endpoint still actually returns a JSON array at runtime, hence the cast.
     this.equipmentService.findAll(undefined, 'body', undefined, this.jsonAccept).subscribe({
       next: (result) => {
-        this.equipment.set(result ?? []);
+        this.equipment.set((result as unknown as EquipmentResponse[]) ?? []);
         this.loading.set(false);
       },
       error: () => {
@@ -469,10 +510,11 @@ export class EquipmentListComponent implements OnInit {
     const days = Number(this.overdueDays());
     this.overdueLoading.set(true);
     this.overdueError.set(null);
+    // Same spec-typing caveat as fetchEquipment() above.
     this.equipmentService.findOverdue(days, 'body', undefined, this.jsonAccept).subscribe({
       next: (result) => {
         this.overdueEquipment.set(
-          [...(result ?? [])].sort((a, b) => this.daysOut(b) - this.daysOut(a)),
+          [...((result as unknown as EquipmentResponse[]) ?? [])].sort((a, b) => this.daysOut(b) - this.daysOut(a)),
         );
         this.overdueLoading.set(false);
       },
@@ -486,7 +528,7 @@ export class EquipmentListComponent implements OnInit {
   private fetchUsers(): void {
     this.usersLoading.set(true);
     this.usersError.set(null);
-    this.userService.findAll1(undefined, undefined, this.jsonAccept).subscribe({
+    this.userService.findAll2(undefined, undefined, this.jsonAccept).subscribe({
       next: (result) => {
         this.users.set(
           [...(result ?? [])].sort((a, b) => (a.fullName ?? '').localeCompare(b.fullName ?? '')),
@@ -497,6 +539,12 @@ export class EquipmentListComponent implements OnInit {
         this.usersError.set('Could not load users for the check-out picker.');
         this.usersLoading.set(false);
       },
+    });
+  }
+
+  private fetchWarehouses(): void {
+    this.warehousesService.listWarehouses(true, 0, 200, undefined).subscribe({
+      next: (result) => this.warehouses.set(result.content ?? []),
     });
   }
 }

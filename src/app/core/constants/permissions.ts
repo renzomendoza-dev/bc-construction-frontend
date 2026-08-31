@@ -47,6 +47,11 @@ export const Permission = {
   // PUT /api/inventory/material-requests/{id} endpoint's behavior and
   // status codes directly, but not its @PreAuthorize role name.
   MaterialRequestEdit: 'MATERIAL_REQUEST_EDIT',
+
+  // Also unverified (see comment above) — DELETE /api/inventory/transfer-batches/{id}
+  // shipped with its status codes documented (422 if not DRAFT, 404 if
+  // missing) but no @PreAuthorize role name in the spec.
+  TransferBatchDelete: 'TRANSFER_BATCH_DELETE',
 } as const;
 
 export type PermissionValue = (typeof Permission)[keyof typeof Permission];

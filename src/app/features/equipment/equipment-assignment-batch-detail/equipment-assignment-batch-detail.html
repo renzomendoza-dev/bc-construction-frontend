@@ -1,0 +1,90 @@
+<div class="batch-detail-page">
+
+  <button type="button" class="back-btn" (click)="backToList()">
+    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+      <path d="M19 12H5"></path>
+      <path d="m12 19-7-7 7-7"></path>
+    </svg>
+    Back to Assignment Batches
+  </button>
+
+  @if (loading()) {
+    <div class="state-message">Loading…</div>
+  } @else if (errorMessage() && !batch()) {
+    <div class="state-message state-message--error">{{ errorMessage() }}</div>
+  } @else if (batch(); as b) {
+
+    <div class="batch-header">
+      <div class="batch-header__top">
+        <div class="batch-header__route">
+          {{ isAssignBatch(b) ? 'Assign to ' + b.destinationWarehouseName : 'Return to ' + b.destinationWarehouseName }}
+        </div>
+        <span class="status-badge" [attr.data-status]="b.status">{{ statusLabel(b) }}</span>
+      </div>
+      <div class="batch-header__meta">
+        @if (b.holderName) {
+          <div><span class="batch-header__meta-label">Holder:</span> {{ b.holderName }}</div>
+        }
+        <div><span class="batch-header__meta-label">Initiated by:</span> {{ b.initiatedByName || '—' }}</div>
+        <div><span class="batch-header__meta-label">Created:</span> {{ b.createdAt | date: 'medium' }}</div>
+        @if (b.updatedAt) {
+          <div><span class="batch-header__meta-label">Last updated:</span> {{ b.updatedAt | date: 'medium' }}</div>
+        }
+      </div>
+      @if (b.notes) {
+        <div class="batch-header__notes">{{ b.notes }}</div>
+      }
+    </div>
+
+    @if (b.status === 'DRAFT' && canSubmit(b)) {
+      <div class="draft-banner">
+        <div>
+          <div class="draft-banner__title">This batch is still a draft</div>
+          <div class="draft-banner__subtitle">
+            Submitting will {{ isAssignBatch(b) ? 'check out' : 'check in' }} {{ (b.lines ?? []).length }} piece(s) of equipment and cannot be undone.
+          </div>
+        </div>
+        <button type="button" class="btn-confirm" (click)="openConfirmDialog()">Submit Batch</button>
+      </div>
+    }
+
+    @if (errorMessage()) {
+      <div class="form-error">{{ errorMessage() }}</div>
+    }
+
+    <div class="lines-card">
+      <div class="lines-head">
+        <div>Equipment</div>
+        <div>Asset Tag</div>
+        <div>Condition Notes</div>
+      </div>
+      @for (line of b.lines; track line.id) {
+        <div class="lines-row">
+          <div class="lines-row__item">{{ line.equipmentName }}</div>
+          <div class="lines-row__tag">{{ line.equipmentAssetTag }}</div>
+          <div class="lines-row__notes">{{ line.conditionNotes || '—' }}</div>
+        </div>
+      } @empty {
+        <div class="lines-empty">No equipment on this batch.</div>
+      }
+    </div>
+
+  }
+
+  @if (confirmDialogOpen() && batch(); as b) {
+    <div class="scrim" (click)="closeConfirmDialog()"></div>
+    <div class="dialog">
+      <div class="dialog__title">Submit this batch?</div>
+      <div class="dialog__body">
+        This will {{ isAssignBatch(b) ? 'check out' : 'check in' }} {{ (b.lines ?? []).length }} piece(s) of equipment. This action cannot be undone.
+      </div>
+      <div class="dialog__actions">
+        <button type="button" class="btn-secondary" [disabled]="submitting()" (click)="closeConfirmDialog()">Cancel</button>
+        <button type="button" class="btn-confirm" [disabled]="submitting()" (click)="submitBatch()">
+          {{ submitting() ? 'Submitting…' : 'Yes, Submit Batch' }}
+        </button>
+      </div>
+    </div>
+  }
+
+</div>

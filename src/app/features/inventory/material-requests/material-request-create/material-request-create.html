@@ -44,16 +44,28 @@
 
     @for (line of lines(); track $index) {
       <div class="lines-row">
-        <select (change)="onLineItemChange($index, $any($event.target).value)">
+        <select [value]="line.itemId" (change)="onLineItemChange($index, $any($event.target).value)">
           <option value="">Select item…</option>
           @for (item of items(); track item.id) {
             <option [value]="item.id">{{ item.name }} ({{ item.sku }})</option>
           }
         </select>
-        <input type="number" min="1" class="align-right" (change)="onLineQtyChange($index, $any($event.target).value)" />
-        <input type="text" placeholder="optional" (change)="onLineNotesChange($index, $any($event.target).value)" />
+        <input type="number" min="1" class="align-right" [value]="line.quantityRequested" (change)="onLineQtyChange($index, $any($event.target).value)" />
+        <input type="text" placeholder="optional" [value]="line.notes" (change)="onLineNotesChange($index, $any($event.target).value)" />
         <button type="button" class="line-remove" [disabled]="lines().length <= 1" (click)="removeLine($index)" aria-label="Remove line">✕</button>
       </div>
+      @if (line.itemId; as itemId) {
+        <div class="availability-hint">
+          @if (warehouseAvailability(itemId).length > 0) {
+            Currently available:
+            @for (w of warehouseAvailability(itemId); track w.warehouseId; let last = $last) {
+              {{ w.warehouseName }} ({{ w.quantity }}){{ last ? '' : ', ' }}
+            }
+          } @else {
+            No stock on record for this item at any warehouse.
+          }
+        </div>
+      }
     }
 
     <button type="button" class="btn-add-line" (click)="addLine()">+ Add Line</button>
@@ -66,7 +78,7 @@
 
   <div class="card">
     <div class="card__title">Notes</div>
-    <textarea placeholder="Optional notes about this request…" (change)="onNotesChange($any($event.target).value)"></textarea>
+    <textarea placeholder="Optional notes about this request…" [value]="notes()" (change)="onNotesChange($any($event.target).value)"></textarea>
   </div>
 
   <div class="form-actions">
