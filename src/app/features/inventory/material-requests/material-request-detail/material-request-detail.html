@@ -1,0 +1,119 @@
+<div class="request-detail-page">
+
+  <button type="button" class="back-btn" (click)="backToList()">
+    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+      <path d="M19 12H5"></path>
+      <path d="m12 19-7-7 7-7"></path>
+    </svg>
+    Back to Material Requests
+  </button>
+
+  @if (loading()) {
+    <div class="state-message">Loading…</div>
+  } @else if (errorMessage() && !request()) {
+    <div class="state-message state-message--error">{{ errorMessage() }}</div>
+  } @else if (request(); as r) {
+
+    <div class="request-header">
+      <div class="request-header__top">
+        <div class="request-header__site">{{ r.siteWarehouseName }}</div>
+        <span class="status-badge" [attr.data-status]="r.status">{{ statusLabel(r) }}</span>
+        @if (mode() === 'view' && (canShowEdit(r) || canDispatch(r))) {
+          <div class="request-header__actions">
+            @if (canShowEdit(r)) {
+              <button type="button" class="btn-edit" (click)="enterEdit()">Edit</button>
+            }
+            @if (canDispatch(r)) {
+              <a class="btn-dispatch" [routerLink]="['/inventory/transfers/new']" [queryParams]="{ fromRequestId: r.id }">
+                Create Dispatch from this Request
+              </a>
+            }
+          </div>
+        }
+      </div>
+
+      @if (mode() === 'view') {
+        <div class="request-header__meta">
+          <div><span class="request-header__meta-label">Requested by:</span> {{ r.requestedByName || '—' }}</div>
+          <div><span class="request-header__meta-label">Date needed:</span> {{ r.dateNeeded || 'Not specified' }}</div>
+          <div><span class="request-header__meta-label">Created:</span> {{ r.createdAt | date: 'medium' }}</div>
+        </div>
+        @if (r.notes) {
+          <div class="request-header__notes">{{ r.notes }}</div>
+        }
+      } @else {
+        <div class="request-header__meta">
+          <div><span class="request-header__meta-label">Requested by:</span> {{ r.requestedByName || '—' }}</div>
+          <div><span class="request-header__meta-label">Created:</span> {{ r.createdAt | date: 'medium' }}</div>
+        </div>
+        <div class="edit-field">
+          <label>Date Needed</label>
+          <input type="date" [value]="editDateNeeded()" (change)="onEditDateNeededChange($any($event.target).value)" />
+        </div>
+        <div class="edit-field">
+          <label>Notes</label>
+          <textarea placeholder="Optional notes about this request…" [value]="editNotes()" (change)="onEditNotesChange($any($event.target).value)"></textarea>
+        </div>
+      }
+    </div>
+
+    @if (errorMessage()) {
+      <div class="form-error">{{ errorMessage() }}</div>
+    }
+
+    @if (mode() === 'view') {
+      <div class="lines-card">
+        <div class="lines-head">
+          <div>Item</div>
+          <div class="align-right">Quantity Requested</div>
+          <div>Notes</div>
+        </div>
+        @for (line of r.lines; track line.id) {
+          <div class="lines-row">
+            <div class="lines-row__item">{{ line.itemName }}</div>
+            <div class="align-right lines-row__qty">{{ line.quantityRequested }}</div>
+            <div class="lines-row__notes">{{ line.notes || '—' }}</div>
+          </div>
+        } @empty {
+          <div class="lines-empty">No line items on this request.</div>
+        }
+      </div>
+    } @else {
+      <div class="card">
+        <div class="card__title">Line Items</div>
+
+        <div class="edit-lines-head">
+          <div>Item</div>
+          <div class="align-right">Quantity *</div>
+          <div>Notes</div>
+          <div></div>
+        </div>
+
+        @for (line of editLines(); track $index) {
+          <div class="edit-lines-row">
+            <select [value]="line.itemId" (change)="onEditLineItemChange($index, $any($event.target).value)">
+              <option value="">Select item…</option>
+              @for (item of items(); track item.id) {
+                <option [value]="item.id">{{ item.name }}</option>
+              }
+            </select>
+            <input type="number" min="1" class="align-right" [value]="line.quantityRequested" (change)="onEditLineQtyChange($index, $any($event.target).value)" />
+            <input type="text" placeholder="optional" [value]="line.notes" (change)="onEditLineNotesChange($index, $any($event.target).value)" />
+            <button type="button" class="line-remove" [disabled]="editLines().length <= 1" (click)="removeEditLine($index)" aria-label="Remove line">✕</button>
+          </div>
+        }
+
+        <button type="button" class="btn-add-line" (click)="addEditLine()">+ Add Line</button>
+      </div>
+
+      <div class="form-actions">
+        <button type="button" class="btn-primary" [disabled]="saving()" (click)="saveEdit()">
+          {{ saving() ? 'Saving…' : 'Save Changes' }}
+        </button>
+        <button type="button" class="btn-secondary" [disabled]="saving()" (click)="cancelEdit()">Cancel</button>
+      </div>
+    }
+
+  }
+
+</div>

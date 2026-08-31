@@ -1,0 +1,70 @@
+<div class="transfers-page">
+
+  <div class="transfers-page__header">
+    <div class="transfers-page__title">Transfers</div>
+    @if (canCreate) {
+      <button type="button" class="btn-primary" (click)="createNew()">+ New Transfer</button>
+    }
+  </div>
+
+  <div class="transfers-page__filters">
+    <select class="filter-select" [value]="statusFilter()" (change)="onStatusFilterChange($any($event.target).value)">
+      <option value="all">All Statuses</option>
+      <option value="DRAFT">Draft</option>
+      <option value="SUBMITTED">Submitted</option>
+      <option value="COMPLETED">Completed</option>
+    </select>
+    <select class="filter-select" [value]="warehouseFilter()" (change)="onWarehouseFilterChange($any($event.target).value)">
+      <option value="all">All Warehouses / Sites</option>
+      @for (w of warehouseNames(); track w) {
+        <option [value]="w">{{ w }}</option>
+      }
+    </select>
+  </div>
+
+  <div class="transfers-table">
+
+    @if (loading()) {
+      <div class="table-state">Loading…</div>
+    } @else if (errorMessage()) {
+      <div class="table-state table-state--error">{{ errorMessage() }}</div>
+    } @else if (hasResults()) {
+      <div class="transfers-table__head">
+        <div>Origin</div>
+        <div>Destination</div>
+        <div>Status</div>
+        <div>Initiated By</div>
+        <div class="align-right">Created</div>
+      </div>
+
+      @for (b of pageItems(); track b.id) {
+        <div class="transfers-table__row" (click)="openBatch(b.id)">
+          <div class="transfers-table__warehouse">{{ b.originWarehouseName }}</div>
+          <div class="transfers-table__warehouse">{{ b.destinationWarehouseName }}</div>
+          <div>
+            <span class="status-badge" [attr.data-status]="b.status">{{ statusLabel(b) }}</span>
+          </div>
+          <div class="transfers-table__by">{{ b.initiatedByName || '—' }}</div>
+          <div class="align-right transfers-table__date">{{ b.createdAt | date: 'mediumDate' }}</div>
+        </div>
+      }
+    } @else {
+      <div class="empty-state">
+        <div class="empty-state__title">No transfers match your filters</div>
+        <div class="empty-state__subtitle">Try adjusting status or warehouse filters.</div>
+      </div>
+    }
+
+  </div>
+
+  @if (!loading() && hasResults()) {
+    <div class="transfers-pagination">
+      <div class="transfers-pagination__summary">{{ pageSummary() }}</div>
+      <div class="transfers-pagination__controls">
+        <button type="button" [disabled]="currentPage() <= 1" (click)="prevPage()">Previous</button>
+        <button type="button" [disabled]="currentPage() >= totalPages()" (click)="nextPage()">Next</button>
+      </div>
+    </div>
+  }
+
+</div>

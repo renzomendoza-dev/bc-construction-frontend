@@ -37,9 +37,11 @@ export class Sidebar {
   readonly inventoryRoutes: InventorySubRoute[] = [
     { path: '/inventory/items', label: 'Items' },
     { path: '/inventory/suppliers', label: 'Suppliers' },
-    { path: '/inventory/warehouses', label: 'Warehouses' },
+    { path: '/inventory/warehouses', label: 'Warehouses & Sites' },
     { path: '/inventory/purchase-receipts', label: 'Purchase Receipts' },
     { path: '/inventory/stock', label: 'Stock' },
+    { path: '/inventory/transfers', label: 'Transfers' },
+    { path: '/inventory/material-requests', label: 'Material Requests' },
   ];
 
   // ---- Derived display state --------------------------------------------

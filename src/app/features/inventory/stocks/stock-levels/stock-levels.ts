@@ -89,6 +89,7 @@ export class StockLevelsComponent implements OnInit {
   readonly search = signal('');
   readonly warehouseFilter = signal('all');
   readonly locationFilter = signal('all');
+  readonly showZeroQty = signal(false);
   readonly page = signal(1);
 
   readonly locationCodes = computed(() =>
@@ -99,7 +100,9 @@ export class StockLevelsComponent implements OnInit {
     const term = this.search().trim().toLowerCase();
     const wh = this.warehouseFilter();
     const loc = this.locationFilter();
+    const includeZero = this.showZeroQty();
     return this.allStock().filter((r) => {
+      if (!includeZero && (r.quantity ?? 0) === 0) return false;
       if (wh !== 'all' && r.warehouseName !== wh) return false;
       if (loc !== 'all' && r.locationCode !== loc) return false;
       if (term) {
@@ -197,11 +200,29 @@ export class StockLevelsComponent implements OnInit {
   readonly adjustSaving = signal(false);
   readonly adjustError = signal<string | null>(null);
 
+  // Displayed as plain text rather than a disabled <select> — a disabled
+  // select's displayed option doesn't reliably reflect a [value] binding
+  // set at open time, even though the underlying signal (and what actually
+  // gets submitted) is correct.
+  readonly adjustItemName = computed(
+    () => this.items().find((i) => i.id === this.adjustItemId())?.name ?? '—',
+  );
+  readonly adjustLocationLabel = computed(
+    () => this.locations().find((l) => l.key === this.adjustLocationKey())?.label ?? '—',
+  );
+
   // ---- Transfer modal ----
   readonly transferOpen = signal(false);
   readonly transferItemId = signal<number | null>(null);
   readonly transferFromKey = signal<string | null>(null);
   readonly transferToKey = signal<string | null>(null);
+
+  readonly transferItemName = computed(
+    () => this.items().find((i) => i.id === this.transferItemId())?.name ?? '—',
+  );
+  readonly transferFromLabel = computed(
+    () => this.locations().find((l) => l.key === this.transferFromKey())?.label ?? '—',
+  );
   readonly transferQty = signal('');
   readonly transferSaving = signal(false);
   readonly transferError = signal<string | null>(null);
@@ -233,6 +254,11 @@ export class StockLevelsComponent implements OnInit {
 
   onLocationFilterChange(value: string): void {
     this.locationFilter.set(value);
+    this.page.set(1);
+  }
+
+  onShowZeroQtyChange(checked: boolean): void {
+    this.showZeroQty.set(checked);
     this.page.set(1);
   }
 
@@ -344,11 +370,22 @@ export class StockLevelsComponent implements OnInit {
     return this.warehouses().find((w) => w.id === id)?.name ?? `#${id}`;
   }
 
+  // Matches FlatLocation.key's format so a StockLevelResponse row can be
+  // looked up directly in the locations() picker options.
+  private locationKeyFor(row: StockLevelResponse): string | null {
+    if (row.warehouseId === undefined) return null;
+    return `${row.warehouseId}:${row.locationId ?? 'none'}`;
+  }
+
   // ---- Adjust modal ----
 
-  openAdjust(): void {
-    this.adjustItemId.set(this.items()[0]?.id ?? null);
-    this.adjustLocationKey.set(this.locations()[0]?.key ?? null);
+  // Opened from a specific location row so item + location arrive
+  // pre-filled — adjustments always target an existing stock row (the API
+  // has no bare "IN" path here), so every valid target is already one of
+  // these rows.
+  openAdjust(row: StockLevelResponse): void {
+    this.adjustItemId.set(row.itemId ?? null);
+    this.adjustLocationKey.set(this.locationKeyFor(row));
     this.adjustQty.set('');
     this.adjustReason.set('');
     this.adjustError.set(null);
@@ -357,14 +394,6 @@ export class StockLevelsComponent implements OnInit {
 
   closeAdjust(): void {
     this.adjustOpen.set(false);
-  }
-
-  onAdjustItemChange(value: string): void {
-    this.adjustItemId.set(value ? Number(value) : null);
-  }
-
-  onAdjustLocationChange(value: string): void {
-    this.adjustLocationKey.set(value || null);
   }
 
   onAdjustQtyChange(value: string): void {
@@ -426,10 +455,14 @@ export class StockLevelsComponent implements OnInit {
 
   // ---- Transfer modal ----
 
-  openTransfer(): void {
-    this.transferItemId.set(this.items()[0]?.id ?? null);
-    this.transferFromKey.set(this.locations()[0]?.key ?? null);
-    this.transferToKey.set(this.locations()[1]?.key ?? this.locations()[0]?.key ?? null);
+  // Opened from a specific location row — that row is always the source,
+  // since a transfer needs existing stock to move from. Only the
+  // destination is left for the user to pick.
+  openTransfer(row: StockLevelResponse): void {
+    const fromKey = this.locationKeyFor(row);
+    this.transferItemId.set(row.itemId ?? null);
+    this.transferFromKey.set(fromKey);
+    this.transferToKey.set(this.locations().find((l) => l.key !== fromKey)?.key ?? null);
     this.transferQty.set('');
     this.transferError.set(null);
     this.transferOpen.set(true);
@@ -437,14 +470,6 @@ export class StockLevelsComponent implements OnInit {
 
   closeTransfer(): void {
     this.transferOpen.set(false);
-  }
-
-  onTransferItemChange(value: string): void {
-    this.transferItemId.set(value ? Number(value) : null);
-  }
-
-  onTransferFromChange(value: string): void {
-    this.transferFromKey.set(value || null);
   }
 
   onTransferToChange(value: string): void {

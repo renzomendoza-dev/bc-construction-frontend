@@ -33,6 +33,20 @@ export const Permission = {
   StockAdjust: 'STOCK_ADJUST',
   StockTransfer: 'STOCK_TRANSFER',
   StockSetReorderThreshold: 'STOCK_SET_REORDER_THRESHOLD',
+
+  // Unverified: the OpenAPI spec doesn't expose @PreAuthorize role names
+  // (every endpoint just declares the generic bearerAuth scheme), so these
+  // are guesses following the established naming pattern above, not
+  // confirmed against the backend controllers. If gating misbehaves for a
+  // role that should/shouldn't have access, check these three first.
+  TransferBatchCreate: 'TRANSFER_BATCH_CREATE',
+  TransferBatchSubmit: 'TRANSFER_BATCH_SUBMIT',
+  MaterialRequestCreate: 'MATERIAL_REQUEST_CREATE',
+
+  // Also unverified (see comment above) — the backend confirmed the
+  // PUT /api/inventory/material-requests/{id} endpoint's behavior and
+  // status codes directly, but not its @PreAuthorize role name.
+  MaterialRequestEdit: 'MATERIAL_REQUEST_EDIT',
 } as const;
 
 export type PermissionValue = (typeof Permission)[keyof typeof Permission];

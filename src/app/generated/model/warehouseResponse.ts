@@ -27,6 +27,10 @@ export interface WarehouseResponse {
      */
     active?: boolean;
     /**
+     * Type of warehouse
+     */
+    type?: WarehouseResponse.TypeEnum;
+    /**
      * Timestamp when the warehouse was created
      */
     createdAt?: string;
@@ -35,4 +39,12 @@ export interface WarehouseResponse {
      */
     updatedAt?: string;
 }
+export namespace WarehouseResponse {
+    export const TypeEnum = {
+        Main: 'MAIN',
+        Site: 'SITE'
+    } as const;
+    export type TypeEnum = typeof TypeEnum[keyof typeof TypeEnum];
+}
+
 

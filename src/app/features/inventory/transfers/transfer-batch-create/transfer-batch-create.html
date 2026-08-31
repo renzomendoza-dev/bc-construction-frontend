@@ -1,0 +1,104 @@
+<div class="create-page">
+
+  <button type="button" class="back-btn" (click)="backToList()">
+    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+      <path d="M19 12H5"></path>
+      <path d="m12 19-7-7 7-7"></path>
+    </svg>
+    Back to Transfers
+  </button>
+
+  <div class="create-page__title">{{ pageTitle() }}</div>
+
+  <div class="tabs">
+    <button type="button" class="tab" [class.tab--active]="direction() === 'PULL_OUT'" (click)="setDirection('PULL_OUT')">
+      Pull-out from Site
+    </button>
+    <button type="button" class="tab" [class.tab--active]="direction() === 'DISPATCH'" (click)="setDirection('DISPATCH')">
+      Dispatch to Site
+    </button>
+  </div>
+
+  @if (fulfillingRequest(); as req) {
+    <div class="fulfilling-banner">
+      Fulfilling Material Request for <strong>{{ req.siteWarehouseName }}</strong> — line items below are pre-filled from the request; adjust quantities to match what's actually being sent.
+    </div>
+  }
+
+  @if (errorMessage()) {
+    <div class="form-error">{{ errorMessage() }}</div>
+  }
+
+  <div class="card">
+    <div class="form-grid">
+      <div class="form-field">
+        <label>{{ direction() === 'PULL_OUT' ? 'Origin Site *' : 'Origin Warehouse *' }}</label>
+        <select [value]="originWarehouseId()" (change)="onOriginChange($any($event.target).value)">
+          <option value="">Select…</option>
+          @for (w of originOptions(); track w.id) {
+            <option [value]="w.id">{{ w.name }}</option>
+          }
+        </select>
+      </div>
+      <div class="form-field">
+        <label>{{ direction() === 'PULL_OUT' ? 'Destination Warehouse *' : 'Destination Site *' }}</label>
+        <select [value]="destinationWarehouseId()" (change)="onDestinationChange($any($event.target).value)">
+          <option value="">Select…</option>
+          @for (w of destinationOptions(); track w.id) {
+            <option [value]="w.id">{{ w.name }}</option>
+          }
+        </select>
+      </div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card__title">Line Items</div>
+    <div class="lines-hint">
+      Expected Quantity is the counted/audited amount at the origin — leave it blank if you're just moving stock without a count.
+    </div>
+
+    <div class="lines-head">
+      <div>Item</div>
+      <div class="align-right">Expected Qty</div>
+      <div class="align-right">Quantity *</div>
+      <div>Notes</div>
+      <div></div>
+    </div>
+
+    @for (line of lines(); track $index) {
+      <div class="lines-row">
+        <select [value]="line.itemId" (change)="onLineItemChange($index, $any($event.target).value)">
+          <option value="">Select item…</option>
+          @for (item of items(); track item.id) {
+            <option [value]="item.id">{{ item.name }} ({{ item.sku }})</option>
+          }
+        </select>
+        <input type="number" min="0" class="align-right" placeholder="optional" [value]="line.expectedQuantity" (change)="onLineExpectedQtyChange($index, $any($event.target).value)" />
+        <input type="number" min="1" class="align-right" [value]="line.quantity" (change)="onLineQtyChange($index, $any($event.target).value)" />
+        <input type="text" placeholder="optional" [value]="line.notes" (change)="onLineNotesChange($index, $any($event.target).value)" />
+        <button type="button" class="line-remove" [disabled]="lines().length <= 1" (click)="removeLine($index)" aria-label="Remove line">✕</button>
+      </div>
+    }
+
+    <button type="button" class="btn-add-line" (click)="addLine()">+ Add Line</button>
+
+    <div class="lines-total">
+      <span class="lines-total__label">Total Items</span>
+      <span class="lines-total__value">{{ totalItemCount() }}</span>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card__title">Notes</div>
+    <textarea placeholder="Optional notes about this transfer…" (change)="onNotesChange($any($event.target).value)"></textarea>
+  </div>
+
+  <div class="form-actions">
+    <button type="button" class="btn-primary" [disabled]="saving() || loadingOptions()" (click)="saveDraft()">
+      {{ saving() ? 'Creating…' : 'Create Draft' }}
+    </button>
+    <button type="button" class="btn-secondary" [disabled]="saving()" (click)="backToList()">Cancel</button>
+  </div>
+
+</div>

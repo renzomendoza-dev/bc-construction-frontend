@@ -8,9 +8,11 @@ api/api.ts
 api/equipment.service.ts
 api/inventory.service.ts
 api/items.service.ts
+api/materialRequests.service.ts
 api/purchaseReceipts.service.ts
 api/salesController.service.ts
 api/suppliers.service.ts
+api/transferBatches.service.ts
 api/user.service.ts
 api/warehouses.service.ts
 configuration.ts
@@ -32,6 +34,11 @@ model/itemSupplierRequest.ts
 model/itemSupplierResponse.ts
 model/itemUpdateRequest.ts
 model/lowStockItemResponse.ts
+model/materialRequestCreateRequest.ts
+model/materialRequestLineItemRequest.ts
+model/materialRequestLineItemResponse.ts
+model/materialRequestResponse.ts
+model/materialRequestUpdateRequest.ts
 model/models.ts
 model/pageResponse.ts
 model/purchaseHistoryEntry.ts
@@ -52,6 +59,10 @@ model/storageLocationResponse.ts
 model/supplierCreateRequest.ts
 model/supplierResponse.ts
 model/supplierUpdateRequest.ts
+model/transferBatchCreateRequest.ts
+model/transferBatchResponse.ts
+model/transferLineItemRequest.ts
+model/transferLineItemResponse.ts
 model/userResponse.ts
 model/validationErrorResponse.ts
 model/warehouseCreateRequest.ts

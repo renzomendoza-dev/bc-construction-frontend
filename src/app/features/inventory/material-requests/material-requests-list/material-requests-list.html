@@ -1,0 +1,69 @@
+<div class="requests-page">
+
+  <div class="requests-page__header">
+    <div class="requests-page__title">Material Requests</div>
+    @if (canCreate) {
+      <button type="button" class="btn-primary" (click)="createNew()">+ New Request</button>
+    }
+  </div>
+
+  <div class="requests-page__filters">
+    <select class="filter-select" [value]="statusFilter()" (change)="onStatusFilterChange($any($event.target).value)">
+      <option value="all">All Statuses</option>
+      <option value="DRAFT">Draft</option>
+      <option value="SUBMITTED">Submitted</option>
+      <option value="PARTIALLY_FULFILLED">Partially Fulfilled</option>
+      <option value="FULFILLED">Fulfilled</option>
+    </select>
+    <select class="filter-select" [value]="siteFilter()" (change)="onSiteFilterChange($any($event.target).value)">
+      <option value="all">All Sites</option>
+      @for (s of siteNames(); track s) {
+        <option [value]="s">{{ s }}</option>
+      }
+    </select>
+  </div>
+
+  <div class="requests-table">
+
+    @if (loading()) {
+      <div class="table-state">Loading…</div>
+    } @else if (errorMessage()) {
+      <div class="table-state table-state--error">{{ errorMessage() }}</div>
+    } @else if (hasResults()) {
+      <div class="requests-table__head">
+        <div>Site</div>
+        <div>Requested By</div>
+        <div>Date Needed</div>
+        <div class="align-right">Status</div>
+      </div>
+
+      @for (r of pageItems(); track r.id) {
+        <div class="requests-table__row" (click)="openRequest(r.id)">
+          <div class="requests-table__site">{{ r.siteWarehouseName }}</div>
+          <div class="requests-table__by">{{ r.requestedByName || '—' }}</div>
+          <div class="requests-table__date">{{ r.dateNeeded || '—' }}</div>
+          <div class="align-right">
+            <span class="status-badge" [attr.data-status]="r.status">{{ statusLabel(r) }}</span>
+          </div>
+        </div>
+      }
+    } @else {
+      <div class="empty-state">
+        <div class="empty-state__title">No material requests match your filters</div>
+        <div class="empty-state__subtitle">Try adjusting status or site filters.</div>
+      </div>
+    }
+
+  </div>
+
+  @if (!loading() && hasResults()) {
+    <div class="requests-pagination">
+      <div class="requests-pagination__summary">{{ pageSummary() }}</div>
+      <div class="requests-pagination__controls">
+        <button type="button" [disabled]="currentPage() <= 1" (click)="prevPage()">Previous</button>
+        <button type="button" [disabled]="currentPage() >= totalPages()" (click)="nextPage()">Next</button>
+      </div>
+    </div>
+  }
+
+</div>

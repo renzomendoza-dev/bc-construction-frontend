@@ -2,14 +2,6 @@
 
   <div class="stock-page__header">
     <div class="stock-page__title">Stock Levels</div>
-    <div class="stock-page__actions">
-      @if (canAdjust) {
-        <button type="button" class="btn-secondary" (click)="openAdjust()">Adjust Stock</button>
-      }
-      @if (canTransfer) {
-        <button type="button" class="btn-primary" (click)="openTransfer()">Transfer Stock</button>
-      }
-    </div>
   </div>
 
   <div class="tabs">
@@ -46,6 +38,10 @@
             <option [value]="l">{{ l }}</option>
           }
         </select>
+        <label class="filter-checkbox">
+          <input type="checkbox" [checked]="showZeroQty()" (change)="onShowZeroQtyChange($any($event.target).checked)" />
+          Show zero quantity
+        </label>
       </div>
 
       <div class="table">
@@ -100,14 +96,17 @@
                     View item details (category, price, cost) →
                   </a>
                   <div class="location-breakdown">
-                    <div class="location-breakdown__head">
+                    <div class="location-breakdown__head" [class.location-breakdown__head--with-actions]="canAdjust || canTransfer">
                       <div>Warehouse</div>
                       <div>Location</div>
                       <div class="align-right">Quantity</div>
                       <div class="align-right">Reorder At</div>
+                      @if (canAdjust || canTransfer) {
+                        <div class="align-right">Actions</div>
+                      }
                     </div>
                     @for (row of group.rows; track rowKey(row)) {
-                      <div class="location-breakdown__row">
+                      <div class="location-breakdown__row" [class.location-breakdown__row--with-actions]="canAdjust || canTransfer">
                         <div>{{ row.warehouseName }}</div>
                         <div class="table__cell-code">{{ row.locationCode || '—' }}</div>
                         <div class="align-right qty-value" [class.qty-value--low]="isRowLow(row)">{{ row.quantity }}</div>
@@ -151,6 +150,16 @@
                             <span class="threshold-value-readonly">{{ row.reorderThreshold ?? '—' }}</span>
                           }
                         </div>
+                        @if (canAdjust || canTransfer) {
+                          <div class="align-right row-actions" (click)="$event.stopPropagation()">
+                            @if (canAdjust) {
+                              <button type="button" class="btn-row-action" (click)="openAdjust(row)">Adjust</button>
+                            }
+                            @if (canTransfer) {
+                              <button type="button" class="btn-row-action btn-row-action--primary" (click)="openTransfer(row)">Transfer</button>
+                            }
+                          </div>
+                        }
                       </div>
                       @if (editingThresholdKey() === rowKey(row) && thresholdError()) {
                         <div class="threshold-error">{{ thresholdError() }}</div>
@@ -287,19 +296,11 @@
       <div class="dialog-form">
         <div class="form-field">
           <label>Item</label>
-          <select [value]="adjustItemId()" (change)="onAdjustItemChange($any($event.target).value)">
-            @for (it of items(); track it.id) {
-              <option [value]="it.id">{{ it.name }}</option>
-            }
-          </select>
+          <div class="frozen-field">{{ adjustItemName() }}</div>
         </div>
         <div class="form-field">
           <label>Warehouse / Location</label>
-          <select [value]="adjustLocationKey()" (change)="onAdjustLocationChange($any($event.target).value)">
-            @for (l of locations(); track l.key) {
-              <option [value]="l.key">{{ l.label }}</option>
-            }
-          </select>
+          <div class="frozen-field">{{ adjustLocationLabel() }}</div>
         </div>
         <div class="form-field">
           <label>Quantity Change (+/-)</label>
@@ -333,20 +334,12 @@
       <div class="dialog-form">
         <div class="form-field">
           <label>Item</label>
-          <select [value]="transferItemId()" (change)="onTransferItemChange($any($event.target).value)">
-            @for (it of items(); track it.id) {
-              <option [value]="it.id">{{ it.name }}</option>
-            }
-          </select>
+          <div class="frozen-field">{{ transferItemName() }}</div>
         </div>
         <div class="form-field-row">
           <div class="form-field">
             <label>From Location</label>
-            <select [value]="transferFromKey()" (change)="onTransferFromChange($any($event.target).value)">
-              @for (l of locations(); track l.key) {
-                <option [value]="l.key">{{ l.label }}</option>
-              }
-            </select>
+            <div class="frozen-field">{{ transferFromLabel() }}</div>
           </div>
           <div class="form-field">
             <label>To Location</label>

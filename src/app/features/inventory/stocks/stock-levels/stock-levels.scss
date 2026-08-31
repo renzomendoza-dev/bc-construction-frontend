@@ -25,11 +25,6 @@
   color: var(--heading-text);
 }
 
-.stock-page__actions {
-  display: flex;
-  gap: 10px;
-}
-
 .btn-primary {
   height: 38px;
   padding: 0 16px;
@@ -150,6 +145,22 @@
   font-size: 13px;
   padding: 0 12px;
   font-family: 'IBM Plex Sans', sans-serif;
+}
+
+.filter-checkbox {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 13px;
+  color: var(--label-text);
+  cursor: pointer;
+  white-space: nowrap;
+
+  input {
+    width: 15px;
+    height: 15px;
+    accent-color: var(--teal);
+  }
 }
 
 // ---- Tables (shared) ----
@@ -312,6 +323,10 @@
   color: var(--sub-text);
 }
 
+.location-breakdown__head--with-actions {
+  grid-template-columns: 1.2fr 0.9fr 0.7fr 0.8fr 1.1fr;
+}
+
 .location-breakdown__row {
   display: grid;
   grid-template-columns: 1.4fr 1fr 0.8fr 0.9fr;
@@ -324,6 +339,45 @@
 
   &:last-child {
     border-bottom: none;
+  }
+}
+
+.location-breakdown__row--with-actions {
+  grid-template-columns: 1.2fr 0.9fr 0.7fr 0.8fr 1.1fr;
+}
+
+.row-actions {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 6px;
+}
+
+.btn-row-action {
+  height: 26px;
+  padding: 0 10px;
+  border-radius: 6px;
+  border: 1px solid var(--border);
+  background: var(--panel-bg);
+  color: var(--label-text);
+  font-size: 11.5px;
+  font-weight: 600;
+  cursor: pointer;
+  white-space: nowrap;
+
+  &:hover {
+    background: var(--hover-bg);
+  }
+}
+
+.btn-row-action--primary {
+  border-color: transparent;
+  background: linear-gradient(180deg, #237e88, #1b6e76);
+  color: #ffffff;
+
+  &:hover {
+    filter: brightness(1.08);
+    background: linear-gradient(180deg, #237e88, #1b6e76);
   }
 }
 
@@ -644,6 +698,19 @@
     height: 38px;
   }
 
+  .frozen-field {
+    height: 38px;
+    display: flex;
+    align-items: center;
+    border-radius: 8px;
+    border: 1px solid var(--border);
+    background: var(--badge-bg);
+    color: var(--sub-text);
+    font-size: 13px;
+    padding: 0 10px;
+    box-sizing: border-box;
+  }
+
   textarea {
     height: 66px;
     padding: 10px;
@@ -665,15 +732,6 @@
 
   .stock-page__header {
     flex-wrap: wrap;
-  }
-
-  .stock-page__actions {
-    width: 100%;
-
-    .btn-primary,
-    .btn-secondary {
-      flex: 1;
-    }
   }
 
   .tabs {
@@ -715,6 +773,11 @@
   .location-breakdown__head,
   .location-breakdown__row {
     min-width: 460px;
+  }
+
+  .location-breakdown__head--with-actions,
+  .location-breakdown__row--with-actions {
+    min-width: 580px;
   }
 
   .dialog {

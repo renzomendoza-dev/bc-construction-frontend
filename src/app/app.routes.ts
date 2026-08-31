@@ -75,6 +75,50 @@ export const routes: Routes = [
             (m) => m.StockLevelsComponent,
           ),
       },
+      {
+        path: 'transfers',
+        loadComponent: () =>
+          import('./features/inventory/transfers/transfer-batches-list/transfer-batches-list').then(
+            (m) => m.TransferBatchesListComponent,
+          ),
+      },
+      {
+        path: 'transfers/new',
+        canActivate: [permissionGuard(Permission.TransferBatchCreate, '/inventory/transfers')],
+        loadComponent: () =>
+          import('./features/inventory/transfers/transfer-batch-create/transfer-batch-create').then(
+            (m) => m.TransferBatchCreateComponent,
+          ),
+      },
+      {
+        path: 'transfers/:id',
+        loadComponent: () =>
+          import('./features/inventory/transfers/transfer-batch-detail/transfer-batch-detail').then(
+            (m) => m.TransferBatchDetailComponent,
+          ),
+      },
+      {
+        path: 'material-requests',
+        loadComponent: () =>
+          import('./features/inventory/material-requests/material-requests-list/material-requests-list').then(
+            (m) => m.MaterialRequestsListComponent,
+          ),
+      },
+      {
+        path: 'material-requests/new',
+        canActivate: [permissionGuard(Permission.MaterialRequestCreate, '/inventory/material-requests')],
+        loadComponent: () =>
+          import('./features/inventory/material-requests/material-request-create/material-request-create').then(
+            (m) => m.MaterialRequestCreateComponent,
+          ),
+      },
+      {
+        path: 'material-requests/:id',
+        loadComponent: () =>
+          import('./features/inventory/material-requests/material-request-detail/material-request-detail').then(
+            (m) => m.MaterialRequestDetailComponent,
+          ),
+      },
       // {
       //   path: 'warehouses',
       //   loadComponent: () =>

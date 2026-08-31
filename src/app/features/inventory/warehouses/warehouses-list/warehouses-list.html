@@ -1,7 +1,7 @@
 <div class="warehouses-page">
 
   <div class="warehouses-page__header">
-    <div class="warehouses-page__title">Warehouses</div>
+    <div class="warehouses-page__title">Warehouses & Sites</div>
     @if (canCreate) {
       <button type="button" class="btn-primary" (click)="openNew()">+ New Warehouse</button>
     }
@@ -20,6 +20,14 @@
         <div class="form-field form-field--name">
           <label>Name</label>
           <input type="text" placeholder="e.g. South Yard" [value]="newForm().name" (change)="onNewNameChange($any($event.target).value)" />
+        </div>
+        <div class="form-field form-field--type">
+          <label>Type</label>
+          <select [value]="newForm().type" (change)="onNewTypeChange($any($event.target).value)">
+            @for (t of warehouseTypes; track t) {
+              <option [value]="t">{{ t === 'SITE' ? 'Site' : 'Warehouse' }}</option>
+            }
+          </select>
         </div>
         <button type="button" class="btn-primary" [disabled]="creatingWarehouse()" (click)="saveNewWarehouse()">
           {{ creatingWarehouse() ? 'Creating…' : 'Create' }}
@@ -49,6 +57,9 @@
               </svg>
               <div class="warehouse-card__code">{{ wh.code }}</div>
               <div class="warehouse-card__name">{{ wh.name }}</div>
+              <span class="type-badge" [class.type-badge--site]="wh.type === 'SITE'">
+                {{ typeLabel(wh) }}
+              </span>
               <span class="status-badge" [class.status-badge--inactive]="!wh.active">
                 {{ wh.active ? 'Active' : 'Inactive' }}
               </span>

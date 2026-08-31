@@ -15,9 +15,10 @@ import { Permission } from '../../../../core/constants/permissions';
 interface NewWarehouseForm {
   code: string;
   name: string;
+  type: WarehouseResponse.TypeEnum;
 }
- 
-const EMPTY_FORM: NewWarehouseForm = { code: '', name: '' };
+
+const EMPTY_FORM: NewWarehouseForm = { code: '', name: '', type: WarehouseResponse.TypeEnum.Main };
  
 @Component({
   selector: 'app-warehouses-list',
@@ -35,6 +36,11 @@ export class WarehousesListComponent implements OnInit {
   readonly canEdit = this.currentUser.hasPermission(Permission.WarehouseEdit);
   readonly canDeactivate = this.currentUser.hasPermission(Permission.WarehouseDeactivate);
   readonly canManageLocations = this.currentUser.hasPermission(Permission.WarehouseManageLocations);
+
+  readonly warehouseTypes: WarehouseResponse.TypeEnum[] = [
+    WarehouseResponse.TypeEnum.Main,
+    WarehouseResponse.TypeEnum.Site,
+  ];
 
   readonly warehouses = signal<WarehouseResponse[]>([]);
   readonly locationsByWarehouse = signal<Record<number, StorageLocationResponse[]>>({});
@@ -81,6 +87,12 @@ export class WarehousesListComponent implements OnInit {
     return warehouse.active ? 'Deactivate' : 'Reactivate';
   }
 
+  // WarehouseUpdateRequest has no `type` field — type is set once at
+  // creation and immutable after, same as `code` — so this is display-only.
+  typeLabel(warehouse: WarehouseResponse): string {
+    return warehouse.type === WarehouseResponse.TypeEnum.Site ? 'Site' : 'Warehouse';
+  }
+
   // Deactivating hits PATCH /deactivate (WAREHOUSE_DEACTIVATE); reactivating
   // goes through PUT /{id} instead (WAREHOUSE_EDIT) since there's no
   // separate reactivate route — so which permission gates this one button
@@ -108,18 +120,22 @@ export class WarehousesListComponent implements OnInit {
   onNewNameChange(value: string): void {
     this.newForm.update((f) => ({ ...f, name: value }));
   }
- 
+
+  onNewTypeChange(value: string): void {
+    this.newForm.update((f) => ({ ...f, type: value as WarehouseResponse.TypeEnum }));
+  }
+
   saveNewWarehouse(): void {
     const f = this.newForm();
     if (!f.code.trim() || !f.name.trim()) {
       this.newFormError.set('Code and Name are required.');
       return;
     }
- 
+
     this.creatingWarehouse.set(true);
     this.newFormError.set(null);
- 
-    const body: WarehouseCreateRequest = { code: f.code.trim(), name: f.name.trim() };
+
+    const body: WarehouseCreateRequest = { code: f.code.trim(), name: f.name.trim(), type: f.type };
  
     this.warehousesService.createWarehouse(body).subscribe({
       next: (created) => {

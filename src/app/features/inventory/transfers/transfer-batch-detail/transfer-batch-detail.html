@@ -1,0 +1,85 @@
+<div class="batch-detail-page">
+
+  <button type="button" class="back-btn" (click)="backToList()">
+    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+      <path d="M19 12H5"></path>
+      <path d="m12 19-7-7 7-7"></path>
+    </svg>
+    Back to Transfers
+  </button>
+
+  @if (loading()) {
+    <div class="state-message">Loading…</div>
+  } @else if (errorMessage() && !batch()) {
+    <div class="state-message state-message--error">{{ errorMessage() }}</div>
+  } @else if (batch(); as b) {
+
+    <div class="batch-header">
+      <div class="batch-header__top">
+        <div class="batch-header__route">{{ b.originWarehouseName }} <span class="batch-header__arrow">→</span> {{ b.destinationWarehouseName }}</div>
+        <span class="status-badge" [attr.data-status]="b.status">{{ statusLabel(b) }}</span>
+      </div>
+      <div class="batch-header__meta">
+        <div><span class="batch-header__meta-label">Initiated by:</span> {{ b.initiatedByName || '—' }}</div>
+        <div><span class="batch-header__meta-label">Created:</span> {{ b.createdAt | date: 'medium' }}</div>
+        @if (b.updatedAt) {
+          <div><span class="batch-header__meta-label">Last updated:</span> {{ b.updatedAt | date: 'medium' }}</div>
+        }
+      </div>
+      @if (b.notes) {
+        <div class="batch-header__notes">{{ b.notes }}</div>
+      }
+    </div>
+
+    @if (b.status === 'DRAFT' && canSubmit) {
+      <div class="draft-banner">
+        <div>
+          <div class="draft-banner__title">This transfer is still a draft</div>
+          <div class="draft-banner__subtitle">Submitting moves stock from {{ b.originWarehouseName }} to {{ b.destinationWarehouseName }} and cannot be undone.</div>
+        </div>
+        <button type="button" class="btn-confirm" (click)="openConfirmDialog()">Submit Transfer</button>
+      </div>
+    }
+
+    @if (errorMessage()) {
+      <div class="form-error">{{ errorMessage() }}</div>
+    }
+
+    <div class="lines-card">
+      <div class="lines-head">
+        <div>Item</div>
+        <div class="align-right">Expected Qty</div>
+        <div class="align-right">Quantity</div>
+        <div>Notes</div>
+      </div>
+      @for (line of b.lines; track line.id) {
+        <div class="lines-row">
+          <div class="lines-row__item">{{ line.itemName }}</div>
+          <div class="align-right">{{ line.expectedQuantity ?? '—' }}</div>
+          <div class="align-right lines-row__qty">{{ line.quantity }}</div>
+          <div class="lines-row__notes">{{ line.notes || '—' }}</div>
+        </div>
+      } @empty {
+        <div class="lines-empty">No line items on this batch.</div>
+      }
+    </div>
+
+  }
+
+  @if (confirmDialogOpen() && batch(); as b) {
+    <div class="scrim" (click)="closeConfirmDialog()"></div>
+    <div class="dialog">
+      <div class="dialog__title">Submit this transfer?</div>
+      <div class="dialog__body">
+        This will move stock for {{ (b.lines ?? []).length }} line item(s) from {{ b.originWarehouseName }} to {{ b.destinationWarehouseName }}. This action cannot be undone.
+      </div>
+      <div class="dialog__actions">
+        <button type="button" class="btn-secondary" [disabled]="submitting()" (click)="closeConfirmDialog()">Cancel</button>
+        <button type="button" class="btn-confirm" [disabled]="submitting()" (click)="submitBatch()">
+          {{ submitting() ? 'Submitting…' : 'Yes, Submit Transfer' }}
+        </button>
+      </div>
+    </div>
+  }
+
+</div>

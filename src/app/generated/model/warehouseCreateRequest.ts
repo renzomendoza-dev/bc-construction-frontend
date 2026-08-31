@@ -18,5 +18,17 @@ export interface WarehouseCreateRequest {
      * Display name of the warehouse
      */
     name: string;
+    /**
+     * Type of warehouse; defaults to MAIN when omitted
+     */
+    type?: WarehouseCreateRequest.TypeEnum;
 }
+export namespace WarehouseCreateRequest {
+    export const TypeEnum = {
+        Main: 'MAIN',
+        Site: 'SITE'
+    } as const;
+    export type TypeEnum = typeof TypeEnum[keyof typeof TypeEnum];
+}
+
 
