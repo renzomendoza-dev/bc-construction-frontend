@@ -18,6 +18,13 @@ import { Permission } from '../../../core/constants/permissions';
 
 type Tab = 'all' | 'overdue';
 
+// The Check Out modal doubles as the direct site-to-site Transfer modal —
+// the backend's checkOut endpoint handles both (equipment AVAILABLE = plain
+// checkout, equipment already CHECKED_OUT/IN_USE at a different SITE =
+// transfer), so reusing one modal/one submit path mirrors that instead of
+// introducing a parallel form for what's really the same request shape.
+type CheckOutMode = 'CHECKOUT' | 'TRANSFER';
+
 const STATUSES: EquipmentResponse.StatusEnum[] = [
   'AVAILABLE',
   'CHECKED_OUT',
@@ -146,14 +153,26 @@ export class EquipmentListComponent implements OnInit {
     this.warehouses().filter((w) => w.type === WarehouseResponse.TypeEnum.Main),
   );
 
-  // ---- Check-out modal --------------------------------------------------
+  // ---- Check-out / Transfer modal ----------------------------------------
   readonly checkOutOpen = signal(false);
+  readonly checkOutMode = signal<CheckOutMode>('CHECKOUT');
   readonly checkOutTarget = signal<EquipmentResponse | null>(null);
   readonly checkOutUserId = signal('');
   readonly checkOutSiteWarehouseId = signal('');
   readonly checkOutCondition = signal('');
   readonly checkOutSaving = signal(false);
   readonly checkOutError = signal<string | null>(null);
+
+  // A transfer can't target the site the equipment is already at (backend
+  // rejects it with 400) — excluded here so the mistake can't be made at all
+  // rather than caught only after submitting.
+  readonly checkOutSiteOptions = computed(() => {
+    const target = this.checkOutTarget();
+    if (this.checkOutMode() === 'TRANSFER' && target) {
+      return this.siteWarehouses().filter((w) => w.id !== target.currentWarehouseId);
+    }
+    return this.siteWarehouses();
+  });
 
   // ---- Check-in modal -----------------------------------------------------
   readonly checkInOpen = signal(false);
@@ -238,6 +257,12 @@ export class EquipmentListComponent implements OnInit {
     return eq.status === 'CHECKED_OUT' || eq.status === 'IN_USE';
   }
 
+  // Same status precondition as check-in — a transfer only makes sense for
+  // equipment that's already out at a site.
+  canTransfer(eq: EquipmentResponse): boolean {
+    return this.canCheckIn(eq);
+  }
+
   daysOut(eq: EquipmentResponse): number {
     if (!eq.checkedOutAt) return 0;
     const checkedOut = new Date(eq.checkedOutAt).getTime();
@@ -245,10 +270,28 @@ export class EquipmentListComponent implements OnInit {
     return Math.max(0, Math.floor(diff / (1000 * 60 * 60 * 24)));
   }
 
-  // ---- Check-out ------------------------------------------------------
+  // ---- Check-out / Transfer ---------------------------------------------
   openCheckOut(eq: EquipmentResponse): void {
+    this.checkOutMode.set('CHECKOUT');
     this.checkOutTarget.set(eq);
     this.checkOutUserId.set('');
+    this.checkOutSiteWarehouseId.set('');
+    this.checkOutCondition.set('');
+    this.checkOutError.set(null);
+    this.checkOutOpen.set(true);
+  }
+
+  // Reuses the same modal/submit path as a plain checkout — the backend's
+  // checkOut endpoint derives "transfer" vs "checkout" from the equipment's
+  // current status, so the only frontend difference is which options are
+  // offered and how the form starts pre-filled.
+  openTransfer(eq: EquipmentResponse): void {
+    this.checkOutMode.set('TRANSFER');
+    this.checkOutTarget.set(eq);
+    // userId is required either way — pre-filled with the current holder
+    // since reconfirming custody unchanged is the common case, but still
+    // editable to reassign at the same time as the site change.
+    this.checkOutUserId.set(eq.currentHolderId ? String(eq.currentHolderId) : '');
     this.checkOutSiteWarehouseId.set('');
     this.checkOutCondition.set('');
     this.checkOutError.set(null);
@@ -277,12 +320,13 @@ export class EquipmentListComponent implements OnInit {
 
     const userId = Number(this.checkOutUserId());
     const siteWarehouseId = Number(this.checkOutSiteWarehouseId());
+    const isTransfer = this.checkOutMode() === 'TRANSFER';
     if (!userId || Number.isNaN(userId)) {
       this.checkOutError.set('Select a user.');
       return;
     }
     if (!siteWarehouseId || Number.isNaN(siteWarehouseId)) {
-      this.checkOutError.set('Select a site.');
+      this.checkOutError.set(isTransfer ? 'Select a destination site.' : 'Select a site.');
       return;
     }
 
@@ -301,9 +345,12 @@ export class EquipmentListComponent implements OnInit {
         this.fetchEquipment();
         this.fetchOverdue();
       },
-      error: () => {
+      error: (err) => {
         this.checkOutSaving.set(false);
-        this.checkOutError.set('Could not check out this equipment. Please try again.');
+        this.checkOutError.set(
+          err?.error?.message ||
+            (isTransfer ? 'Could not transfer this equipment. Please try again.' : 'Could not check out this equipment. Please try again.'),
+        );
       },
     });
   }

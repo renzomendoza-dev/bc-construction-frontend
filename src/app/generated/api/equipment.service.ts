@@ -120,8 +120,8 @@ export class EquipmentService extends BaseService {
     }
 
     /**
-     * Check out equipment to a user at a site
-     * siteWarehouseId must reference a SITE-type warehouse — a checkout targeting a MAIN warehouse is rejected with 400. For processing many pieces of equipment to one holder in one action, see POST /api/equipment/assignment-batches instead.
+     * Check out equipment to a user at a site — also handles a direct site-to-site transfer
+     * siteWarehouseId must reference a SITE-type warehouse — a checkout targeting a MAIN warehouse is rejected with 400. Two starting states are accepted: AVAILABLE equipment (an ordinary checkout), or equipment already CHECKED_OUT/IN_USE at a *different* SITE warehouse (a direct transfer — closes its current assignment and opens a new one at siteWarehouseId, without an intermediate check-in to a MAIN warehouse). userId is required either way, including for a transfer: it either reconfirms the same holder or reassigns to someone new. Targeting the SITE warehouse the equipment is already at is rejected with 400. For processing many pieces of equipment in one action (including transfers), see POST /api/equipment/assignment-batches instead.
      * @endpoint post /api/equipment/{id}/checkout
      * @param id 
      * @param equipmentCheckOutRequest 

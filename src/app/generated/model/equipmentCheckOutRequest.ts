@@ -10,19 +10,19 @@
 
 
 /**
- * Request payload to check out equipment to a user
+ * Request payload to check out equipment to a user, or to transfer it directly between two SITE warehouses if it\'s already checked out elsewhere
  */
 export interface EquipmentCheckOutRequest { 
     /**
-     * App-local user ID receiving the equipment
+     * App-local user ID receiving the equipment. Required even for a site-to-site transfer of already-checked-out equipment — either reconfirming the existing holder or reassigning to someone new.
      */
     userId: number;
     /**
-     * Identifier of the SITE-type warehouse the equipment is going to (400 if it isn\'t a SITE warehouse)
+     * Identifier of the SITE-type warehouse the equipment is going to (400 if it isn\'t a SITE warehouse, or if it\'s the warehouse the equipment is already at)
      */
     siteWarehouseId: number;
     /**
-     * Condition notes recorded at checkout
+     * Condition notes recorded at checkout (or at both sides of a transfer — the closed assignment\'s conditionIn and the new one\'s conditionOut)
      */
     conditionOut?: string;
 }

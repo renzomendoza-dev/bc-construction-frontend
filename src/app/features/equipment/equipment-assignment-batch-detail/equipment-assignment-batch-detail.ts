@@ -57,12 +57,17 @@ export class EquipmentAssignmentBatchDetailComponent implements OnInit {
     this.router.navigate(['/equipment/assignment-batches']);
   }
 
-  isAssignBatch(batch: EquipmentAssignmentBatchResponse): boolean {
+  // A batch with holderId set goes through checkOut() per line, which now
+  // covers both an assign-out (equipment was AVAILABLE) and a direct
+  // site-to-site transfer (equipment was already CHECKED_OUT/IN_USE) — the
+  // response doesn't disambiguate which sub-case it was, so this only tells
+  // us "uses checkOut" vs "uses checkIn", not "assign" vs "transfer".
+  usesCheckOut(batch: EquipmentAssignmentBatchResponse): boolean {
     return !!batch.holderId;
   }
 
   canSubmit(batch: EquipmentAssignmentBatchResponse): boolean {
-    return this.isAssignBatch(batch) ? this.hasCheckoutPermission : this.hasCheckinPermission;
+    return this.usesCheckOut(batch) ? this.hasCheckoutPermission : this.hasCheckinPermission;
   }
 
   statusLabel(batch: EquipmentAssignmentBatchResponse): string {

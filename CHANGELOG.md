@@ -8,6 +8,7 @@ All notable changes to this project are documented here, newest first. Dates are
 - Add a Delete action for draft Transfer Batches.
 - Add batch equipment assignment/return (Assign to Site / Return to Warehouse) with new list/create/detail pages, and link Equipment to real Warehouse records (`currentWarehouseId`) instead of a free-text site.
 - Fix pre-filled dropdowns (destination site, line items, warehouse) not displaying correctly when populated asynchronously from a fulfilling Material Request or Transfer Batch — replaced with locked read-only text for those fields.
+- Add direct site-to-site equipment transfer: a "Transfer" action on checked-out/in-use equipment (and a matching batch tab) moves it straight to another site without an intermediate return to a warehouse.
 
 ## 2026-08-31
 - Add Site ↔ Warehouse Transfers and Material Requests: `Warehouse.type` (MAIN/SITE), Transfer Batches (list/create/detail/submit, with a pull-out-from-site vs dispatch-to-site direction toggle), Material Requests (list/create/detail/edit), and a "Create Dispatch from this Request" shortcut linking the two.

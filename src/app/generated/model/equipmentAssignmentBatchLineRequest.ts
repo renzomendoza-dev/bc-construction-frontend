@@ -18,7 +18,7 @@ export interface EquipmentAssignmentBatchLineRequest {
      */
     equipmentId: number;
     /**
-     * Condition notes for this piece of equipment — conditionOut for an assign-out batch, conditionIn for a return batch
+     * Condition notes for this piece of equipment — conditionOut for an assign-out line, conditionIn for a return line, or both sides of a transfer line (the closed assignment\'s conditionIn and the new one\'s conditionOut)
      */
     conditionNotes?: string;
 }

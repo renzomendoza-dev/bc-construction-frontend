@@ -85,8 +85,11 @@ export class EquipmentAssignmentBatchesListComponent implements OnInit {
     this.router.navigate(['/equipment/assignment-batches/new']);
   }
 
+  // A batch with holderId set goes through checkOut() per line, which now
+  // covers both an assign-out and a direct site-to-site transfer — the
+  // response doesn't disambiguate which sub-case it was.
   directionLabel(batch: EquipmentAssignmentBatchResponse): string {
-    return batch.holderId ? 'Assign' : 'Return';
+    return batch.holderId ? 'Send' : 'Return';
   }
 
   statusLabel(batch: EquipmentAssignmentBatchResponse): string {

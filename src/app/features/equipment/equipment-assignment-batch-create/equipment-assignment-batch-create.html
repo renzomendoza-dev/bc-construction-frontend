@@ -14,6 +14,9 @@
     <button type="button" class="tab" [class.tab--active]="direction() === 'ASSIGN'" (click)="setDirection('ASSIGN')">
       Assign to Site
     </button>
+    <button type="button" class="tab" [class.tab--active]="direction() === 'TRANSFER'" (click)="setDirection('TRANSFER')">
+      Transfer to Another Site
+    </button>
     <button type="button" class="tab" [class.tab--active]="direction() === 'RETURN'" (click)="setDirection('RETURN')">
       Return to Warehouse
     </button>
@@ -26,7 +29,7 @@
   <div class="card">
     <div class="form-grid">
       <div class="form-field">
-        <label>{{ direction() === 'ASSIGN' ? 'Destination Site *' : 'Destination Warehouse *' }}</label>
+        <label>{{ direction() === 'RETURN' ? 'Destination Warehouse *' : 'Destination Site *' }}</label>
         <select [value]="destinationWarehouseId()" (change)="onDestinationChange($any($event.target).value)">
           <option value="">Select…</option>
           @for (w of destinationOptions(); track w.id) {
@@ -34,7 +37,7 @@
           }
         </select>
       </div>
-      @if (direction() === 'ASSIGN') {
+      @if (holderRequired()) {
         <div class="form-field">
           <label>Holder *</label>
           <select [value]="holderId()" (change)="onHolderChange($any($event.target).value)">

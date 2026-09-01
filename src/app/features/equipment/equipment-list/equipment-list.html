@@ -75,7 +75,11 @@
               }
               @if (canCheckOut(eq) && hasCheckoutPermission) {
                 <button type="button" class="btn-secondary btn-small" (click)="openCheckOut(eq)">Check Out</button>
-              } @else if (canCheckIn(eq) && hasCheckinPermission) {
+              }
+              @if (canTransfer(eq) && hasCheckoutPermission) {
+                <button type="button" class="btn-secondary btn-small" (click)="openTransfer(eq)">Transfer</button>
+              }
+              @if (canCheckIn(eq) && hasCheckinPermission) {
                 <button type="button" class="btn-primary btn-small" (click)="openCheckIn(eq)">Check In</button>
               }
             </div>
@@ -130,12 +134,17 @@
     </div>
   }
 
-  <!-- ===== Check Out modal ===== -->
+  <!-- ===== Check Out / Transfer modal ===== -->
   @if (checkOutOpen()) {
     <div class="scrim" (click)="closeCheckOut()"></div>
     <div class="dialog">
-      <div class="dialog__title">Check Out Equipment</div>
-      <div class="dialog__subtitle">{{ checkOutTarget()?.name }} · {{ checkOutTarget()?.assetTag }}</div>
+      <div class="dialog__title">{{ checkOutMode() === 'TRANSFER' ? 'Transfer Equipment' : 'Check Out Equipment' }}</div>
+      <div class="dialog__subtitle">
+        {{ checkOutTarget()?.name }} · {{ checkOutTarget()?.assetTag }}
+        @if (checkOutMode() === 'TRANSFER') {
+          · currently at {{ checkOutTarget()?.currentWarehouseName }}
+        }
+      </div>
 
       @if (checkOutError()) {
         <div class="form-error">{{ checkOutError() }}</div>
@@ -163,19 +172,19 @@
           }
         </div>
         <div class="form-field">
-          <label>Site</label>
+          <label>{{ checkOutMode() === 'TRANSFER' ? 'Destination Site' : 'Site' }}</label>
           <select
             [value]="checkOutSiteWarehouseId()"
             (change)="onCheckOutSiteWarehouseIdChange($any($event.target).value)"
           >
             <option value="">Select a site…</option>
-            @for (w of siteWarehouses(); track w.id) {
+            @for (w of checkOutSiteOptions(); track w.id) {
               <option [value]="w.id">{{ w.name }}</option>
             }
           </select>
         </div>
         <div class="form-field">
-          <label>Condition Out (optional)</label>
+          <label>Condition {{ checkOutMode() === 'TRANSFER' ? '(optional)' : 'Out (optional)' }}</label>
           <textarea
             placeholder="e.g. Minor scuff on housing, fully functional"
             [value]="checkOutCondition()"
@@ -187,7 +196,11 @@
       <div class="dialog__actions">
         <button type="button" class="btn-secondary" [disabled]="checkOutSaving()" (click)="closeCheckOut()">Cancel</button>
         <button type="button" class="btn-primary" [disabled]="checkOutSaving()" (click)="submitCheckOut()">
-          {{ checkOutSaving() ? 'Checking Out…' : 'Confirm Check Out' }}
+          @if (checkOutSaving()) {
+            {{ checkOutMode() === 'TRANSFER' ? 'Transferring…' : 'Checking Out…' }}
+          } @else {
+            {{ checkOutMode() === 'TRANSFER' ? 'Confirm Transfer' : 'Confirm Check Out' }}
+          }
         </button>
       </div>
     </div>

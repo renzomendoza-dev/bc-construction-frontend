@@ -17,7 +17,7 @@
     <div class="batch-header">
       <div class="batch-header__top">
         <div class="batch-header__route">
-          {{ isAssignBatch(b) ? 'Assign to ' + b.destinationWarehouseName : 'Return to ' + b.destinationWarehouseName }}
+          {{ usesCheckOut(b) ? 'Send to ' + b.destinationWarehouseName : 'Return to ' + b.destinationWarehouseName }}
         </div>
         <span class="status-badge" [attr.data-status]="b.status">{{ statusLabel(b) }}</span>
       </div>
@@ -41,7 +41,7 @@
         <div>
           <div class="draft-banner__title">This batch is still a draft</div>
           <div class="draft-banner__subtitle">
-            Submitting will {{ isAssignBatch(b) ? 'check out' : 'check in' }} {{ (b.lines ?? []).length }} piece(s) of equipment and cannot be undone.
+            Submitting will {{ usesCheckOut(b) ? 'check out' : 'check in' }} {{ (b.lines ?? []).length }} piece(s) of equipment and cannot be undone.
           </div>
         </div>
         <button type="button" class="btn-confirm" (click)="openConfirmDialog()">Submit Batch</button>
@@ -76,7 +76,7 @@
     <div class="dialog">
       <div class="dialog__title">Submit this batch?</div>
       <div class="dialog__body">
-        This will {{ isAssignBatch(b) ? 'check out' : 'check in' }} {{ (b.lines ?? []).length }} piece(s) of equipment. This action cannot be undone.
+        This will {{ usesCheckOut(b) ? 'check out' : 'check in' }} {{ (b.lines ?? []).length }} piece(s) of equipment. This action cannot be undone.
       </div>
       <div class="dialog__actions">
         <button type="button" class="btn-secondary" [disabled]="submitting()" (click)="closeConfirmDialog()">Cancel</button>

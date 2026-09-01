@@ -11,15 +11,15 @@ import { EquipmentAssignmentBatchLineRequest } from './equipmentAssignmentBatchL
 
 
 /**
- * Request payload to create a draft batch of equipment assignments (checkouts) or returns (check-ins)
+ * Request payload to create a draft batch of equipment assignments (checkouts), site-to-site transfers, or returns (check-ins)
  */
 export interface EquipmentAssignmentBatchCreateRequest { 
     /**
-     * Identifier of the destination warehouse — SITE-type for an assign-out batch (holderId required), MAIN-type for a return batch (holderId must be omitted)
+     * Identifier of the destination warehouse — SITE-type for an assign-out or transfer batch (holderId required either way), MAIN-type for a return batch (holderId must be omitted)
      */
     destinationWarehouseId: number;
     /**
-     * App-local user id taking custody — required for an assign-out batch (destination is SITE), must be omitted/null for a return batch (destination is MAIN)
+     * App-local user id taking (or reconfirmed as) custody — required whenever destinationWarehouseId is a SITE warehouse (assign-out or transfer), must be omitted/null for a return batch (destination is MAIN)
      */
     holderId?: number;
     /**

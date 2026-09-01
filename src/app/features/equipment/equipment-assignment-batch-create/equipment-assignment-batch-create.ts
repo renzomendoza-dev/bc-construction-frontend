@@ -13,7 +13,7 @@ import {
   WarehousesService,
 } from '../../../generated';
 
-type Direction = 'ASSIGN' | 'RETURN';
+type Direction = 'ASSIGN' | 'RETURN' | 'TRANSFER';
 
 interface DraftLine {
   equipmentId: number | null;
@@ -62,19 +62,21 @@ export class EquipmentAssignmentBatchCreateComponent implements OnInit {
   readonly errorMessage = signal<string | null>(null);
 
   // Destination options are filtered by the warehouse's own type — a SITE
-  // warehouse is only a valid destination for an assign-out batch, a MAIN
-  // warehouse only for a return batch (mirrors the backend's own derivation
-  // of direction from destinationWarehouseId's type).
+  // warehouse is a valid destination for an assign-out or transfer batch
+  // (both land equipment at a site), a MAIN warehouse only for a return
+  // batch (mirrors the backend's own derivation of direction from
+  // destinationWarehouseId's type + each line's equipment status).
   readonly destinationOptions = computed(() =>
-    this.direction() === 'ASSIGN'
-      ? this.warehouses().filter((w) => w.type === WarehouseResponse.TypeEnum.Site)
-      : this.warehouses().filter((w) => w.type === WarehouseResponse.TypeEnum.Main),
+    this.direction() === 'RETURN'
+      ? this.warehouses().filter((w) => w.type === WarehouseResponse.TypeEnum.Main)
+      : this.warehouses().filter((w) => w.type === WarehouseResponse.TypeEnum.Site),
   );
 
   // Equipment options are filtered to whatever status is actually valid for
   // this batch's direction — a client-side early warning, same idea as the
   // stock-shortfall hint on transfer-batch-create. The backend is still the
-  // authority at submit() time.
+  // authority at submit() time. Transfer uses the same starting status as
+  // return (already out at a site) but a SITE destination like assign.
   readonly equipmentOptions = computed(() =>
     this.direction() === 'ASSIGN'
       ? this.equipment().filter((e) => e.status === EquipmentResponse.StatusEnum.Available)
@@ -83,6 +85,11 @@ export class EquipmentAssignmentBatchCreateComponent implements OnInit {
             e.status === EquipmentResponse.StatusEnum.CheckedOut || e.status === EquipmentResponse.StatusEnum.InUse,
         ),
   );
+
+  // holderId is required whenever the destination is a SITE warehouse
+  // (assign-out or transfer) and must be omitted for a return, matching the
+  // backend's validation exactly.
+  readonly holderRequired = computed(() => this.direction() !== 'RETURN');
 
   readonly totalLineCount = computed(() => this.lines().filter((l) => l.equipmentId !== null).length);
 
@@ -143,11 +150,11 @@ export class EquipmentAssignmentBatchCreateComponent implements OnInit {
     const validLines = this.lines().filter((l) => l.equipmentId !== null);
 
     if (!destinationWarehouseId) {
-      this.errorMessage.set(`Select the ${this.direction() === 'ASSIGN' ? 'destination site' : 'destination warehouse'}.`);
+      this.errorMessage.set(`Select the ${this.direction() === 'RETURN' ? 'destination warehouse' : 'destination site'}.`);
       return;
     }
-    if (this.direction() === 'ASSIGN' && !this.holderId()) {
-      this.errorMessage.set('Select who is taking custody of this equipment.');
+    if (this.holderRequired() && !this.holderId()) {
+      this.errorMessage.set('Select who is taking (or keeping) custody of this equipment.');
       return;
     }
     if (validLines.length === 0) {
@@ -160,7 +167,7 @@ export class EquipmentAssignmentBatchCreateComponent implements OnInit {
 
     const body: EquipmentAssignmentBatchCreateRequest = {
       destinationWarehouseId,
-      holderId: this.direction() === 'ASSIGN' ? (this.holderId() ?? undefined) : undefined,
+      holderId: this.holderRequired() ? (this.holderId() ?? undefined) : undefined,
       notes: this.notes().trim() || undefined,
       lines: validLines.map(
         (l): EquipmentAssignmentBatchLineRequest => ({
