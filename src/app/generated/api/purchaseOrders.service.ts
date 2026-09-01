@@ -17,17 +17,19 @@ import { Observable }                                        from 'rxjs';
 import { OpenApiHttpParams, QueryParamStyle } from '../query.params';
 
 // @ts-ignore
-import { EquipmentCheckInRequest } from '../model/equipmentCheckInRequest';
-// @ts-ignore
-import { EquipmentCheckOutRequest } from '../model/equipmentCheckOutRequest';
-// @ts-ignore
-import { EquipmentCreateRequest } from '../model/equipmentCreateRequest';
-// @ts-ignore
-import { EquipmentResponse } from '../model/equipmentResponse';
-// @ts-ignore
-import { EquipmentUpdateRequest } from '../model/equipmentUpdateRequest';
-// @ts-ignore
 import { ErrorResponse } from '../model/errorResponse';
+// @ts-ignore
+import { PageResponse } from '../model/pageResponse';
+// @ts-ignore
+import { PurchaseOrderCreateRequest } from '../model/purchaseOrderCreateRequest';
+// @ts-ignore
+import { PurchaseOrderResponse } from '../model/purchaseOrderResponse';
+// @ts-ignore
+import { PurchaseOrderSuggestionsResponse } from '../model/purchaseOrderSuggestionsResponse';
+// @ts-ignore
+import { PurchaseOrderUpdateRequest } from '../model/purchaseOrderUpdateRequest';
+// @ts-ignore
+import { ValidationErrorResponse } from '../model/validationErrorResponse';
 
 // @ts-ignore
 import { BASE_PATH, COLLECTION_FORMATS }                     from '../variables';
@@ -39,31 +41,27 @@ import { BaseService } from '../api.base.service';
 @Injectable({
   providedIn: 'root'
 })
-export class EquipmentService extends BaseService {
+export class PurchaseOrdersService extends BaseService {
 
     constructor(protected httpClient: HttpClient, @Optional() @Inject(BASE_PATH) basePath: string|string[], @Optional() configuration?: Configuration) {
         super(basePath, configuration);
     }
 
     /**
-     * Check in equipment, closing the open assignment
-     * destinationWarehouseId must reference a MAIN-type warehouse — a check-in targeting a SITE warehouse is rejected with 400. For returning many pieces of equipment in one action, see POST /api/equipment/assignment-batches instead.
-     * @endpoint post /api/equipment/{id}/checkin
-     * @param id 
-     * @param equipmentCheckInRequest 
+     * Manually close a purchase order
+     * Terminates the order regardless of how much of it has been received — for when the remaining shortfall isn\&#39;t coming (supplier discontinued an item, order was over-cautious, etc.). Allowed from any status except RECEIVED/CLOSED (422 — both are already terminal). Deliberately a separate terminal status from RECEIVED, not reused for it, so \&quot;fully delivered\&quot; and \&quot;abandoned short\&quot; stay distinguishable.
+     * @endpoint post /api/purchase-orders/{id}/close
+     * @param id Identifier of the purchase order to close
      * @param observe set whether or not to return the data Observable as the body, response or events. defaults to returning the body.
      * @param reportProgress flag to report request and response progress.
      * @param options additional options
      */
-    public checkIn(id: number, equipmentCheckInRequest: EquipmentCheckInRequest, observe?: 'body', reportProgress?: boolean, options?: {httpHeaderAccept?: '*/*', context?: HttpContext, transferCache?: boolean}): Observable<EquipmentResponse>;
-    public checkIn(id: number, equipmentCheckInRequest: EquipmentCheckInRequest, observe?: 'response', reportProgress?: boolean, options?: {httpHeaderAccept?: '*/*', context?: HttpContext, transferCache?: boolean}): Observable<HttpResponse<EquipmentResponse>>;
-    public checkIn(id: number, equipmentCheckInRequest: EquipmentCheckInRequest, observe?: 'events', reportProgress?: boolean, options?: {httpHeaderAccept?: '*/*', context?: HttpContext, transferCache?: boolean}): Observable<HttpEvent<EquipmentResponse>>;
-    public checkIn(id: number, equipmentCheckInRequest: EquipmentCheckInRequest, observe: any = 'body', reportProgress: boolean = false, options?: {httpHeaderAccept?: '*/*', context?: HttpContext, transferCache?: boolean}): Observable<any> {
+    public close(id: number, observe?: 'body', reportProgress?: boolean, options?: {httpHeaderAccept?: 'application/json', context?: HttpContext, transferCache?: boolean}): Observable<PurchaseOrderResponse>;
+    public close(id: number, observe?: 'response', reportProgress?: boolean, options?: {httpHeaderAccept?: 'application/json', context?: HttpContext, transferCache?: boolean}): Observable<HttpResponse<PurchaseOrderResponse>>;
+    public close(id: number, observe?: 'events', reportProgress?: boolean, options?: {httpHeaderAccept?: 'application/json', context?: HttpContext, transferCache?: boolean}): Observable<HttpEvent<PurchaseOrderResponse>>;
+    public close(id: number, observe: any = 'body', reportProgress: boolean = false, options?: {httpHeaderAccept?: 'application/json', context?: HttpContext, transferCache?: boolean}): Observable<any> {
         if (id === null || id === undefined) {
-            throw new Error('Required parameter id was null or undefined when calling checkIn.');
-        }
-        if (equipmentCheckInRequest === null || equipmentCheckInRequest === undefined) {
-            throw new Error('Required parameter equipmentCheckInRequest was null or undefined when calling checkIn.');
+            throw new Error('Required parameter id was null or undefined when calling close.');
         }
 
         let localVarHeaders = this.defaultHeaders;
@@ -72,7 +70,67 @@ export class EquipmentService extends BaseService {
         localVarHeaders = this.configuration.addCredentialToHeaders('bearerAuth', 'Authorization', localVarHeaders, 'Bearer ');
 
         const localVarHttpHeaderAcceptSelected: string | undefined = options?.httpHeaderAccept ?? this.configuration.selectHeaderAccept([
-            '*/*'
+            'application/json'
+        ]);
+        if (localVarHttpHeaderAcceptSelected !== undefined) {
+            localVarHeaders = localVarHeaders.set('Accept', localVarHttpHeaderAcceptSelected);
+        }
+
+        const localVarHttpContext: HttpContext = options?.context ?? new HttpContext();
+
+        const localVarTransferCache: boolean = options?.transferCache ?? true;
+
+
+        let responseType_: 'text' | 'json' | 'blob' = 'json';
+        if (localVarHttpHeaderAcceptSelected) {
+            if (localVarHttpHeaderAcceptSelected.startsWith('text')) {
+                responseType_ = 'text';
+            } else if (this.configuration.isJsonMime(localVarHttpHeaderAcceptSelected)) {
+                responseType_ = 'json';
+            } else {
+                responseType_ = 'blob';
+            }
+        }
+
+        let localVarPath = `/api/purchase-orders/${this.configuration.encodeParam({name: "id", value: id, in: "path", style: "simple", explode: false, dataType: "number", dataFormat: "int64"})}/close`;
+        const { basePath, withCredentials } = this.configuration;
+        return this.httpClient.request<PurchaseOrderResponse>('post', `${basePath}${localVarPath}`,
+            {
+                context: localVarHttpContext,
+                responseType: <any>responseType_,
+                ...(withCredentials ? { withCredentials } : {}),
+                headers: localVarHeaders,
+                observe: observe,
+                ...(localVarTransferCache !== undefined ? { transferCache: localVarTransferCache } : {}),
+                reportProgress: reportProgress
+            }
+        );
+    }
+
+    /**
+     * Create a draft purchase order
+     * Records a purchase order and its line items as a draft — freely editable while DRAFT via PUT /{id}. lines is typically pre-filled from GET /api/purchase-orders/suggestions?supplierId&#x3D;, but that\&#39;s a frontend convenience only; this endpoint accepts any well-formed list regardless of where it came from.
+     * @endpoint post /api/purchase-orders
+     * @param purchaseOrderCreateRequest 
+     * @param observe set whether or not to return the data Observable as the body, response or events. defaults to returning the body.
+     * @param reportProgress flag to report request and response progress.
+     * @param options additional options
+     */
+    public createDraft(purchaseOrderCreateRequest: PurchaseOrderCreateRequest, observe?: 'body', reportProgress?: boolean, options?: {httpHeaderAccept?: 'application/json', context?: HttpContext, transferCache?: boolean}): Observable<PurchaseOrderResponse>;
+    public createDraft(purchaseOrderCreateRequest: PurchaseOrderCreateRequest, observe?: 'response', reportProgress?: boolean, options?: {httpHeaderAccept?: 'application/json', context?: HttpContext, transferCache?: boolean}): Observable<HttpResponse<PurchaseOrderResponse>>;
+    public createDraft(purchaseOrderCreateRequest: PurchaseOrderCreateRequest, observe?: 'events', reportProgress?: boolean, options?: {httpHeaderAccept?: 'application/json', context?: HttpContext, transferCache?: boolean}): Observable<HttpEvent<PurchaseOrderResponse>>;
+    public createDraft(purchaseOrderCreateRequest: PurchaseOrderCreateRequest, observe: any = 'body', reportProgress: boolean = false, options?: {httpHeaderAccept?: 'application/json', context?: HttpContext, transferCache?: boolean}): Observable<any> {
+        if (purchaseOrderCreateRequest === null || purchaseOrderCreateRequest === undefined) {
+            throw new Error('Required parameter purchaseOrderCreateRequest was null or undefined when calling createDraft.');
+        }
+
+        let localVarHeaders = this.defaultHeaders;
+
+        // authentication (bearerAuth) required
+        localVarHeaders = this.configuration.addCredentialToHeaders('bearerAuth', 'Authorization', localVarHeaders, 'Bearer ');
+
+        const localVarHttpHeaderAcceptSelected: string | undefined = options?.httpHeaderAccept ?? this.configuration.selectHeaderAccept([
+            'application/json'
         ]);
         if (localVarHttpHeaderAcceptSelected !== undefined) {
             localVarHeaders = localVarHeaders.set('Accept', localVarHttpHeaderAcceptSelected);
@@ -103,12 +161,12 @@ export class EquipmentService extends BaseService {
             }
         }
 
-        let localVarPath = `/api/equipment/${this.configuration.encodeParam({name: "id", value: id, in: "path", style: "simple", explode: false, dataType: "number", dataFormat: "int64"})}/checkin`;
+        let localVarPath = `/api/purchase-orders`;
         const { basePath, withCredentials } = this.configuration;
-        return this.httpClient.request<EquipmentResponse>('post', `${basePath}${localVarPath}`,
+        return this.httpClient.request<PurchaseOrderResponse>('post', `${basePath}${localVarPath}`,
             {
                 context: localVarHttpContext,
-                body: equipmentCheckInRequest,
+                body: purchaseOrderCreateRequest,
                 responseType: <any>responseType_,
                 ...(withCredentials ? { withCredentials } : {}),
                 headers: localVarHeaders,
@@ -120,24 +178,20 @@ export class EquipmentService extends BaseService {
     }
 
     /**
-     * Check out equipment to a user at a site — also handles a direct site-to-site transfer
-     * siteWarehouseId must reference a SITE-type warehouse — a checkout targeting a MAIN warehouse is rejected with 400. Two starting states are accepted: AVAILABLE equipment (an ordinary checkout), or equipment already CHECKED_OUT/IN_USE at a *different* SITE warehouse (a direct transfer — closes its current assignment and opens a new one at siteWarehouseId, without an intermediate check-in to a MAIN warehouse). userId is required either way, including for a transfer: it either reconfirms the same holder or reassigns to someone new. Targeting the SITE warehouse the equipment is already at is rejected with 400. For processing many pieces of equipment in one action (including transfers), see POST /api/equipment/assignment-batches instead.
-     * @endpoint post /api/equipment/{id}/checkout
-     * @param id 
-     * @param equipmentCheckOutRequest 
+     * Get a purchase order by id
+     * Retrieves a single purchase order, including its line items and, per line, receivedQuantity — the sum of that item\&#39;s quantity across every CONFIRMED PurchaseReceipt created against this order.
+     * @endpoint get /api/purchase-orders/{id}
+     * @param id Identifier of the purchase order to retrieve
      * @param observe set whether or not to return the data Observable as the body, response or events. defaults to returning the body.
      * @param reportProgress flag to report request and response progress.
      * @param options additional options
      */
-    public checkOut(id: number, equipmentCheckOutRequest: EquipmentCheckOutRequest, observe?: 'body', reportProgress?: boolean, options?: {httpHeaderAccept?: '*/*', context?: HttpContext, transferCache?: boolean}): Observable<EquipmentResponse>;
-    public checkOut(id: number, equipmentCheckOutRequest: EquipmentCheckOutRequest, observe?: 'response', reportProgress?: boolean, options?: {httpHeaderAccept?: '*/*', context?: HttpContext, transferCache?: boolean}): Observable<HttpResponse<EquipmentResponse>>;
-    public checkOut(id: number, equipmentCheckOutRequest: EquipmentCheckOutRequest, observe?: 'events', reportProgress?: boolean, options?: {httpHeaderAccept?: '*/*', context?: HttpContext, transferCache?: boolean}): Observable<HttpEvent<EquipmentResponse>>;
-    public checkOut(id: number, equipmentCheckOutRequest: EquipmentCheckOutRequest, observe: any = 'body', reportProgress: boolean = false, options?: {httpHeaderAccept?: '*/*', context?: HttpContext, transferCache?: boolean}): Observable<any> {
+    public getById(id: number, observe?: 'body', reportProgress?: boolean, options?: {httpHeaderAccept?: 'application/json', context?: HttpContext, transferCache?: boolean}): Observable<PurchaseOrderResponse>;
+    public getById(id: number, observe?: 'response', reportProgress?: boolean, options?: {httpHeaderAccept?: 'application/json', context?: HttpContext, transferCache?: boolean}): Observable<HttpResponse<PurchaseOrderResponse>>;
+    public getById(id: number, observe?: 'events', reportProgress?: boolean, options?: {httpHeaderAccept?: 'application/json', context?: HttpContext, transferCache?: boolean}): Observable<HttpEvent<PurchaseOrderResponse>>;
+    public getById(id: number, observe: any = 'body', reportProgress: boolean = false, options?: {httpHeaderAccept?: 'application/json', context?: HttpContext, transferCache?: boolean}): Observable<any> {
         if (id === null || id === undefined) {
-            throw new Error('Required parameter id was null or undefined when calling checkOut.');
-        }
-        if (equipmentCheckOutRequest === null || equipmentCheckOutRequest === undefined) {
-            throw new Error('Required parameter equipmentCheckOutRequest was null or undefined when calling checkOut.');
+            throw new Error('Required parameter id was null or undefined when calling getById.');
         }
 
         let localVarHeaders = this.defaultHeaders;
@@ -146,7 +200,7 @@ export class EquipmentService extends BaseService {
         localVarHeaders = this.configuration.addCredentialToHeaders('bearerAuth', 'Authorization', localVarHeaders, 'Bearer ');
 
         const localVarHttpHeaderAcceptSelected: string | undefined = options?.httpHeaderAccept ?? this.configuration.selectHeaderAccept([
-            '*/*'
+            'application/json'
         ]);
         if (localVarHttpHeaderAcceptSelected !== undefined) {
             localVarHeaders = localVarHeaders.set('Accept', localVarHttpHeaderAcceptSelected);
@@ -156,15 +210,6 @@ export class EquipmentService extends BaseService {
 
         const localVarTransferCache: boolean = options?.transferCache ?? true;
 
-
-        // to determine the Content-Type header
-        const consumes: string[] = [
-            'application/json'
-        ];
-        const httpContentTypeSelected: string | undefined = this.configuration.selectHeaderContentType(consumes);
-        if (httpContentTypeSelected !== undefined) {
-            localVarHeaders = localVarHeaders.set('Content-Type', httpContentTypeSelected);
-        }
 
         let responseType_: 'text' | 'json' | 'blob' = 'json';
         if (localVarHttpHeaderAcceptSelected) {
@@ -177,12 +222,11 @@ export class EquipmentService extends BaseService {
             }
         }
 
-        let localVarPath = `/api/equipment/${this.configuration.encodeParam({name: "id", value: id, in: "path", style: "simple", explode: false, dataType: "number", dataFormat: "int64"})}/checkout`;
+        let localVarPath = `/api/purchase-orders/${this.configuration.encodeParam({name: "id", value: id, in: "path", style: "simple", explode: false, dataType: "number", dataFormat: "int64"})}`;
         const { basePath, withCredentials } = this.configuration;
-        return this.httpClient.request<EquipmentResponse>('post', `${basePath}${localVarPath}`,
+        return this.httpClient.request<PurchaseOrderResponse>('get', `${basePath}${localVarPath}`,
             {
                 context: localVarHttpContext,
-                body: equipmentCheckOutRequest,
                 responseType: <any>responseType_,
                 ...(withCredentials ? { withCredentials } : {}),
                 headers: localVarHeaders,
@@ -194,89 +238,105 @@ export class EquipmentService extends BaseService {
     }
 
     /**
-     * Create new equipment
-     * Registers a new piece of equipment at a MAIN-type warehouse. warehouseId is required -  equipment.currentWarehouseId is always populated, so even newly-registered equipment that\&#39;s never been checked out needs a starting location.
-     * @endpoint post /api/equipment
-     * @param equipmentCreateRequest 
+     * Suggest line items for a new purchase order against a supplier
+     * Combines three sources: (1) shortfall items on TransferBatch lines currently AWAITING_PURCHASE, re-checked against current stock (not the stale moment the batch failed); (2) items at/below their reorder threshold (same data as GET /api/inventory/low-stock); (3) items on open (SUBMITTED/PARTIALLY_FULFILLED) MaterialRequest lines not yet fully dispatched. Quantities from multiple sources for the same item are summed, not deduplicated. Suggestions are NOT filtered to items linked to the supplier via ItemSupplier — every candidate is returned regardless, with linkedToSupplier telling you whether that link exists, so nothing is silently hidden. This is a starting point to edit before POST /api/purchase-orders, not a constraint — it\&#39;s also the intended way to find a PARTIALLY_RECEIVED order\&#39;s remaining shortfall, since that isn\&#39;t auto-chained into a new order.
+     * @endpoint get /api/purchase-orders/suggestions
+     * @param supplierId Identifier of the supplier to suggest items for
      * @param observe set whether or not to return the data Observable as the body, response or events. defaults to returning the body.
      * @param reportProgress flag to report request and response progress.
      * @param options additional options
      */
-    public create1(equipmentCreateRequest: EquipmentCreateRequest, observe?: 'body', reportProgress?: boolean, options?: {httpHeaderAccept?: '*/*', context?: HttpContext, transferCache?: boolean}): Observable<EquipmentResponse>;
-    public create1(equipmentCreateRequest: EquipmentCreateRequest, observe?: 'response', reportProgress?: boolean, options?: {httpHeaderAccept?: '*/*', context?: HttpContext, transferCache?: boolean}): Observable<HttpResponse<EquipmentResponse>>;
-    public create1(equipmentCreateRequest: EquipmentCreateRequest, observe?: 'events', reportProgress?: boolean, options?: {httpHeaderAccept?: '*/*', context?: HttpContext, transferCache?: boolean}): Observable<HttpEvent<EquipmentResponse>>;
-    public create1(equipmentCreateRequest: EquipmentCreateRequest, observe: any = 'body', reportProgress: boolean = false, options?: {httpHeaderAccept?: '*/*', context?: HttpContext, transferCache?: boolean}): Observable<any> {
-        if (equipmentCreateRequest === null || equipmentCreateRequest === undefined) {
-            throw new Error('Required parameter equipmentCreateRequest was null or undefined when calling create1.');
+    public getSuggestions(supplierId: number, observe?: 'body', reportProgress?: boolean, options?: {httpHeaderAccept?: 'application/json', context?: HttpContext, transferCache?: boolean}): Observable<PurchaseOrderSuggestionsResponse>;
+    public getSuggestions(supplierId: number, observe?: 'response', reportProgress?: boolean, options?: {httpHeaderAccept?: 'application/json', context?: HttpContext, transferCache?: boolean}): Observable<HttpResponse<PurchaseOrderSuggestionsResponse>>;
+    public getSuggestions(supplierId: number, observe?: 'events', reportProgress?: boolean, options?: {httpHeaderAccept?: 'application/json', context?: HttpContext, transferCache?: boolean}): Observable<HttpEvent<PurchaseOrderSuggestionsResponse>>;
+    public getSuggestions(supplierId: number, observe: any = 'body', reportProgress: boolean = false, options?: {httpHeaderAccept?: 'application/json', context?: HttpContext, transferCache?: boolean}): Observable<any> {
+        if (supplierId === null || supplierId === undefined) {
+            throw new Error('Required parameter supplierId was null or undefined when calling getSuggestions.');
         }
-
-        let localVarHeaders = this.defaultHeaders;
-
-        // authentication (bearerAuth) required
-        localVarHeaders = this.configuration.addCredentialToHeaders('bearerAuth', 'Authorization', localVarHeaders, 'Bearer ');
-
-        const localVarHttpHeaderAcceptSelected: string | undefined = options?.httpHeaderAccept ?? this.configuration.selectHeaderAccept([
-            '*/*'
-        ]);
-        if (localVarHttpHeaderAcceptSelected !== undefined) {
-            localVarHeaders = localVarHeaders.set('Accept', localVarHttpHeaderAcceptSelected);
-        }
-
-        const localVarHttpContext: HttpContext = options?.context ?? new HttpContext();
-
-        const localVarTransferCache: boolean = options?.transferCache ?? true;
-
-
-        // to determine the Content-Type header
-        const consumes: string[] = [
-            'application/json'
-        ];
-        const httpContentTypeSelected: string | undefined = this.configuration.selectHeaderContentType(consumes);
-        if (httpContentTypeSelected !== undefined) {
-            localVarHeaders = localVarHeaders.set('Content-Type', httpContentTypeSelected);
-        }
-
-        let responseType_: 'text' | 'json' | 'blob' = 'json';
-        if (localVarHttpHeaderAcceptSelected) {
-            if (localVarHttpHeaderAcceptSelected.startsWith('text')) {
-                responseType_ = 'text';
-            } else if (this.configuration.isJsonMime(localVarHttpHeaderAcceptSelected)) {
-                responseType_ = 'json';
-            } else {
-                responseType_ = 'blob';
-            }
-        }
-
-        let localVarPath = `/api/equipment`;
-        const { basePath, withCredentials } = this.configuration;
-        return this.httpClient.request<EquipmentResponse>('post', `${basePath}${localVarPath}`,
-            {
-                context: localVarHttpContext,
-                body: equipmentCreateRequest,
-                responseType: <any>responseType_,
-                ...(withCredentials ? { withCredentials } : {}),
-                headers: localVarHeaders,
-                observe: observe,
-                ...(localVarTransferCache !== undefined ? { transferCache: localVarTransferCache } : {}),
-                reportProgress: reportProgress
-            }
-        );
-    }
-
-    /**
-     * List equipment, optionally filtered by status
-     * @endpoint get /api/equipment
-     * @param status Optional status filter
-     * @param observe set whether or not to return the data Observable as the body, response or events. defaults to returning the body.
-     * @param reportProgress flag to report request and response progress.
-     * @param options additional options
-     */
-    public findAll(status?: 'AVAILABLE' | 'CHECKED_OUT' | 'IN_REPAIR' | 'RETIRED' | 'LOST' | 'MAINTENANCE' | 'IN_USE', observe?: 'body', reportProgress?: boolean, options?: {httpHeaderAccept?: '*/*', context?: HttpContext, transferCache?: boolean}): Observable<EquipmentResponse>;
-    public findAll(status?: 'AVAILABLE' | 'CHECKED_OUT' | 'IN_REPAIR' | 'RETIRED' | 'LOST' | 'MAINTENANCE' | 'IN_USE', observe?: 'response', reportProgress?: boolean, options?: {httpHeaderAccept?: '*/*', context?: HttpContext, transferCache?: boolean}): Observable<HttpResponse<EquipmentResponse>>;
-    public findAll(status?: 'AVAILABLE' | 'CHECKED_OUT' | 'IN_REPAIR' | 'RETIRED' | 'LOST' | 'MAINTENANCE' | 'IN_USE', observe?: 'events', reportProgress?: boolean, options?: {httpHeaderAccept?: '*/*', context?: HttpContext, transferCache?: boolean}): Observable<HttpEvent<EquipmentResponse>>;
-    public findAll(status?: 'AVAILABLE' | 'CHECKED_OUT' | 'IN_REPAIR' | 'RETIRED' | 'LOST' | 'MAINTENANCE' | 'IN_USE', observe: any = 'body', reportProgress: boolean = false, options?: {httpHeaderAccept?: '*/*', context?: HttpContext, transferCache?: boolean}): Observable<any> {
 
         let localVarQueryParameters = new OpenApiHttpParams(this.encoder);
+
+        localVarQueryParameters = this.addToHttpParams(
+            localVarQueryParameters,
+            'supplierId',
+            <any>supplierId,
+            QueryParamStyle.Form,
+            true,
+        );
+
+
+        let localVarHeaders = this.defaultHeaders;
+
+        // authentication (bearerAuth) required
+        localVarHeaders = this.configuration.addCredentialToHeaders('bearerAuth', 'Authorization', localVarHeaders, 'Bearer ');
+
+        const localVarHttpHeaderAcceptSelected: string | undefined = options?.httpHeaderAccept ?? this.configuration.selectHeaderAccept([
+            'application/json'
+        ]);
+        if (localVarHttpHeaderAcceptSelected !== undefined) {
+            localVarHeaders = localVarHeaders.set('Accept', localVarHttpHeaderAcceptSelected);
+        }
+
+        const localVarHttpContext: HttpContext = options?.context ?? new HttpContext();
+
+        const localVarTransferCache: boolean = options?.transferCache ?? true;
+
+
+        let responseType_: 'text' | 'json' | 'blob' = 'json';
+        if (localVarHttpHeaderAcceptSelected) {
+            if (localVarHttpHeaderAcceptSelected.startsWith('text')) {
+                responseType_ = 'text';
+            } else if (this.configuration.isJsonMime(localVarHttpHeaderAcceptSelected)) {
+                responseType_ = 'json';
+            } else {
+                responseType_ = 'blob';
+            }
+        }
+
+        let localVarPath = `/api/purchase-orders/suggestions`;
+        const { basePath, withCredentials } = this.configuration;
+        return this.httpClient.request<PurchaseOrderSuggestionsResponse>('get', `${basePath}${localVarPath}`,
+            {
+                context: localVarHttpContext,
+                params: localVarQueryParameters.toHttpParams(),
+                responseType: <any>responseType_,
+                ...(withCredentials ? { withCredentials } : {}),
+                headers: localVarHeaders,
+                observe: observe,
+                ...(localVarTransferCache !== undefined ? { transferCache: localVarTransferCache } : {}),
+                reportProgress: reportProgress
+            }
+        );
+    }
+
+    /**
+     * List purchase orders
+     * Returns a paged list of purchase orders, optionally filtered by supplier and/or status.
+     * @endpoint get /api/purchase-orders
+     * @param supplierId Filter by supplier id
+     * @param status Filter by status
+     * @param page Zero-based page index (0..N)
+     * @param size The size of the page to be returned
+     * @param sort Sorting criteria in the format: property,(asc|desc). Default sort order is ascending. Multiple sort criteria are supported.
+     * @param observe set whether or not to return the data Observable as the body, response or events. defaults to returning the body.
+     * @param reportProgress flag to report request and response progress.
+     * @param options additional options
+     */
+    public search(supplierId?: number, status?: 'DRAFT' | 'SUBMITTED' | 'PARTIALLY_RECEIVED' | 'RECEIVED' | 'CLOSED', page?: number, size?: number, sort?: Array<string>, observe?: 'body', reportProgress?: boolean, options?: {httpHeaderAccept?: 'application/json', context?: HttpContext, transferCache?: boolean}): Observable<PageResponse>;
+    public search(supplierId?: number, status?: 'DRAFT' | 'SUBMITTED' | 'PARTIALLY_RECEIVED' | 'RECEIVED' | 'CLOSED', page?: number, size?: number, sort?: Array<string>, observe?: 'response', reportProgress?: boolean, options?: {httpHeaderAccept?: 'application/json', context?: HttpContext, transferCache?: boolean}): Observable<HttpResponse<PageResponse>>;
+    public search(supplierId?: number, status?: 'DRAFT' | 'SUBMITTED' | 'PARTIALLY_RECEIVED' | 'RECEIVED' | 'CLOSED', page?: number, size?: number, sort?: Array<string>, observe?: 'events', reportProgress?: boolean, options?: {httpHeaderAccept?: 'application/json', context?: HttpContext, transferCache?: boolean}): Observable<HttpEvent<PageResponse>>;
+    public search(supplierId?: number, status?: 'DRAFT' | 'SUBMITTED' | 'PARTIALLY_RECEIVED' | 'RECEIVED' | 'CLOSED', page?: number, size?: number, sort?: Array<string>, observe: any = 'body', reportProgress: boolean = false, options?: {httpHeaderAccept?: 'application/json', context?: HttpContext, transferCache?: boolean}): Observable<any> {
+
+        let localVarQueryParameters = new OpenApiHttpParams(this.encoder);
+
+        localVarQueryParameters = this.addToHttpParams(
+            localVarQueryParameters,
+            'supplierId',
+            <any>supplierId,
+            QueryParamStyle.Form,
+            true,
+        );
+
 
         localVarQueryParameters = this.addToHttpParams(
             localVarQueryParameters,
@@ -287,131 +347,28 @@ export class EquipmentService extends BaseService {
         );
 
 
-        let localVarHeaders = this.defaultHeaders;
-
-        // authentication (bearerAuth) required
-        localVarHeaders = this.configuration.addCredentialToHeaders('bearerAuth', 'Authorization', localVarHeaders, 'Bearer ');
-
-        const localVarHttpHeaderAcceptSelected: string | undefined = options?.httpHeaderAccept ?? this.configuration.selectHeaderAccept([
-            '*/*'
-        ]);
-        if (localVarHttpHeaderAcceptSelected !== undefined) {
-            localVarHeaders = localVarHeaders.set('Accept', localVarHttpHeaderAcceptSelected);
-        }
-
-        const localVarHttpContext: HttpContext = options?.context ?? new HttpContext();
-
-        const localVarTransferCache: boolean = options?.transferCache ?? true;
-
-
-        let responseType_: 'text' | 'json' | 'blob' = 'json';
-        if (localVarHttpHeaderAcceptSelected) {
-            if (localVarHttpHeaderAcceptSelected.startsWith('text')) {
-                responseType_ = 'text';
-            } else if (this.configuration.isJsonMime(localVarHttpHeaderAcceptSelected)) {
-                responseType_ = 'json';
-            } else {
-                responseType_ = 'blob';
-            }
-        }
-
-        let localVarPath = `/api/equipment`;
-        const { basePath, withCredentials } = this.configuration;
-        return this.httpClient.request<EquipmentResponse>('get', `${basePath}${localVarPath}`,
-            {
-                context: localVarHttpContext,
-                params: localVarQueryParameters.toHttpParams(),
-                responseType: <any>responseType_,
-                ...(withCredentials ? { withCredentials } : {}),
-                headers: localVarHeaders,
-                observe: observe,
-                ...(localVarTransferCache !== undefined ? { transferCache: localVarTransferCache } : {}),
-                reportProgress: reportProgress
-            }
+        localVarQueryParameters = this.addToHttpParams(
+            localVarQueryParameters,
+            'page',
+            <any>page,
+            QueryParamStyle.Form,
+            true,
         );
-    }
 
-    /**
-     * Get equipment by id
-     * @endpoint get /api/equipment/{id}
-     * @param id 
-     * @param observe set whether or not to return the data Observable as the body, response or events. defaults to returning the body.
-     * @param reportProgress flag to report request and response progress.
-     * @param options additional options
-     */
-    public findById(id: number, observe?: 'body', reportProgress?: boolean, options?: {httpHeaderAccept?: '*/*', context?: HttpContext, transferCache?: boolean}): Observable<EquipmentResponse>;
-    public findById(id: number, observe?: 'response', reportProgress?: boolean, options?: {httpHeaderAccept?: '*/*', context?: HttpContext, transferCache?: boolean}): Observable<HttpResponse<EquipmentResponse>>;
-    public findById(id: number, observe?: 'events', reportProgress?: boolean, options?: {httpHeaderAccept?: '*/*', context?: HttpContext, transferCache?: boolean}): Observable<HttpEvent<EquipmentResponse>>;
-    public findById(id: number, observe: any = 'body', reportProgress: boolean = false, options?: {httpHeaderAccept?: '*/*', context?: HttpContext, transferCache?: boolean}): Observable<any> {
-        if (id === null || id === undefined) {
-            throw new Error('Required parameter id was null or undefined when calling findById.');
-        }
-
-        let localVarHeaders = this.defaultHeaders;
-
-        // authentication (bearerAuth) required
-        localVarHeaders = this.configuration.addCredentialToHeaders('bearerAuth', 'Authorization', localVarHeaders, 'Bearer ');
-
-        const localVarHttpHeaderAcceptSelected: string | undefined = options?.httpHeaderAccept ?? this.configuration.selectHeaderAccept([
-            '*/*'
-        ]);
-        if (localVarHttpHeaderAcceptSelected !== undefined) {
-            localVarHeaders = localVarHeaders.set('Accept', localVarHttpHeaderAcceptSelected);
-        }
-
-        const localVarHttpContext: HttpContext = options?.context ?? new HttpContext();
-
-        const localVarTransferCache: boolean = options?.transferCache ?? true;
-
-
-        let responseType_: 'text' | 'json' | 'blob' = 'json';
-        if (localVarHttpHeaderAcceptSelected) {
-            if (localVarHttpHeaderAcceptSelected.startsWith('text')) {
-                responseType_ = 'text';
-            } else if (this.configuration.isJsonMime(localVarHttpHeaderAcceptSelected)) {
-                responseType_ = 'json';
-            } else {
-                responseType_ = 'blob';
-            }
-        }
-
-        let localVarPath = `/api/equipment/${this.configuration.encodeParam({name: "id", value: id, in: "path", style: "simple", explode: false, dataType: "number", dataFormat: "int64"})}`;
-        const { basePath, withCredentials } = this.configuration;
-        return this.httpClient.request<EquipmentResponse>('get', `${basePath}${localVarPath}`,
-            {
-                context: localVarHttpContext,
-                responseType: <any>responseType_,
-                ...(withCredentials ? { withCredentials } : {}),
-                headers: localVarHeaders,
-                observe: observe,
-                ...(localVarTransferCache !== undefined ? { transferCache: localVarTransferCache } : {}),
-                reportProgress: reportProgress
-            }
-        );
-    }
-
-    /**
-     * List equipment checked out longer than the given number of days
-     * @endpoint get /api/equipment/overdue
-     * @param days Threshold in days
-     * @param observe set whether or not to return the data Observable as the body, response or events. defaults to returning the body.
-     * @param reportProgress flag to report request and response progress.
-     * @param options additional options
-     */
-    public findOverdue(days: number, observe?: 'body', reportProgress?: boolean, options?: {httpHeaderAccept?: '*/*', context?: HttpContext, transferCache?: boolean}): Observable<EquipmentResponse>;
-    public findOverdue(days: number, observe?: 'response', reportProgress?: boolean, options?: {httpHeaderAccept?: '*/*', context?: HttpContext, transferCache?: boolean}): Observable<HttpResponse<EquipmentResponse>>;
-    public findOverdue(days: number, observe?: 'events', reportProgress?: boolean, options?: {httpHeaderAccept?: '*/*', context?: HttpContext, transferCache?: boolean}): Observable<HttpEvent<EquipmentResponse>>;
-    public findOverdue(days: number, observe: any = 'body', reportProgress: boolean = false, options?: {httpHeaderAccept?: '*/*', context?: HttpContext, transferCache?: boolean}): Observable<any> {
-        if (days === null || days === undefined) {
-            throw new Error('Required parameter days was null or undefined when calling findOverdue.');
-        }
-
-        let localVarQueryParameters = new OpenApiHttpParams(this.encoder);
 
         localVarQueryParameters = this.addToHttpParams(
             localVarQueryParameters,
-            'days',
-            <any>days,
+            'size',
+            <any>size,
+            QueryParamStyle.Form,
+            true,
+        );
+
+
+        localVarQueryParameters = this.addToHttpParams(
+            localVarQueryParameters,
+            'sort',
+            <any>sort,
             QueryParamStyle.Form,
             true,
         );
@@ -423,7 +380,7 @@ export class EquipmentService extends BaseService {
         localVarHeaders = this.configuration.addCredentialToHeaders('bearerAuth', 'Authorization', localVarHeaders, 'Bearer ');
 
         const localVarHttpHeaderAcceptSelected: string | undefined = options?.httpHeaderAccept ?? this.configuration.selectHeaderAccept([
-            '*/*'
+            'application/json'
         ]);
         if (localVarHttpHeaderAcceptSelected !== undefined) {
             localVarHeaders = localVarHeaders.set('Accept', localVarHttpHeaderAcceptSelected);
@@ -445,9 +402,9 @@ export class EquipmentService extends BaseService {
             }
         }
 
-        let localVarPath = `/api/equipment/overdue`;
+        let localVarPath = `/api/purchase-orders`;
         const { basePath, withCredentials } = this.configuration;
-        return this.httpClient.request<EquipmentResponse>('get', `${basePath}${localVarPath}`,
+        return this.httpClient.request<PageResponse>('get', `${basePath}${localVarPath}`,
             {
                 context: localVarHttpContext,
                 params: localVarQueryParameters.toHttpParams(),
@@ -462,24 +419,20 @@ export class EquipmentService extends BaseService {
     }
 
     /**
-     * Update equipment details (name, category, serial, purchase info)
-     * Status, holder, and current warehouse are not editable here — they change only via checkout/checkin (or a batch that delegates to them).
-     * @endpoint patch /api/equipment/{id}
-     * @param id 
-     * @param equipmentUpdateRequest 
+     * Submit a draft purchase order to the supplier
+     * DRAFT -&gt; SUBMITTED, only while DRAFT (422 otherwise). Locks line items from this point — see PUT /{id}\&#39;s description for why.
+     * @endpoint post /api/purchase-orders/{id}/submit
+     * @param id Identifier of the purchase order to submit
      * @param observe set whether or not to return the data Observable as the body, response or events. defaults to returning the body.
      * @param reportProgress flag to report request and response progress.
      * @param options additional options
      */
-    public update2(id: number, equipmentUpdateRequest: EquipmentUpdateRequest, observe?: 'body', reportProgress?: boolean, options?: {httpHeaderAccept?: '*/*', context?: HttpContext, transferCache?: boolean}): Observable<EquipmentResponse>;
-    public update2(id: number, equipmentUpdateRequest: EquipmentUpdateRequest, observe?: 'response', reportProgress?: boolean, options?: {httpHeaderAccept?: '*/*', context?: HttpContext, transferCache?: boolean}): Observable<HttpResponse<EquipmentResponse>>;
-    public update2(id: number, equipmentUpdateRequest: EquipmentUpdateRequest, observe?: 'events', reportProgress?: boolean, options?: {httpHeaderAccept?: '*/*', context?: HttpContext, transferCache?: boolean}): Observable<HttpEvent<EquipmentResponse>>;
-    public update2(id: number, equipmentUpdateRequest: EquipmentUpdateRequest, observe: any = 'body', reportProgress: boolean = false, options?: {httpHeaderAccept?: '*/*', context?: HttpContext, transferCache?: boolean}): Observable<any> {
+    public submit(id: number, observe?: 'body', reportProgress?: boolean, options?: {httpHeaderAccept?: 'application/json', context?: HttpContext, transferCache?: boolean}): Observable<PurchaseOrderResponse>;
+    public submit(id: number, observe?: 'response', reportProgress?: boolean, options?: {httpHeaderAccept?: 'application/json', context?: HttpContext, transferCache?: boolean}): Observable<HttpResponse<PurchaseOrderResponse>>;
+    public submit(id: number, observe?: 'events', reportProgress?: boolean, options?: {httpHeaderAccept?: 'application/json', context?: HttpContext, transferCache?: boolean}): Observable<HttpEvent<PurchaseOrderResponse>>;
+    public submit(id: number, observe: any = 'body', reportProgress: boolean = false, options?: {httpHeaderAccept?: 'application/json', context?: HttpContext, transferCache?: boolean}): Observable<any> {
         if (id === null || id === undefined) {
-            throw new Error('Required parameter id was null or undefined when calling update2.');
-        }
-        if (equipmentUpdateRequest === null || equipmentUpdateRequest === undefined) {
-            throw new Error('Required parameter equipmentUpdateRequest was null or undefined when calling update2.');
+            throw new Error('Required parameter id was null or undefined when calling submit.');
         }
 
         let localVarHeaders = this.defaultHeaders;
@@ -488,7 +441,71 @@ export class EquipmentService extends BaseService {
         localVarHeaders = this.configuration.addCredentialToHeaders('bearerAuth', 'Authorization', localVarHeaders, 'Bearer ');
 
         const localVarHttpHeaderAcceptSelected: string | undefined = options?.httpHeaderAccept ?? this.configuration.selectHeaderAccept([
-            '*/*'
+            'application/json'
+        ]);
+        if (localVarHttpHeaderAcceptSelected !== undefined) {
+            localVarHeaders = localVarHeaders.set('Accept', localVarHttpHeaderAcceptSelected);
+        }
+
+        const localVarHttpContext: HttpContext = options?.context ?? new HttpContext();
+
+        const localVarTransferCache: boolean = options?.transferCache ?? true;
+
+
+        let responseType_: 'text' | 'json' | 'blob' = 'json';
+        if (localVarHttpHeaderAcceptSelected) {
+            if (localVarHttpHeaderAcceptSelected.startsWith('text')) {
+                responseType_ = 'text';
+            } else if (this.configuration.isJsonMime(localVarHttpHeaderAcceptSelected)) {
+                responseType_ = 'json';
+            } else {
+                responseType_ = 'blob';
+            }
+        }
+
+        let localVarPath = `/api/purchase-orders/${this.configuration.encodeParam({name: "id", value: id, in: "path", style: "simple", explode: false, dataType: "number", dataFormat: "int64"})}/submit`;
+        const { basePath, withCredentials } = this.configuration;
+        return this.httpClient.request<PurchaseOrderResponse>('post', `${basePath}${localVarPath}`,
+            {
+                context: localVarHttpContext,
+                responseType: <any>responseType_,
+                ...(withCredentials ? { withCredentials } : {}),
+                headers: localVarHeaders,
+                observe: observe,
+                ...(localVarTransferCache !== undefined ? { transferCache: localVarTransferCache } : {}),
+                reportProgress: reportProgress
+            }
+        );
+    }
+
+    /**
+     * Replace a draft purchase order\&#39;s notes and line items
+     * Full-replacement update, only while DRAFT (422 otherwise — once SUBMITTED, a supplier already has this order, so changing quantities without telling them is misleading). supplierId cannot be changed and is not part of this request body. notes is copied as given, including null (clearing it); lines entirely replaces the existing line items.
+     * @endpoint put /api/purchase-orders/{id}
+     * @param id Identifier of the purchase order to update
+     * @param purchaseOrderUpdateRequest 
+     * @param observe set whether or not to return the data Observable as the body, response or events. defaults to returning the body.
+     * @param reportProgress flag to report request and response progress.
+     * @param options additional options
+     */
+    public update(id: number, purchaseOrderUpdateRequest: PurchaseOrderUpdateRequest, observe?: 'body', reportProgress?: boolean, options?: {httpHeaderAccept?: 'application/json', context?: HttpContext, transferCache?: boolean}): Observable<PurchaseOrderResponse>;
+    public update(id: number, purchaseOrderUpdateRequest: PurchaseOrderUpdateRequest, observe?: 'response', reportProgress?: boolean, options?: {httpHeaderAccept?: 'application/json', context?: HttpContext, transferCache?: boolean}): Observable<HttpResponse<PurchaseOrderResponse>>;
+    public update(id: number, purchaseOrderUpdateRequest: PurchaseOrderUpdateRequest, observe?: 'events', reportProgress?: boolean, options?: {httpHeaderAccept?: 'application/json', context?: HttpContext, transferCache?: boolean}): Observable<HttpEvent<PurchaseOrderResponse>>;
+    public update(id: number, purchaseOrderUpdateRequest: PurchaseOrderUpdateRequest, observe: any = 'body', reportProgress: boolean = false, options?: {httpHeaderAccept?: 'application/json', context?: HttpContext, transferCache?: boolean}): Observable<any> {
+        if (id === null || id === undefined) {
+            throw new Error('Required parameter id was null or undefined when calling update.');
+        }
+        if (purchaseOrderUpdateRequest === null || purchaseOrderUpdateRequest === undefined) {
+            throw new Error('Required parameter purchaseOrderUpdateRequest was null or undefined when calling update.');
+        }
+
+        let localVarHeaders = this.defaultHeaders;
+
+        // authentication (bearerAuth) required
+        localVarHeaders = this.configuration.addCredentialToHeaders('bearerAuth', 'Authorization', localVarHeaders, 'Bearer ');
+
+        const localVarHttpHeaderAcceptSelected: string | undefined = options?.httpHeaderAccept ?? this.configuration.selectHeaderAccept([
+            'application/json'
         ]);
         if (localVarHttpHeaderAcceptSelected !== undefined) {
             localVarHeaders = localVarHeaders.set('Accept', localVarHttpHeaderAcceptSelected);
@@ -519,12 +536,12 @@ export class EquipmentService extends BaseService {
             }
         }
 
-        let localVarPath = `/api/equipment/${this.configuration.encodeParam({name: "id", value: id, in: "path", style: "simple", explode: false, dataType: "number", dataFormat: "int64"})}`;
+        let localVarPath = `/api/purchase-orders/${this.configuration.encodeParam({name: "id", value: id, in: "path", style: "simple", explode: false, dataType: "number", dataFormat: "int64"})}`;
         const { basePath, withCredentials } = this.configuration;
-        return this.httpClient.request<EquipmentResponse>('patch', `${basePath}${localVarPath}`,
+        return this.httpClient.request<PurchaseOrderResponse>('put', `${basePath}${localVarPath}`,
             {
                 context: localVarHttpContext,
-                body: equipmentUpdateRequest,
+                body: purchaseOrderUpdateRequest,
                 responseType: <any>responseType_,
                 ...(withCredentials ? { withCredentials } : {}),
                 headers: localVarHeaders,

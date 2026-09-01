@@ -1,0 +1,152 @@
+<div class="order-detail-page">
+
+  <button type="button" class="back-btn" (click)="backToList()">
+    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+      <path d="M19 12H5"></path>
+      <path d="m12 19-7-7 7-7"></path>
+    </svg>
+    Back to Purchase Orders
+  </button>
+
+  @if (loading()) {
+    <div class="state-message">Loading…</div>
+  } @else if (errorMessage() && !order()) {
+    <div class="state-message state-message--error">{{ errorMessage() }}</div>
+  } @else if (order(); as o) {
+
+    <div class="order-header">
+      <div class="order-header__top">
+        <div class="order-header__supplier">{{ o.supplierName }}</div>
+        <span class="status-badge" [attr.data-status]="o.status">{{ statusLabel(o) }}</span>
+      </div>
+      <div class="order-header__meta">
+        <div><span class="order-header__meta-label">Initiated by:</span> {{ o.initiatedByName || '—' }}</div>
+        <div><span class="order-header__meta-label">Created:</span> {{ o.createdAt | date: 'medium' }}</div>
+        @if (o.updatedAt) {
+          <div><span class="order-header__meta-label">Last updated:</span> {{ o.updatedAt | date: 'medium' }}</div>
+        }
+      </div>
+      @if (o.notes && mode() === 'view') {
+        <div class="order-header__notes">{{ o.notes }}</div>
+      }
+    </div>
+
+    @if (mode() === 'view') {
+      <div class="action-row">
+        @if (canShowEdit(o)) {
+          <button type="button" class="btn-secondary" (click)="enterEdit()">Edit</button>
+        }
+        @if (canShowSubmit(o)) {
+          <button type="button" class="btn-confirm" (click)="openSubmitDialog()">Submit to Supplier</button>
+        }
+        @if (canShowReceive(o)) {
+          <a class="btn-secondary" [routerLink]="['/inventory/purchase-receipts/new']" [queryParams]="{ purchaseOrderId: o.id }">
+            Receive Against This Order
+          </a>
+        }
+        @if (canShowClose(o)) {
+          <button type="button" class="btn-danger-outline" (click)="openCloseDialog()">Close Order</button>
+        }
+      </div>
+    }
+
+    @if (errorMessage()) {
+      <div class="form-error">{{ errorMessage() }}</div>
+    }
+
+    @if (mode() === 'view') {
+      <div class="lines-card">
+        <div class="lines-head">
+          <div>Item</div>
+          <div>SKU</div>
+          <div class="align-right">Ordered / Received</div>
+          <div>Notes</div>
+        </div>
+        @for (line of o.lines; track line.id) {
+          <div class="lines-row" [class.lines-row--complete]="isLineComplete(line)">
+            <div class="lines-row__item">{{ line.itemName }}</div>
+            <div class="lines-row__sku">{{ line.itemSku }}</div>
+            <div class="align-right lines-row__progress">{{ lineProgress(line) }}</div>
+            <div class="lines-row__notes">{{ line.notes || '—' }}</div>
+          </div>
+        } @empty {
+          <div class="lines-empty">No line items on this order.</div>
+        }
+      </div>
+    } @else {
+      <!-- ===== Edit mode ===== -->
+      <div class="card">
+        <div class="card__title">Line Items</div>
+
+        <div class="lines-head lines-head--edit">
+          <div>Item</div>
+          <div class="align-right">Quantity</div>
+          <div>Notes</div>
+          <div></div>
+        </div>
+
+        @for (line of editLines(); track $index) {
+          <div class="lines-row lines-row--edit">
+            <select [value]="line.itemId" (change)="onEditLineItemChange($index, $any($event.target).value)">
+              <option value="">Select item…</option>
+              @for (item of items(); track item.id) {
+                <option [value]="item.id">{{ item.name }} ({{ item.sku }})</option>
+              }
+            </select>
+            <input type="number" min="1" class="align-right" [value]="line.quantity" (change)="onEditLineQuantityChange($index, $any($event.target).value)" />
+            <input type="text" placeholder="optional" [value]="line.notes" (change)="onEditLineNotesChange($index, $any($event.target).value)" />
+            <button type="button" class="line-remove" [disabled]="editLines().length <= 1" (click)="removeEditLine($index)" aria-label="Remove line">✕</button>
+          </div>
+        }
+
+        <button type="button" class="btn-add-line" (click)="addEditLine()">+ Add Line</button>
+      </div>
+
+      <div class="card">
+        <div class="card__title">Notes</div>
+        <textarea placeholder="Optional notes about this order…" [value]="editNotes()" (change)="onEditNotesChange($any($event.target).value)"></textarea>
+      </div>
+
+      <div class="form-actions">
+        <button type="button" class="btn-primary" [disabled]="saving()" (click)="saveEdit()">
+          {{ saving() ? 'Saving…' : 'Save Changes' }}
+        </button>
+        <button type="button" class="btn-secondary" [disabled]="saving()" (click)="cancelEdit()">Cancel</button>
+      </div>
+    }
+
+  }
+
+  @if (submitDialogOpen() && order(); as o) {
+    <div class="scrim" (click)="closeSubmitDialog()"></div>
+    <div class="dialog">
+      <div class="dialog__title">Submit this order to {{ o.supplierName }}?</div>
+      <div class="dialog__body">
+        This locks the line items — you won't be able to edit quantities after this. This action cannot be undone.
+      </div>
+      <div class="dialog__actions">
+        <button type="button" class="btn-secondary" [disabled]="submitting()" (click)="closeSubmitDialog()">Cancel</button>
+        <button type="button" class="btn-confirm" [disabled]="submitting()" (click)="submitOrder()">
+          {{ submitting() ? 'Submitting…' : 'Yes, Submit Order' }}
+        </button>
+      </div>
+    </div>
+  }
+
+  @if (closeDialogOpen() && order(); as o) {
+    <div class="scrim" (click)="closeCloseDialog()"></div>
+    <div class="dialog">
+      <div class="dialog__title">Close this order?</div>
+      <div class="dialog__body">
+        Use this when the remaining shortfall isn't coming — this ends the order regardless of how much has been received so far. This action cannot be undone.
+      </div>
+      <div class="dialog__actions">
+        <button type="button" class="btn-secondary" [disabled]="closing()" (click)="closeCloseDialog()">Cancel</button>
+        <button type="button" class="btn-danger-outline" [disabled]="closing()" (click)="closeOrder()">
+          {{ closing() ? 'Closing…' : 'Yes, Close Order' }}
+        </button>
+      </div>
+    </div>
+  }
+
+</div>

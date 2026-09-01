@@ -518,7 +518,7 @@ export class EquipmentListComponent implements OnInit {
 
     this.editSaving.set(true);
     this.editError.set(null);
-    this.equipmentService.update1(target.id, request, 'body', undefined, this.jsonAccept).subscribe({
+    this.equipmentService.update2(target.id, request, 'body', undefined, this.jsonAccept).subscribe({
       next: () => {
         this.editSaving.set(false);
         this.editOpen.set(false);

@@ -253,7 +253,7 @@ export class MaterialRequestDetailComponent implements OnInit {
       ),
     };
 
-    this.materialRequestsService.update(current.id, body).subscribe({
+    this.materialRequestsService.update1(current.id, body).subscribe({
       next: (updated) => {
         this.request.set(updated);
         this.saving.set(false);
@@ -302,7 +302,7 @@ export class MaterialRequestDetailComponent implements OnInit {
 
   private loadRequest(id: number): void {
     this.loading.set(true);
-    this.materialRequestsService.getById(id).subscribe({
+    this.materialRequestsService.getById1(id).subscribe({
       next: (request) => {
         this.request.set(request);
         this.loading.set(false);

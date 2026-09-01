@@ -56,6 +56,10 @@ export interface PurchaseReceiptResponse {
      */
     fulfillsTransferBatchId?: number;
     /**
+     * Identifier of the PurchaseOrder this receipt is (at least partially) fulfilling, if any
+     */
+    purchaseOrderId?: number;
+    /**
      * Line items purchased on this receipt
      */
     lines?: Array<PurchaseReceiptLineResponse>;

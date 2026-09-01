@@ -1,0 +1,95 @@
+<div class="create-page">
+
+  <button type="button" class="back-btn" (click)="backToList()">
+    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+      <path d="M19 12H5"></path>
+      <path d="m12 19-7-7 7-7"></path>
+    </svg>
+    Back to Purchase Orders
+  </button>
+
+  <div class="create-page__title">New Purchase Order</div>
+
+  @if (errorMessage()) {
+    <div class="form-error">{{ errorMessage() }}</div>
+  }
+
+  <div class="card">
+    <div class="form-grid">
+      <div class="form-field">
+        <label>Supplier *</label>
+        <select [value]="supplierId()" (change)="onSupplierChange($any($event.target).value)">
+          <option value="">Select a supplier…</option>
+          @for (s of suppliers(); track s.id) {
+            <option [value]="s.id">{{ s.name }}</option>
+          }
+        </select>
+      </div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card__title">Line Items</div>
+    <div class="lines-hint">
+      @if (loadingSuggestions()) {
+        Loading suggestions for this supplier…
+      } @else {
+        Lines are pre-filled from shortfalls, low stock, and open material requests — a starting point, freely editable.
+      }
+    </div>
+
+    <div class="lines-head">
+      <div>Item</div>
+      <div class="align-right">Quantity</div>
+      <div>Notes</div>
+      <div></div>
+    </div>
+
+    @for (line of lines(); track $index) {
+      <div class="lines-row">
+        <select [value]="line.itemId" (change)="onLineItemChange($index, $any($event.target).value)">
+          <option value="">Select item…</option>
+          @for (item of items(); track item.id) {
+            <option [value]="item.id">{{ item.name }} ({{ item.sku }})</option>
+          }
+        </select>
+        <input type="number" min="1" class="align-right" [value]="line.quantity" (change)="onLineQuantityChange($index, $any($event.target).value)" />
+        <input type="text" placeholder="optional" [value]="line.notes" (change)="onLineNotesChange($index, $any($event.target).value)" />
+        <button type="button" class="line-remove" [disabled]="lines().length <= 1" (click)="removeLine($index)" aria-label="Remove line">✕</button>
+      </div>
+      @if (line.itemId; as itemId) {
+        @if (suggestionByItemId().get(itemId); as suggestion) {
+          <div class="suggestion-hint">
+            Suggested ({{ suggestion.suggestedQuantity }}) from
+            @for (src of suggestion.sources; track src; let last = $last) {
+              {{ suggestionSourceLabel(src) }}{{ last ? '' : ', ' }}
+            }
+            @if (!suggestion.linkedToSupplier) {
+              — not currently linked to this supplier
+            }
+          </div>
+        }
+      }
+    }
+
+    <button type="button" class="btn-add-line" (click)="addLine()">+ Add Line</button>
+
+    <div class="lines-total">
+      <span class="lines-total__label">Total Items</span>
+      <span class="lines-total__value">{{ totalLineCount() }}</span>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card__title">Notes</div>
+    <textarea placeholder="Optional notes about this order…" [value]="notes()" (change)="onNotesChange($any($event.target).value)"></textarea>
+  </div>
+
+  <div class="form-actions">
+    <button type="button" class="btn-primary" [disabled]="saving() || loadingOptions()" (click)="saveDraft()">
+      {{ saving() ? 'Creating…' : 'Create Draft' }}
+    </button>
+    <button type="button" class="btn-secondary" [disabled]="saving()" (click)="backToList()">Cancel</button>
+  </div>
+
+</div>

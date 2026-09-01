@@ -48,12 +48,12 @@ export class EquipmentAssignmentBatchesService extends BaseService {
      * @param reportProgress flag to report request and response progress.
      * @param options additional options
      */
-    public createDraft1(equipmentAssignmentBatchCreateRequest: EquipmentAssignmentBatchCreateRequest, observe?: 'body', reportProgress?: boolean, options?: {httpHeaderAccept?: '*/*', context?: HttpContext, transferCache?: boolean}): Observable<EquipmentAssignmentBatchResponse>;
-    public createDraft1(equipmentAssignmentBatchCreateRequest: EquipmentAssignmentBatchCreateRequest, observe?: 'response', reportProgress?: boolean, options?: {httpHeaderAccept?: '*/*', context?: HttpContext, transferCache?: boolean}): Observable<HttpResponse<EquipmentAssignmentBatchResponse>>;
-    public createDraft1(equipmentAssignmentBatchCreateRequest: EquipmentAssignmentBatchCreateRequest, observe?: 'events', reportProgress?: boolean, options?: {httpHeaderAccept?: '*/*', context?: HttpContext, transferCache?: boolean}): Observable<HttpEvent<EquipmentAssignmentBatchResponse>>;
-    public createDraft1(equipmentAssignmentBatchCreateRequest: EquipmentAssignmentBatchCreateRequest, observe: any = 'body', reportProgress: boolean = false, options?: {httpHeaderAccept?: '*/*', context?: HttpContext, transferCache?: boolean}): Observable<any> {
+    public createDraft2(equipmentAssignmentBatchCreateRequest: EquipmentAssignmentBatchCreateRequest, observe?: 'body', reportProgress?: boolean, options?: {httpHeaderAccept?: '*/*', context?: HttpContext, transferCache?: boolean}): Observable<EquipmentAssignmentBatchResponse>;
+    public createDraft2(equipmentAssignmentBatchCreateRequest: EquipmentAssignmentBatchCreateRequest, observe?: 'response', reportProgress?: boolean, options?: {httpHeaderAccept?: '*/*', context?: HttpContext, transferCache?: boolean}): Observable<HttpResponse<EquipmentAssignmentBatchResponse>>;
+    public createDraft2(equipmentAssignmentBatchCreateRequest: EquipmentAssignmentBatchCreateRequest, observe?: 'events', reportProgress?: boolean, options?: {httpHeaderAccept?: '*/*', context?: HttpContext, transferCache?: boolean}): Observable<HttpEvent<EquipmentAssignmentBatchResponse>>;
+    public createDraft2(equipmentAssignmentBatchCreateRequest: EquipmentAssignmentBatchCreateRequest, observe: any = 'body', reportProgress: boolean = false, options?: {httpHeaderAccept?: '*/*', context?: HttpContext, transferCache?: boolean}): Observable<any> {
         if (equipmentAssignmentBatchCreateRequest === null || equipmentAssignmentBatchCreateRequest === undefined) {
-            throw new Error('Required parameter equipmentAssignmentBatchCreateRequest was null or undefined when calling createDraft1.');
+            throw new Error('Required parameter equipmentAssignmentBatchCreateRequest was null or undefined when calling createDraft2.');
         }
 
         let localVarHeaders = this.defaultHeaders;
@@ -185,12 +185,12 @@ export class EquipmentAssignmentBatchesService extends BaseService {
      * @param reportProgress flag to report request and response progress.
      * @param options additional options
      */
-    public getById2(id: number, observe?: 'body', reportProgress?: boolean, options?: {httpHeaderAccept?: '*/*', context?: HttpContext, transferCache?: boolean}): Observable<EquipmentAssignmentBatchResponse>;
-    public getById2(id: number, observe?: 'response', reportProgress?: boolean, options?: {httpHeaderAccept?: '*/*', context?: HttpContext, transferCache?: boolean}): Observable<HttpResponse<EquipmentAssignmentBatchResponse>>;
-    public getById2(id: number, observe?: 'events', reportProgress?: boolean, options?: {httpHeaderAccept?: '*/*', context?: HttpContext, transferCache?: boolean}): Observable<HttpEvent<EquipmentAssignmentBatchResponse>>;
-    public getById2(id: number, observe: any = 'body', reportProgress: boolean = false, options?: {httpHeaderAccept?: '*/*', context?: HttpContext, transferCache?: boolean}): Observable<any> {
+    public getById3(id: number, observe?: 'body', reportProgress?: boolean, options?: {httpHeaderAccept?: '*/*', context?: HttpContext, transferCache?: boolean}): Observable<EquipmentAssignmentBatchResponse>;
+    public getById3(id: number, observe?: 'response', reportProgress?: boolean, options?: {httpHeaderAccept?: '*/*', context?: HttpContext, transferCache?: boolean}): Observable<HttpResponse<EquipmentAssignmentBatchResponse>>;
+    public getById3(id: number, observe?: 'events', reportProgress?: boolean, options?: {httpHeaderAccept?: '*/*', context?: HttpContext, transferCache?: boolean}): Observable<HttpEvent<EquipmentAssignmentBatchResponse>>;
+    public getById3(id: number, observe: any = 'body', reportProgress: boolean = false, options?: {httpHeaderAccept?: '*/*', context?: HttpContext, transferCache?: boolean}): Observable<any> {
         if (id === null || id === undefined) {
-            throw new Error('Required parameter id was null or undefined when calling getById2.');
+            throw new Error('Required parameter id was null or undefined when calling getById3.');
         }
 
         let localVarHeaders = this.defaultHeaders;
@@ -245,12 +245,12 @@ export class EquipmentAssignmentBatchesService extends BaseService {
      * @param reportProgress flag to report request and response progress.
      * @param options additional options
      */
-    public submit1(id: number, observe?: 'body', reportProgress?: boolean, options?: {httpHeaderAccept?: '*/*', context?: HttpContext, transferCache?: boolean}): Observable<EquipmentAssignmentBatchResponse>;
-    public submit1(id: number, observe?: 'response', reportProgress?: boolean, options?: {httpHeaderAccept?: '*/*', context?: HttpContext, transferCache?: boolean}): Observable<HttpResponse<EquipmentAssignmentBatchResponse>>;
-    public submit1(id: number, observe?: 'events', reportProgress?: boolean, options?: {httpHeaderAccept?: '*/*', context?: HttpContext, transferCache?: boolean}): Observable<HttpEvent<EquipmentAssignmentBatchResponse>>;
-    public submit1(id: number, observe: any = 'body', reportProgress: boolean = false, options?: {httpHeaderAccept?: '*/*', context?: HttpContext, transferCache?: boolean}): Observable<any> {
+    public submit2(id: number, observe?: 'body', reportProgress?: boolean, options?: {httpHeaderAccept?: '*/*', context?: HttpContext, transferCache?: boolean}): Observable<EquipmentAssignmentBatchResponse>;
+    public submit2(id: number, observe?: 'response', reportProgress?: boolean, options?: {httpHeaderAccept?: '*/*', context?: HttpContext, transferCache?: boolean}): Observable<HttpResponse<EquipmentAssignmentBatchResponse>>;
+    public submit2(id: number, observe?: 'events', reportProgress?: boolean, options?: {httpHeaderAccept?: '*/*', context?: HttpContext, transferCache?: boolean}): Observable<HttpEvent<EquipmentAssignmentBatchResponse>>;
+    public submit2(id: number, observe: any = 'body', reportProgress: boolean = false, options?: {httpHeaderAccept?: '*/*', context?: HttpContext, transferCache?: boolean}): Observable<any> {
         if (id === null || id === undefined) {
-            throw new Error('Required parameter id was null or undefined when calling submit1.');
+            throw new Error('Required parameter id was null or undefined when calling submit2.');
         }
 
         let localVarHeaders = this.defaultHeaders;

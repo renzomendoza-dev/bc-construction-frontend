@@ -146,6 +146,28 @@ export const routes: Routes = [
             (m) => m.MaterialRequestDetailComponent,
           ),
       },
+      {
+        path: 'purchase-orders',
+        loadComponent: () =>
+          import('./features/inventory/purchase-orders/purchase-orders-list/purchase-orders-list').then(
+            (m) => m.PurchaseOrdersListComponent,
+          ),
+      },
+      {
+        path: 'purchase-orders/new',
+        canActivate: [permissionGuard(Permission.PurchaseOrderCreate, '/inventory/purchase-orders')],
+        loadComponent: () =>
+          import('./features/inventory/purchase-orders/purchase-order-create/purchase-order-create').then(
+            (m) => m.PurchaseOrderCreateComponent,
+          ),
+      },
+      {
+        path: 'purchase-orders/:id',
+        loadComponent: () =>
+          import('./features/inventory/purchase-orders/purchase-order-detail/purchase-order-detail').then(
+            (m) => m.PurchaseOrderDetailComponent,
+          ),
+      },
       // {
       //   path: 'warehouses',
       //   loadComponent: () =>

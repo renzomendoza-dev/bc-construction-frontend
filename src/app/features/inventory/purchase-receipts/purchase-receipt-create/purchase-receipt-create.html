@@ -16,6 +16,12 @@
     </div>
   }
 
+  @if (fulfillingOrder(); as order) {
+    <div class="fulfilling-banner">
+      Receiving against Purchase Order #{{ order.id }} (<strong>{{ order.supplierName }}</strong>) — supplier and outstanding line items are pre-filled from the order; set the warehouse and unit costs, then confirming this receipt will update that order's status.
+    </div>
+  }
+
   @if (errorMessage()) {
     <div class="form-error">{{ errorMessage() }}</div>
   }
@@ -24,12 +30,16 @@
     <div class="form-grid">
       <div class="form-field">
         <label>Supplier *</label>
-        <select [value]="supplierId()" (change)="onSupplierChange($any($event.target).value)">
-          <option value="">Select a supplier…</option>
-          @for (s of suppliers(); track s.id) {
-            <option [value]="s.id">{{ s.name }}</option>
-          }
-        </select>
+        @if (fulfillingOrder(); as order) {
+          <div class="frozen-field">{{ order.supplierName }}</div>
+        } @else {
+          <select [value]="supplierId()" (change)="onSupplierChange($any($event.target).value)">
+            <option value="">Select a supplier…</option>
+            @for (s of suppliers(); track s.id) {
+              <option [value]="s.id">{{ s.name }}</option>
+            }
+          </select>
+        }
       </div>
       <div class="form-field">
         <label>Warehouse *</label>
@@ -68,7 +78,7 @@
 
     @for (line of lines(); track $index) {
       <div class="lines-row">
-        @if (line.fromBatch) {
+        @if (line.locked) {
           <div class="frozen-field">{{ itemName(line.itemId) }}</div>
         } @else {
           <select [value]="line.itemId" (change)="onLineItemChange($index, $any($event.target).value)">

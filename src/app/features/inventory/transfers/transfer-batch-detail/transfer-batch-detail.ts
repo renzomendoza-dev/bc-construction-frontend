@@ -86,7 +86,7 @@ export class TransferBatchDetailComponent implements OnInit {
     const batchId = current.id;
 
     this.submitting.set(true);
-    this.transferBatchesService.submit(batchId).subscribe({
+    this.transferBatchesService.submit1(batchId).subscribe({
       next: (updated) => {
         this.batch.set(updated);
         this.submitting.set(false);
@@ -156,7 +156,7 @@ export class TransferBatchDetailComponent implements OnInit {
 
   private loadBatch(id: number): void {
     this.loading.set(true);
-    this.transferBatchesService.getById1(id).subscribe({
+    this.transferBatchesService.getById2(id).subscribe({
       next: (batch) => {
         this.batch.set(batch);
         this.loading.set(false);

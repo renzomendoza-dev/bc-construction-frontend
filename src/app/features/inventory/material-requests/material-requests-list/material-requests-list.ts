@@ -113,7 +113,7 @@ export class MaterialRequestsListComponent implements OnInit {
     this.loading.set(true);
     this.errorMessage.set(null);
 
-    this.materialRequestsService.search1(undefined, undefined, 0, FETCH_SIZE, undefined).subscribe({
+    this.materialRequestsService.search2(undefined, undefined, 0, FETCH_SIZE, undefined).subscribe({
       next: (result) => {
         this.allRequests.set((result.content ?? []) as MaterialRequestResponse[]);
         this.loading.set(false);

@@ -10,6 +10,7 @@ api/equipmentAssignmentBatches.service.ts
 api/inventory.service.ts
 api/items.service.ts
 api/materialRequests.service.ts
+api/purchaseOrders.service.ts
 api/purchaseReceipts.service.ts
 api/salesController.service.ts
 api/suppliers.service.ts
@@ -48,6 +49,13 @@ model/models.ts
 model/pageResponse.ts
 model/purchaseHistoryEntry.ts
 model/purchaseHistoryResponse.ts
+model/purchaseOrderCreateRequest.ts
+model/purchaseOrderLineRequest.ts
+model/purchaseOrderLineResponse.ts
+model/purchaseOrderResponse.ts
+model/purchaseOrderSuggestionItem.ts
+model/purchaseOrderSuggestionsResponse.ts
+model/purchaseOrderUpdateRequest.ts
 model/purchaseReceiptCreateRequest.ts
 model/purchaseReceiptLineRequest.ts
 model/purchaseReceiptLineResponse.ts

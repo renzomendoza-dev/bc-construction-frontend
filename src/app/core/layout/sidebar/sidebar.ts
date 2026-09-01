@@ -39,6 +39,7 @@ export class Sidebar {
     { path: '/inventory/suppliers', label: 'Suppliers' },
     { path: '/inventory/warehouses', label: 'Warehouses & Sites' },
     { path: '/inventory/purchase-receipts', label: 'Purchase Receipts' },
+    { path: '/inventory/purchase-orders', label: 'Purchase Orders' },
     { path: '/inventory/stock', label: 'Stock' },
     { path: '/inventory/transfers', label: 'Transfers' },
     { path: '/inventory/material-requests', label: 'Material Requests' },

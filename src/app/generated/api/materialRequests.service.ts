@@ -124,12 +124,12 @@ export class MaterialRequestsService extends BaseService {
      * @param reportProgress flag to report request and response progress.
      * @param options additional options
      */
-    public getById(id: number, observe?: 'body', reportProgress?: boolean, options?: {httpHeaderAccept?: 'application/json', context?: HttpContext, transferCache?: boolean}): Observable<MaterialRequestResponse>;
-    public getById(id: number, observe?: 'response', reportProgress?: boolean, options?: {httpHeaderAccept?: 'application/json', context?: HttpContext, transferCache?: boolean}): Observable<HttpResponse<MaterialRequestResponse>>;
-    public getById(id: number, observe?: 'events', reportProgress?: boolean, options?: {httpHeaderAccept?: 'application/json', context?: HttpContext, transferCache?: boolean}): Observable<HttpEvent<MaterialRequestResponse>>;
-    public getById(id: number, observe: any = 'body', reportProgress: boolean = false, options?: {httpHeaderAccept?: 'application/json', context?: HttpContext, transferCache?: boolean}): Observable<any> {
+    public getById1(id: number, observe?: 'body', reportProgress?: boolean, options?: {httpHeaderAccept?: 'application/json', context?: HttpContext, transferCache?: boolean}): Observable<MaterialRequestResponse>;
+    public getById1(id: number, observe?: 'response', reportProgress?: boolean, options?: {httpHeaderAccept?: 'application/json', context?: HttpContext, transferCache?: boolean}): Observable<HttpResponse<MaterialRequestResponse>>;
+    public getById1(id: number, observe?: 'events', reportProgress?: boolean, options?: {httpHeaderAccept?: 'application/json', context?: HttpContext, transferCache?: boolean}): Observable<HttpEvent<MaterialRequestResponse>>;
+    public getById1(id: number, observe: any = 'body', reportProgress: boolean = false, options?: {httpHeaderAccept?: 'application/json', context?: HttpContext, transferCache?: boolean}): Observable<any> {
         if (id === null || id === undefined) {
-            throw new Error('Required parameter id was null or undefined when calling getById.');
+            throw new Error('Required parameter id was null or undefined when calling getById1.');
         }
 
         let localVarHeaders = this.defaultHeaders;
@@ -188,10 +188,10 @@ export class MaterialRequestsService extends BaseService {
      * @param reportProgress flag to report request and response progress.
      * @param options additional options
      */
-    public search1(siteWarehouseId?: number, status?: 'DRAFT' | 'SUBMITTED' | 'PARTIALLY_FULFILLED' | 'FULFILLED', page?: number, size?: number, sort?: Array<string>, observe?: 'body', reportProgress?: boolean, options?: {httpHeaderAccept?: 'application/json', context?: HttpContext, transferCache?: boolean}): Observable<PageResponse>;
-    public search1(siteWarehouseId?: number, status?: 'DRAFT' | 'SUBMITTED' | 'PARTIALLY_FULFILLED' | 'FULFILLED', page?: number, size?: number, sort?: Array<string>, observe?: 'response', reportProgress?: boolean, options?: {httpHeaderAccept?: 'application/json', context?: HttpContext, transferCache?: boolean}): Observable<HttpResponse<PageResponse>>;
-    public search1(siteWarehouseId?: number, status?: 'DRAFT' | 'SUBMITTED' | 'PARTIALLY_FULFILLED' | 'FULFILLED', page?: number, size?: number, sort?: Array<string>, observe?: 'events', reportProgress?: boolean, options?: {httpHeaderAccept?: 'application/json', context?: HttpContext, transferCache?: boolean}): Observable<HttpEvent<PageResponse>>;
-    public search1(siteWarehouseId?: number, status?: 'DRAFT' | 'SUBMITTED' | 'PARTIALLY_FULFILLED' | 'FULFILLED', page?: number, size?: number, sort?: Array<string>, observe: any = 'body', reportProgress: boolean = false, options?: {httpHeaderAccept?: 'application/json', context?: HttpContext, transferCache?: boolean}): Observable<any> {
+    public search2(siteWarehouseId?: number, status?: 'DRAFT' | 'SUBMITTED' | 'PARTIALLY_FULFILLED' | 'FULFILLED', page?: number, size?: number, sort?: Array<string>, observe?: 'body', reportProgress?: boolean, options?: {httpHeaderAccept?: 'application/json', context?: HttpContext, transferCache?: boolean}): Observable<PageResponse>;
+    public search2(siteWarehouseId?: number, status?: 'DRAFT' | 'SUBMITTED' | 'PARTIALLY_FULFILLED' | 'FULFILLED', page?: number, size?: number, sort?: Array<string>, observe?: 'response', reportProgress?: boolean, options?: {httpHeaderAccept?: 'application/json', context?: HttpContext, transferCache?: boolean}): Observable<HttpResponse<PageResponse>>;
+    public search2(siteWarehouseId?: number, status?: 'DRAFT' | 'SUBMITTED' | 'PARTIALLY_FULFILLED' | 'FULFILLED', page?: number, size?: number, sort?: Array<string>, observe?: 'events', reportProgress?: boolean, options?: {httpHeaderAccept?: 'application/json', context?: HttpContext, transferCache?: boolean}): Observable<HttpEvent<PageResponse>>;
+    public search2(siteWarehouseId?: number, status?: 'DRAFT' | 'SUBMITTED' | 'PARTIALLY_FULFILLED' | 'FULFILLED', page?: number, size?: number, sort?: Array<string>, observe: any = 'body', reportProgress: boolean = false, options?: {httpHeaderAccept?: 'application/json', context?: HttpContext, transferCache?: boolean}): Observable<any> {
 
         let localVarQueryParameters = new OpenApiHttpParams(this.encoder);
 
@@ -294,15 +294,15 @@ export class MaterialRequestsService extends BaseService {
      * @param reportProgress flag to report request and response progress.
      * @param options additional options
      */
-    public update(id: number, materialRequestUpdateRequest: MaterialRequestUpdateRequest, observe?: 'body', reportProgress?: boolean, options?: {httpHeaderAccept?: 'application/json', context?: HttpContext, transferCache?: boolean}): Observable<MaterialRequestResponse>;
-    public update(id: number, materialRequestUpdateRequest: MaterialRequestUpdateRequest, observe?: 'response', reportProgress?: boolean, options?: {httpHeaderAccept?: 'application/json', context?: HttpContext, transferCache?: boolean}): Observable<HttpResponse<MaterialRequestResponse>>;
-    public update(id: number, materialRequestUpdateRequest: MaterialRequestUpdateRequest, observe?: 'events', reportProgress?: boolean, options?: {httpHeaderAccept?: 'application/json', context?: HttpContext, transferCache?: boolean}): Observable<HttpEvent<MaterialRequestResponse>>;
-    public update(id: number, materialRequestUpdateRequest: MaterialRequestUpdateRequest, observe: any = 'body', reportProgress: boolean = false, options?: {httpHeaderAccept?: 'application/json', context?: HttpContext, transferCache?: boolean}): Observable<any> {
+    public update1(id: number, materialRequestUpdateRequest: MaterialRequestUpdateRequest, observe?: 'body', reportProgress?: boolean, options?: {httpHeaderAccept?: 'application/json', context?: HttpContext, transferCache?: boolean}): Observable<MaterialRequestResponse>;
+    public update1(id: number, materialRequestUpdateRequest: MaterialRequestUpdateRequest, observe?: 'response', reportProgress?: boolean, options?: {httpHeaderAccept?: 'application/json', context?: HttpContext, transferCache?: boolean}): Observable<HttpResponse<MaterialRequestResponse>>;
+    public update1(id: number, materialRequestUpdateRequest: MaterialRequestUpdateRequest, observe?: 'events', reportProgress?: boolean, options?: {httpHeaderAccept?: 'application/json', context?: HttpContext, transferCache?: boolean}): Observable<HttpEvent<MaterialRequestResponse>>;
+    public update1(id: number, materialRequestUpdateRequest: MaterialRequestUpdateRequest, observe: any = 'body', reportProgress: boolean = false, options?: {httpHeaderAccept?: 'application/json', context?: HttpContext, transferCache?: boolean}): Observable<any> {
         if (id === null || id === undefined) {
-            throw new Error('Required parameter id was null or undefined when calling update.');
+            throw new Error('Required parameter id was null or undefined when calling update1.');
         }
         if (materialRequestUpdateRequest === null || materialRequestUpdateRequest === undefined) {
-            throw new Error('Required parameter materialRequestUpdateRequest was null or undefined when calling update.');
+            throw new Error('Required parameter materialRequestUpdateRequest was null or undefined when calling update1.');
         }
 
         let localVarHeaders = this.defaultHeaders;

@@ -4,6 +4,8 @@ import { forkJoin } from 'rxjs';
 import {
   ItemResponse,
   ItemsService,
+  PurchaseOrderResponse,
+  PurchaseOrdersService,
   PurchaseReceiptCreateRequest,
   PurchaseReceiptLineRequest,
   PurchaseReceiptsService,
@@ -20,16 +22,17 @@ interface DraftLine {
   itemId: number | null;
   quantity: number | null;
   unitCost: number | null;
-  // True for a line pre-filled from a fulfilling TransferBatch shortfall —
-  // its item is shown as locked text instead of a <select>. Same rationale
-  // as transfer-batch-create.ts's DraftLine.fromRequest: a native <select>'s
-  // [value] binding isn't reliable for a row that didn't exist in the DOM
-  // until the batch loaded, and the item isn't meant to change here anyway.
-  fromBatch: boolean;
+  // True for a line pre-filled from a fulfilling TransferBatch shortfall or
+  // PurchaseOrder — its item is shown as locked text instead of a <select>.
+  // Same rationale as transfer-batch-create.ts's DraftLine.fromRequest: a
+  // native <select>'s [value] binding isn't reliable for a row that didn't
+  // exist in the DOM until the source loaded, and the item isn't meant to
+  // change here anyway.
+  locked: boolean;
 }
 
 function emptyLine(): DraftLine {
-  return { itemId: null, quantity: null, unitCost: null, fromBatch: false };
+  return { itemId: null, quantity: null, unitCost: null, locked: false };
 }
 
 @Component({
@@ -45,6 +48,7 @@ export class PurchaseReceiptCreateComponent implements OnInit {
   private readonly warehousesService = inject(WarehousesService);
   private readonly itemsService = inject(ItemsService);
   private readonly transferBatchesService = inject(TransferBatchesService);
+  private readonly purchaseOrdersService = inject(PurchaseOrdersService);
   private readonly router = inject(Router);
   private readonly route = inject(ActivatedRoute);
 
@@ -72,13 +76,21 @@ export class PurchaseReceiptCreateComponent implements OnInit {
   readonly fulfillsTransferBatchId = signal<number | null>(null);
   readonly fulfillingBatch = signal<TransferBatchResponse | null>(null);
 
+  // Set when arriving via "Receive Against This Order" on a Purchase Order's
+  // detail page (?purchaseOrderId=). Confirming this receipt updates that
+  // order's status to PARTIALLY_RECEIVED or RECEIVED — independent of
+  // fulfillsTransferBatchId, a receipt can carry either, both, or neither.
+  readonly purchaseOrderId = signal<number | null>(null);
+  readonly fulfillingOrder = signal<PurchaseOrderResponse | null>(null);
+
   readonly total = computed(() =>
     this.lines().reduce((sum, l) => sum + (l.quantity ?? 0) * (l.unitCost ?? 0), 0),
   );
 
   ngOnInit(): void {
     const batchId = Number(this.route.snapshot.queryParamMap.get('fulfillsTransferBatchId'));
-    this.loadOptions(batchId || null);
+    const orderId = Number(this.route.snapshot.queryParamMap.get('purchaseOrderId'));
+    this.loadOptions(batchId || null, orderId || null);
   }
 
   backToList(): void {
@@ -164,6 +176,7 @@ export class PurchaseReceiptCreateComponent implements OnInit {
       receiptNumber: this.receiptNumber().trim() || undefined,
       notes: this.notes().trim() || undefined,
       fulfillsTransferBatchId: this.fulfillsTransferBatchId() ?? undefined,
+      purchaseOrderId: this.purchaseOrderId() ?? undefined,
       lines: validLines.map(
         (l): PurchaseReceiptLineRequest => ({
           itemId: l.itemId!,
@@ -194,7 +207,7 @@ export class PurchaseReceiptCreateComponent implements OnInit {
   }
 
   private loadFulfillingBatch(batchId: number): void {
-    this.transferBatchesService.getById1(batchId).subscribe({
+    this.transferBatchesService.getById2(batchId).subscribe({
       next: (batch) => {
         this.fulfillingBatch.set(batch);
         this.fulfillsTransferBatchId.set(batch.id ?? null);
@@ -210,7 +223,7 @@ export class PurchaseReceiptCreateComponent implements OnInit {
                 itemId: l.itemId ?? null,
                 quantity: l.quantity ?? null,
                 unitCost: null,
-                fromBatch: true,
+                locked: true,
               }),
             ),
           );
@@ -222,12 +235,45 @@ export class PurchaseReceiptCreateComponent implements OnInit {
     });
   }
 
+  // Pre-fills supplier + remaining line items from a Purchase Order being
+  // (at least partially) received against. Only lines with quantity still
+  // outstanding are included — a line already fully received by prior
+  // receipts against this order has nothing left to receive.
+  private loadFulfillingOrder(orderId: number): void {
+    this.purchaseOrdersService.getById(orderId).subscribe({
+      next: (order) => {
+        this.fulfillingOrder.set(order);
+        this.purchaseOrderId.set(order.id ?? null);
+        this.supplierId.set(order.supplierId ?? null);
+
+        const outstandingLines = (order.lines ?? []).filter(
+          (l) => (l.receivedQuantity ?? 0) < (l.quantity ?? 0),
+        );
+        if (outstandingLines.length > 0) {
+          this.lines.set(
+            outstandingLines.map(
+              (l): DraftLine => ({
+                itemId: l.itemId ?? null,
+                quantity: (l.quantity ?? 0) - (l.receivedQuantity ?? 0),
+                unitCost: null,
+                locked: true,
+              }),
+            ),
+          );
+        }
+      },
+      error: () => {
+        this.errorMessage.set('Could not load the purchase order to receive against. You can still create a plain receipt below.');
+      },
+    });
+  }
+
   // Loads suppliers/warehouses/items and only *then* applies the
   // fulfilling-batch pre-fill (if any) — see the comment on the equivalent
   // method in transfer-batch-create.ts for why the ordering matters: a
   // native <select>'s [value] binding silently fails to select an <option>
   // that doesn't exist in the DOM yet, and Angular won't retry once it does.
-  private loadOptions(fulfillsBatchId: number | null): void {
+  private loadOptions(fulfillsBatchId: number | null, purchaseOrderId: number | null): void {
     this.loadingOptions.set(true);
 
     this.suppliersService.listSuppliers(true, 0, 200, undefined).subscribe({
@@ -245,6 +291,9 @@ export class PurchaseReceiptCreateComponent implements OnInit {
         this.loadingOptions.set(false);
         if (fulfillsBatchId) {
           this.loadFulfillingBatch(fulfillsBatchId);
+        }
+        if (purchaseOrderId) {
+          this.loadFulfillingOrder(purchaseOrderId);
         }
       },
       error: () => {

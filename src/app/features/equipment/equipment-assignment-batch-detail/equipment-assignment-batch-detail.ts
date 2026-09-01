@@ -97,7 +97,7 @@ export class EquipmentAssignmentBatchDetailComponent implements OnInit {
     const batchId = current.id;
 
     this.submitting.set(true);
-    this.batchesService.submit1(batchId, 'body', undefined, this.jsonAccept).subscribe({
+    this.batchesService.submit2(batchId, 'body', undefined, this.jsonAccept).subscribe({
       next: (updated) => {
         this.batch.set(updated);
         this.submitting.set(false);
@@ -122,7 +122,7 @@ export class EquipmentAssignmentBatchDetailComponent implements OnInit {
 
   private loadBatch(id: number): void {
     this.loading.set(true);
-    this.batchesService.getById2(id, 'body', undefined, this.jsonAccept).subscribe({
+    this.batchesService.getById3(id, 'body', undefined, this.jsonAccept).subscribe({
       next: (batch) => {
         this.batch.set(batch);
         this.loading.set(false);

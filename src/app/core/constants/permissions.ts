@@ -52,6 +52,14 @@ export const Permission = {
   // shipped with its status codes documented (422 if not DRAFT, 404 if
   // missing) but no @PreAuthorize role name in the spec.
   TransferBatchDelete: 'TRANSFER_BATCH_DELETE',
+
+  // Also unverified (see comment above) — the Purchase Order feature's
+  // backend prompt explicitly asked for these role names and never got an
+  // answer; every other detail (entity/field/status names, response codes)
+  // was confirmed directly.
+  PurchaseOrderCreate: 'PURCHASE_ORDER_CREATE',
+  PurchaseOrderEdit: 'PURCHASE_ORDER_EDIT',
+  PurchaseOrderClose: 'PURCHASE_ORDER_CLOSE',
 } as const;
 
 export type PermissionValue = (typeof Permission)[keyof typeof Permission];

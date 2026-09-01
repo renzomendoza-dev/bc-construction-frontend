@@ -40,6 +40,10 @@ export interface PurchaseReceiptCreateRequest {
      */
     fulfillsTransferBatchId?: number;
     /**
+     * Identifier of the PurchaseOrder this receipt is (at least partially) fulfilling, if any. The referenced order must not be RECEIVED or CLOSED (422 if it is). Independent of fulfillsTransferBatchId — a receipt can carry either, both, or neither. Confirming this receipt updates that order\'s status to PARTIALLY_RECEIVED or RECEIVED depending on whether every line\'s ordered quantity has now been covered by the sum of confirmed receipts against it.
+     */
+    purchaseOrderId?: number;
+    /**
      * Line items purchased on this receipt; at least one is required
      */
     lines: Array<PurchaseReceiptLineRequest>;

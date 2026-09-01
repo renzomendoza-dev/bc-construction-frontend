@@ -177,7 +177,7 @@ export class EquipmentAssignmentBatchCreateComponent implements OnInit {
       ),
     };
 
-    this.batchesService.createDraft1(body, 'body', undefined, this.jsonAccept).subscribe({
+    this.batchesService.createDraft2(body, 'body', undefined, this.jsonAccept).subscribe({
       next: (created) => {
         this.saving.set(false);
         this.router.navigate(['/equipment/assignment-batches', created.id]);

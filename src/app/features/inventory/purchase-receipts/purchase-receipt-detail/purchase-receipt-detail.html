@@ -40,6 +40,15 @@
           }
         </div>
       }
+      @if (r.purchaseOrderId) {
+        <div class="receipt-header__fulfills">
+          Receiving against
+          <a [routerLink]="['/inventory/purchase-orders', r.purchaseOrderId]">Purchase Order #{{ r.purchaseOrderId }}</a>
+          @if (!r.confirmed) {
+            — confirming this receipt will update that order's status.
+          }
+        </div>
+      }
     </div>
 
     @if (!r.confirmed && canConfirm) {

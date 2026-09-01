@@ -110,12 +110,12 @@ export class TransferBatchesService extends BaseService {
      * @param reportProgress flag to report request and response progress.
      * @param options additional options
      */
-    public createDraft(transferBatchCreateRequest: TransferBatchCreateRequest, observe?: 'body', reportProgress?: boolean, options?: {httpHeaderAccept?: 'application/json', context?: HttpContext, transferCache?: boolean}): Observable<TransferBatchResponse>;
-    public createDraft(transferBatchCreateRequest: TransferBatchCreateRequest, observe?: 'response', reportProgress?: boolean, options?: {httpHeaderAccept?: 'application/json', context?: HttpContext, transferCache?: boolean}): Observable<HttpResponse<TransferBatchResponse>>;
-    public createDraft(transferBatchCreateRequest: TransferBatchCreateRequest, observe?: 'events', reportProgress?: boolean, options?: {httpHeaderAccept?: 'application/json', context?: HttpContext, transferCache?: boolean}): Observable<HttpEvent<TransferBatchResponse>>;
-    public createDraft(transferBatchCreateRequest: TransferBatchCreateRequest, observe: any = 'body', reportProgress: boolean = false, options?: {httpHeaderAccept?: 'application/json', context?: HttpContext, transferCache?: boolean}): Observable<any> {
+    public createDraft1(transferBatchCreateRequest: TransferBatchCreateRequest, observe?: 'body', reportProgress?: boolean, options?: {httpHeaderAccept?: 'application/json', context?: HttpContext, transferCache?: boolean}): Observable<TransferBatchResponse>;
+    public createDraft1(transferBatchCreateRequest: TransferBatchCreateRequest, observe?: 'response', reportProgress?: boolean, options?: {httpHeaderAccept?: 'application/json', context?: HttpContext, transferCache?: boolean}): Observable<HttpResponse<TransferBatchResponse>>;
+    public createDraft1(transferBatchCreateRequest: TransferBatchCreateRequest, observe?: 'events', reportProgress?: boolean, options?: {httpHeaderAccept?: 'application/json', context?: HttpContext, transferCache?: boolean}): Observable<HttpEvent<TransferBatchResponse>>;
+    public createDraft1(transferBatchCreateRequest: TransferBatchCreateRequest, observe: any = 'body', reportProgress: boolean = false, options?: {httpHeaderAccept?: 'application/json', context?: HttpContext, transferCache?: boolean}): Observable<any> {
         if (transferBatchCreateRequest === null || transferBatchCreateRequest === undefined) {
-            throw new Error('Required parameter transferBatchCreateRequest was null or undefined when calling createDraft.');
+            throw new Error('Required parameter transferBatchCreateRequest was null or undefined when calling createDraft1.');
         }
 
         let localVarHeaders = this.defaultHeaders;
@@ -180,12 +180,12 @@ export class TransferBatchesService extends BaseService {
      * @param reportProgress flag to report request and response progress.
      * @param options additional options
      */
-    public getById1(id: number, observe?: 'body', reportProgress?: boolean, options?: {httpHeaderAccept?: 'application/json', context?: HttpContext, transferCache?: boolean}): Observable<TransferBatchResponse>;
-    public getById1(id: number, observe?: 'response', reportProgress?: boolean, options?: {httpHeaderAccept?: 'application/json', context?: HttpContext, transferCache?: boolean}): Observable<HttpResponse<TransferBatchResponse>>;
-    public getById1(id: number, observe?: 'events', reportProgress?: boolean, options?: {httpHeaderAccept?: 'application/json', context?: HttpContext, transferCache?: boolean}): Observable<HttpEvent<TransferBatchResponse>>;
-    public getById1(id: number, observe: any = 'body', reportProgress: boolean = false, options?: {httpHeaderAccept?: 'application/json', context?: HttpContext, transferCache?: boolean}): Observable<any> {
+    public getById2(id: number, observe?: 'body', reportProgress?: boolean, options?: {httpHeaderAccept?: 'application/json', context?: HttpContext, transferCache?: boolean}): Observable<TransferBatchResponse>;
+    public getById2(id: number, observe?: 'response', reportProgress?: boolean, options?: {httpHeaderAccept?: 'application/json', context?: HttpContext, transferCache?: boolean}): Observable<HttpResponse<TransferBatchResponse>>;
+    public getById2(id: number, observe?: 'events', reportProgress?: boolean, options?: {httpHeaderAccept?: 'application/json', context?: HttpContext, transferCache?: boolean}): Observable<HttpEvent<TransferBatchResponse>>;
+    public getById2(id: number, observe: any = 'body', reportProgress: boolean = false, options?: {httpHeaderAccept?: 'application/json', context?: HttpContext, transferCache?: boolean}): Observable<any> {
         if (id === null || id === undefined) {
-            throw new Error('Required parameter id was null or undefined when calling getById1.');
+            throw new Error('Required parameter id was null or undefined when calling getById2.');
         }
 
         let localVarHeaders = this.defaultHeaders;
@@ -245,10 +245,10 @@ export class TransferBatchesService extends BaseService {
      * @param reportProgress flag to report request and response progress.
      * @param options additional options
      */
-    public search(originWarehouseId?: number, destinationWarehouseId?: number, status?: 'DRAFT' | 'SUBMITTED' | 'COMPLETED' | 'AWAITING_PURCHASE', page?: number, size?: number, sort?: Array<string>, observe?: 'body', reportProgress?: boolean, options?: {httpHeaderAccept?: 'application/json', context?: HttpContext, transferCache?: boolean}): Observable<PageResponse>;
-    public search(originWarehouseId?: number, destinationWarehouseId?: number, status?: 'DRAFT' | 'SUBMITTED' | 'COMPLETED' | 'AWAITING_PURCHASE', page?: number, size?: number, sort?: Array<string>, observe?: 'response', reportProgress?: boolean, options?: {httpHeaderAccept?: 'application/json', context?: HttpContext, transferCache?: boolean}): Observable<HttpResponse<PageResponse>>;
-    public search(originWarehouseId?: number, destinationWarehouseId?: number, status?: 'DRAFT' | 'SUBMITTED' | 'COMPLETED' | 'AWAITING_PURCHASE', page?: number, size?: number, sort?: Array<string>, observe?: 'events', reportProgress?: boolean, options?: {httpHeaderAccept?: 'application/json', context?: HttpContext, transferCache?: boolean}): Observable<HttpEvent<PageResponse>>;
-    public search(originWarehouseId?: number, destinationWarehouseId?: number, status?: 'DRAFT' | 'SUBMITTED' | 'COMPLETED' | 'AWAITING_PURCHASE', page?: number, size?: number, sort?: Array<string>, observe: any = 'body', reportProgress: boolean = false, options?: {httpHeaderAccept?: 'application/json', context?: HttpContext, transferCache?: boolean}): Observable<any> {
+    public search1(originWarehouseId?: number, destinationWarehouseId?: number, status?: 'DRAFT' | 'SUBMITTED' | 'COMPLETED' | 'AWAITING_PURCHASE', page?: number, size?: number, sort?: Array<string>, observe?: 'body', reportProgress?: boolean, options?: {httpHeaderAccept?: 'application/json', context?: HttpContext, transferCache?: boolean}): Observable<PageResponse>;
+    public search1(originWarehouseId?: number, destinationWarehouseId?: number, status?: 'DRAFT' | 'SUBMITTED' | 'COMPLETED' | 'AWAITING_PURCHASE', page?: number, size?: number, sort?: Array<string>, observe?: 'response', reportProgress?: boolean, options?: {httpHeaderAccept?: 'application/json', context?: HttpContext, transferCache?: boolean}): Observable<HttpResponse<PageResponse>>;
+    public search1(originWarehouseId?: number, destinationWarehouseId?: number, status?: 'DRAFT' | 'SUBMITTED' | 'COMPLETED' | 'AWAITING_PURCHASE', page?: number, size?: number, sort?: Array<string>, observe?: 'events', reportProgress?: boolean, options?: {httpHeaderAccept?: 'application/json', context?: HttpContext, transferCache?: boolean}): Observable<HttpEvent<PageResponse>>;
+    public search1(originWarehouseId?: number, destinationWarehouseId?: number, status?: 'DRAFT' | 'SUBMITTED' | 'COMPLETED' | 'AWAITING_PURCHASE', page?: number, size?: number, sort?: Array<string>, observe: any = 'body', reportProgress: boolean = false, options?: {httpHeaderAccept?: 'application/json', context?: HttpContext, transferCache?: boolean}): Observable<any> {
 
         let localVarQueryParameters = new OpenApiHttpParams(this.encoder);
 
@@ -359,12 +359,12 @@ export class TransferBatchesService extends BaseService {
      * @param reportProgress flag to report request and response progress.
      * @param options additional options
      */
-    public submit(id: number, observe?: 'body', reportProgress?: boolean, options?: {httpHeaderAccept?: 'application/json', context?: HttpContext, transferCache?: boolean}): Observable<TransferBatchResponse>;
-    public submit(id: number, observe?: 'response', reportProgress?: boolean, options?: {httpHeaderAccept?: 'application/json', context?: HttpContext, transferCache?: boolean}): Observable<HttpResponse<TransferBatchResponse>>;
-    public submit(id: number, observe?: 'events', reportProgress?: boolean, options?: {httpHeaderAccept?: 'application/json', context?: HttpContext, transferCache?: boolean}): Observable<HttpEvent<TransferBatchResponse>>;
-    public submit(id: number, observe: any = 'body', reportProgress: boolean = false, options?: {httpHeaderAccept?: 'application/json', context?: HttpContext, transferCache?: boolean}): Observable<any> {
+    public submit1(id: number, observe?: 'body', reportProgress?: boolean, options?: {httpHeaderAccept?: 'application/json', context?: HttpContext, transferCache?: boolean}): Observable<TransferBatchResponse>;
+    public submit1(id: number, observe?: 'response', reportProgress?: boolean, options?: {httpHeaderAccept?: 'application/json', context?: HttpContext, transferCache?: boolean}): Observable<HttpResponse<TransferBatchResponse>>;
+    public submit1(id: number, observe?: 'events', reportProgress?: boolean, options?: {httpHeaderAccept?: 'application/json', context?: HttpContext, transferCache?: boolean}): Observable<HttpEvent<TransferBatchResponse>>;
+    public submit1(id: number, observe: any = 'body', reportProgress: boolean = false, options?: {httpHeaderAccept?: 'application/json', context?: HttpContext, transferCache?: boolean}): Observable<any> {
         if (id === null || id === undefined) {
-            throw new Error('Required parameter id was null or undefined when calling submit.');
+            throw new Error('Required parameter id was null or undefined when calling submit1.');
         }
 
         let localVarHeaders = this.defaultHeaders;
