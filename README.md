@@ -8,7 +8,7 @@ Angular frontend for BC Construction Services' inventory, equipment, and admin o
 - **Inventory**
   - Items — list, detail (view/edit toggle), create, images, linked suppliers, categories.
   - Suppliers — list with create/edit drawer.
-  - Warehouses & Sites — list/create, `MAIN`/`SITE` type, storage locations.
+  - Warehouses & Sites — list/create, `MAIN`/`SITE` type, storage locations, a "View Stock" shortcut into Stock Levels pre-filtered to that warehouse.
   - Purchase Receipts — draft → confirm workflow that applies stock on confirmation, optionally linked to a fulfilling Transfer Batch or Purchase Order.
   - Purchase Orders — an earlier ordering-ahead stage, with auto-suggested (freely editable) line items from stock shortfalls/low stock/open material requests, draft → submit → partially received/received workflow, manual close, and a shortcut to receive against an order.
   - Stock Levels — grouped-by-item view with Low Stock and Movement History tabs, per-row Adjust/Transfer actions, inline reorder-threshold editing.

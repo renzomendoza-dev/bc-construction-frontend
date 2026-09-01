@@ -271,9 +271,9 @@ export class EquipmentService extends BaseService {
      * @param reportProgress flag to report request and response progress.
      * @param options additional options
      */
-    public findAll(status?: 'AVAILABLE' | 'CHECKED_OUT' | 'IN_REPAIR' | 'RETIRED' | 'LOST' | 'MAINTENANCE' | 'IN_USE', observe?: 'body', reportProgress?: boolean, options?: {httpHeaderAccept?: '*/*', context?: HttpContext, transferCache?: boolean}): Observable<EquipmentResponse>;
-    public findAll(status?: 'AVAILABLE' | 'CHECKED_OUT' | 'IN_REPAIR' | 'RETIRED' | 'LOST' | 'MAINTENANCE' | 'IN_USE', observe?: 'response', reportProgress?: boolean, options?: {httpHeaderAccept?: '*/*', context?: HttpContext, transferCache?: boolean}): Observable<HttpResponse<EquipmentResponse>>;
-    public findAll(status?: 'AVAILABLE' | 'CHECKED_OUT' | 'IN_REPAIR' | 'RETIRED' | 'LOST' | 'MAINTENANCE' | 'IN_USE', observe?: 'events', reportProgress?: boolean, options?: {httpHeaderAccept?: '*/*', context?: HttpContext, transferCache?: boolean}): Observable<HttpEvent<EquipmentResponse>>;
+    public findAll(status?: 'AVAILABLE' | 'CHECKED_OUT' | 'IN_REPAIR' | 'RETIRED' | 'LOST' | 'MAINTENANCE' | 'IN_USE', observe?: 'body', reportProgress?: boolean, options?: {httpHeaderAccept?: '*/*', context?: HttpContext, transferCache?: boolean}): Observable<Array<EquipmentResponse>>;
+    public findAll(status?: 'AVAILABLE' | 'CHECKED_OUT' | 'IN_REPAIR' | 'RETIRED' | 'LOST' | 'MAINTENANCE' | 'IN_USE', observe?: 'response', reportProgress?: boolean, options?: {httpHeaderAccept?: '*/*', context?: HttpContext, transferCache?: boolean}): Observable<HttpResponse<Array<EquipmentResponse>>>;
+    public findAll(status?: 'AVAILABLE' | 'CHECKED_OUT' | 'IN_REPAIR' | 'RETIRED' | 'LOST' | 'MAINTENANCE' | 'IN_USE', observe?: 'events', reportProgress?: boolean, options?: {httpHeaderAccept?: '*/*', context?: HttpContext, transferCache?: boolean}): Observable<HttpEvent<Array<EquipmentResponse>>>;
     public findAll(status?: 'AVAILABLE' | 'CHECKED_OUT' | 'IN_REPAIR' | 'RETIRED' | 'LOST' | 'MAINTENANCE' | 'IN_USE', observe: any = 'body', reportProgress: boolean = false, options?: {httpHeaderAccept?: '*/*', context?: HttpContext, transferCache?: boolean}): Observable<any> {
 
         let localVarQueryParameters = new OpenApiHttpParams(this.encoder);
@@ -317,7 +317,7 @@ export class EquipmentService extends BaseService {
 
         let localVarPath = `/api/equipment`;
         const { basePath, withCredentials } = this.configuration;
-        return this.httpClient.request<EquipmentResponse>('get', `${basePath}${localVarPath}`,
+        return this.httpClient.request<Array<EquipmentResponse>>('get', `${basePath}${localVarPath}`,
             {
                 context: localVarHttpContext,
                 params: localVarQueryParameters.toHttpParams(),
@@ -398,9 +398,9 @@ export class EquipmentService extends BaseService {
      * @param reportProgress flag to report request and response progress.
      * @param options additional options
      */
-    public findOverdue(days: number, observe?: 'body', reportProgress?: boolean, options?: {httpHeaderAccept?: '*/*', context?: HttpContext, transferCache?: boolean}): Observable<EquipmentResponse>;
-    public findOverdue(days: number, observe?: 'response', reportProgress?: boolean, options?: {httpHeaderAccept?: '*/*', context?: HttpContext, transferCache?: boolean}): Observable<HttpResponse<EquipmentResponse>>;
-    public findOverdue(days: number, observe?: 'events', reportProgress?: boolean, options?: {httpHeaderAccept?: '*/*', context?: HttpContext, transferCache?: boolean}): Observable<HttpEvent<EquipmentResponse>>;
+    public findOverdue(days: number, observe?: 'body', reportProgress?: boolean, options?: {httpHeaderAccept?: '*/*', context?: HttpContext, transferCache?: boolean}): Observable<Array<EquipmentResponse>>;
+    public findOverdue(days: number, observe?: 'response', reportProgress?: boolean, options?: {httpHeaderAccept?: '*/*', context?: HttpContext, transferCache?: boolean}): Observable<HttpResponse<Array<EquipmentResponse>>>;
+    public findOverdue(days: number, observe?: 'events', reportProgress?: boolean, options?: {httpHeaderAccept?: '*/*', context?: HttpContext, transferCache?: boolean}): Observable<HttpEvent<Array<EquipmentResponse>>>;
     public findOverdue(days: number, observe: any = 'body', reportProgress: boolean = false, options?: {httpHeaderAccept?: '*/*', context?: HttpContext, transferCache?: boolean}): Observable<any> {
         if (days === null || days === undefined) {
             throw new Error('Required parameter days was null or undefined when calling findOverdue.');
@@ -447,7 +447,7 @@ export class EquipmentService extends BaseService {
 
         let localVarPath = `/api/equipment/overdue`;
         const { basePath, withCredentials } = this.configuration;
-        return this.httpClient.request<EquipmentResponse>('get', `${basePath}${localVarPath}`,
+        return this.httpClient.request<Array<EquipmentResponse>>('get', `${basePath}${localVarPath}`,
             {
                 context: localVarHttpContext,
                 params: localVarQueryParameters.toHttpParams(),

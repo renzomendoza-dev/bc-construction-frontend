@@ -2,6 +2,10 @@
 
 All notable changes to this project are documented here, newest first. Dates are when the change was committed.
 
+## 2026-09-02
+- Add a "View Stock" shortcut on each warehouse card that jumps to Stock Levels pre-filtered to that warehouse, so browsing what's on hand no longer requires finding it in the filter dropdown.
+- Clean up equipment list/overdue/assignment-batches loading now that a backend spec regression (documented as returning a single object instead of an array) has been fixed — removed the array-cast workarounds.
+
 ## 2026-09-01
 - Add Material Request ↔ Purchasing linkage: a Transfer Batch that fails submit for insufficient stock automatically becomes `AWAITING_PURCHASE` and is blocked in the UI until a linked Purchase Receipt (`fulfillsTransferBatchId`) is confirmed, which flips it back to Draft for resubmission.
 - Add per-line stock availability hints (and an origin-shortfall warning) to Transfer Batch and Material Request create/edit screens.

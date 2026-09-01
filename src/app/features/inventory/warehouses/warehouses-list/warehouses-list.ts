@@ -1,4 +1,5 @@
 import { ChangeDetectionStrategy, Component, OnInit, inject, signal } from '@angular/core';
+import { Router } from '@angular/router';
 import { forkJoin, of } from 'rxjs';
 import { catchError } from 'rxjs/operators';
 import {
@@ -31,6 +32,7 @@ const EMPTY_FORM: NewWarehouseForm = { code: '', name: '', type: WarehouseRespon
 export class WarehousesListComponent implements OnInit {
   private readonly warehousesService = inject(WarehousesService);
   private readonly currentUser = inject(CurrentUserService);
+  private readonly router = inject(Router);
 
   readonly canCreate = this.currentUser.hasPermission(Permission.WarehouseCreate);
   readonly canEdit = this.currentUser.hasPermission(Permission.WarehouseEdit);
@@ -99,6 +101,12 @@ export class WarehousesListComponent implements OnInit {
   // depends on the warehouse's current state.
   canToggleActive(warehouse: WarehouseResponse): boolean {
     return warehouse.active ? this.canDeactivate : this.canEdit;
+  }
+
+  viewStock(warehouseId: number | undefined, event: Event): void {
+    event.stopPropagation();
+    if (warehouseId === undefined) return;
+    this.router.navigate(['/inventory/stock'], { queryParams: { warehouseId } });
   }
  
   // ---- Create warehouse ----

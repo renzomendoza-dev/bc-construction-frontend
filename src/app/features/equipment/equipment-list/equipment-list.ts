@@ -536,14 +536,9 @@ export class EquipmentListComponent implements OnInit {
   private fetchEquipment(): void {
     this.loading.set(true);
     this.errorMessage.set(null);
-    // The live OpenAPI spec currently documents this endpoint's response as
-    // a single EquipmentResponse rather than an array (likely a springdoc
-    // regression introduced alongside the new assignment-batches controller
-    // — flagged to the backend, not an intentional contract change). The
-    // endpoint still actually returns a JSON array at runtime, hence the cast.
     this.equipmentService.findAll(undefined, 'body', undefined, this.jsonAccept).subscribe({
       next: (result) => {
-        this.equipment.set((result as unknown as EquipmentResponse[]) ?? []);
+        this.equipment.set(result ?? []);
         this.loading.set(false);
       },
       error: () => {
@@ -557,12 +552,9 @@ export class EquipmentListComponent implements OnInit {
     const days = Number(this.overdueDays());
     this.overdueLoading.set(true);
     this.overdueError.set(null);
-    // Same spec-typing caveat as fetchEquipment() above.
     this.equipmentService.findOverdue(days, 'body', undefined, this.jsonAccept).subscribe({
       next: (result) => {
-        this.overdueEquipment.set(
-          [...((result as unknown as EquipmentResponse[]) ?? [])].sort((a, b) => this.daysOut(b) - this.daysOut(a)),
-        );
+        this.overdueEquipment.set([...(result ?? [])].sort((a, b) => this.daysOut(b) - this.daysOut(a)));
         this.overdueLoading.set(false);
       },
       error: () => {

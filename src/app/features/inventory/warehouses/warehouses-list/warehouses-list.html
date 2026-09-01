@@ -64,6 +64,7 @@
                 {{ wh.active ? 'Active' : 'Inactive' }}
               </span>
               <div class="warehouse-card__loc-count">{{ locationCount(warehouseId) }} locations</div>
+              <button type="button" class="view-stock-btn" (click)="viewStock(warehouseId, $event)">View Stock</button>
               @if (canToggleActive(wh)) {
                 <button
                   type="button"

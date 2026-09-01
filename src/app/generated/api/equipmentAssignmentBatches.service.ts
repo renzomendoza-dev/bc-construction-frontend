@@ -117,9 +117,9 @@ export class EquipmentAssignmentBatchesService extends BaseService {
      * @param reportProgress flag to report request and response progress.
      * @param options additional options
      */
-    public findAll1(status?: 'DRAFT' | 'SUBMITTED' | 'COMPLETED', observe?: 'body', reportProgress?: boolean, options?: {httpHeaderAccept?: '*/*', context?: HttpContext, transferCache?: boolean}): Observable<EquipmentAssignmentBatchResponse>;
-    public findAll1(status?: 'DRAFT' | 'SUBMITTED' | 'COMPLETED', observe?: 'response', reportProgress?: boolean, options?: {httpHeaderAccept?: '*/*', context?: HttpContext, transferCache?: boolean}): Observable<HttpResponse<EquipmentAssignmentBatchResponse>>;
-    public findAll1(status?: 'DRAFT' | 'SUBMITTED' | 'COMPLETED', observe?: 'events', reportProgress?: boolean, options?: {httpHeaderAccept?: '*/*', context?: HttpContext, transferCache?: boolean}): Observable<HttpEvent<EquipmentAssignmentBatchResponse>>;
+    public findAll1(status?: 'DRAFT' | 'SUBMITTED' | 'COMPLETED', observe?: 'body', reportProgress?: boolean, options?: {httpHeaderAccept?: '*/*', context?: HttpContext, transferCache?: boolean}): Observable<Array<EquipmentAssignmentBatchResponse>>;
+    public findAll1(status?: 'DRAFT' | 'SUBMITTED' | 'COMPLETED', observe?: 'response', reportProgress?: boolean, options?: {httpHeaderAccept?: '*/*', context?: HttpContext, transferCache?: boolean}): Observable<HttpResponse<Array<EquipmentAssignmentBatchResponse>>>;
+    public findAll1(status?: 'DRAFT' | 'SUBMITTED' | 'COMPLETED', observe?: 'events', reportProgress?: boolean, options?: {httpHeaderAccept?: '*/*', context?: HttpContext, transferCache?: boolean}): Observable<HttpEvent<Array<EquipmentAssignmentBatchResponse>>>;
     public findAll1(status?: 'DRAFT' | 'SUBMITTED' | 'COMPLETED', observe: any = 'body', reportProgress: boolean = false, options?: {httpHeaderAccept?: '*/*', context?: HttpContext, transferCache?: boolean}): Observable<any> {
 
         let localVarQueryParameters = new OpenApiHttpParams(this.encoder);
@@ -163,7 +163,7 @@ export class EquipmentAssignmentBatchesService extends BaseService {
 
         let localVarPath = `/api/equipment/assignment-batches`;
         const { basePath, withCredentials } = this.configuration;
-        return this.httpClient.request<EquipmentAssignmentBatchResponse>('get', `${basePath}${localVarPath}`,
+        return this.httpClient.request<Array<EquipmentAssignmentBatchResponse>>('get', `${basePath}${localVarPath}`,
             {
                 context: localVarHttpContext,
                 params: localVarQueryParameters.toHttpParams(),

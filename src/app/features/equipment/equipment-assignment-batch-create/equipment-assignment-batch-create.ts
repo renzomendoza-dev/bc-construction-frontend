@@ -204,12 +204,7 @@ export class EquipmentAssignmentBatchCreateComponent implements OnInit {
     }).subscribe({
       next: ({ warehouses, equipment, users }) => {
         this.warehouses.set(warehouses.content ?? []);
-        // Same live-spec typing caveat as equipment-list.ts's fetchEquipment()
-        // — findAll is documented as returning a single EquipmentResponse
-        // rather than an array, which looks like a springdoc regression from
-        // the new assignment-batches controller. Still a JSON array at
-        // runtime, hence the cast.
-        this.equipment.set((equipment as unknown as EquipmentResponse[]) ?? []);
+        this.equipment.set(equipment ?? []);
         this.users.set(users ?? []);
         this.loadingOptions.set(false);
       },

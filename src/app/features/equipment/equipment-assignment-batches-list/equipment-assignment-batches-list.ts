@@ -113,11 +113,7 @@ export class EquipmentAssignmentBatchesListComponent implements OnInit {
     const status = filter === 'all' ? undefined : filter;
     this.batchesService.findAll1(status, 'body', undefined, this.jsonAccept).subscribe({
       next: (result) => {
-        // Same live-spec typing caveat as equipment-list.ts's fetchEquipment()
-        // — findAll1 is documented as returning a single
-        // EquipmentAssignmentBatchResponse rather than an array. Still a
-        // JSON array at runtime, hence the cast.
-        this.allBatches.set((result as unknown as EquipmentAssignmentBatchResponse[]) ?? []);
+        this.allBatches.set(result ?? []);
         this.loading.set(false);
       },
       error: () => {

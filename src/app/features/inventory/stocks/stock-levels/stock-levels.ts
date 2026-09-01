@@ -1,6 +1,6 @@
 import { ChangeDetectionStrategy, Component, OnInit, computed, inject, signal } from '@angular/core';
 import { DatePipe } from '@angular/common';
-import { RouterLink } from '@angular/router';
+import { ActivatedRoute, RouterLink } from '@angular/router';
 import { forkJoin, of } from 'rxjs';
 import { catchError } from 'rxjs/operators';
 import {
@@ -65,6 +65,7 @@ export class StockLevelsComponent implements OnInit {
   private readonly warehousesService = inject(WarehousesService);
   private readonly itemsService = inject(ItemsService);
   private readonly currentUser = inject(CurrentUserService);
+  private readonly route = inject(ActivatedRoute);
 
   readonly canAdjust = this.currentUser.hasPermission(Permission.StockAdjust);
   readonly canTransfer = this.currentUser.hasPermission(Permission.StockTransfer);
@@ -228,7 +229,8 @@ export class StockLevelsComponent implements OnInit {
   readonly transferError = signal<string | null>(null);
 
   ngOnInit(): void {
-    this.loadOptions();
+    const warehouseId = Number(this.route.snapshot.queryParamMap.get('warehouseId'));
+    this.loadOptions(warehouseId || null);
     this.fetchStock();
   }
 
@@ -583,7 +585,12 @@ export class StockLevelsComponent implements OnInit {
     });
   }
 
-  private loadOptions(): void {
+  // Arriving via "View Stock" on a warehouse card (?warehouseId=) pre-sets
+  // the existing warehouse filter once the warehouse list resolves the id
+  // to a name — the filter itself is name-based (matches warehouseName on
+  // each stock row), so this just feeds it the same value a user picking
+  // from the dropdown would produce, rather than adding a parallel filter.
+  private loadOptions(preselectWarehouseId: number | null): void {
     this.itemsService.listItems(undefined, true, undefined, 0, 300, undefined).subscribe({
       next: (result) => this.items.set(result.content ?? []),
     });
@@ -593,6 +600,10 @@ export class StockLevelsComponent implements OnInit {
         const list = result.content ?? [];
         this.warehouses.set(list);
         this.loadLocations(list);
+        if (preselectWarehouseId !== null) {
+          const name = list.find((w) => w.id === preselectWarehouseId)?.name;
+          if (name) this.warehouseFilter.set(name);
+        }
       },
     });
   }
