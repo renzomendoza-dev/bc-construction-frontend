@@ -60,6 +60,18 @@ export const Permission = {
   PurchaseOrderCreate: 'PURCHASE_ORDER_CREATE',
   PurchaseOrderEdit: 'PURCHASE_ORDER_EDIT',
   PurchaseOrderClose: 'PURCHASE_ORDER_CLOSE',
+
+  // Also unverified (see comment above) — DELETE /api/inventory/material-requests/{id}
+  // shipped with its status codes and lock rule documented (422 once
+  // PARTIALLY_FULFILLED/FULFILLED, matching the existing edit-lock; 404 if
+  // missing) but no @PreAuthorize role name in the spec.
+  MaterialRequestDelete: 'MATERIAL_REQUEST_DELETE',
+
+  // Also unverified (see comment above) — DELETE /api/purchase-orders/{id}
+  // shipped with its status codes documented (422 if not DRAFT, 409 if a
+  // PurchaseReceipt already references it, 404 if missing) but no
+  // @PreAuthorize role name, the third unanswered ask for a PO permission.
+  PurchaseOrderDelete: 'PURCHASE_ORDER_DELETE',
 } as const;
 
 export type PermissionValue = (typeof Permission)[keyof typeof Permission];

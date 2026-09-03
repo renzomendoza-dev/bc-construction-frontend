@@ -18,6 +18,12 @@
   <!-- ===== Levels tab ===== -->
   @if (tab() === 'levels') {
     <div>
+      @if (warehouseFilter() !== 'all') {
+        <div class="scope-banner">
+          Showing stock for <strong>{{ warehouseFilter() }}</strong> only
+          <button type="button" class="scope-banner__clear" (click)="clearWarehouseFilter()">Show All Warehouses</button>
+        </div>
+      }
       <div class="filters">
         <input
           type="text"

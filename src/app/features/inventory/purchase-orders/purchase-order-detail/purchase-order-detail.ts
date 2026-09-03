@@ -1,4 +1,4 @@
-import { ChangeDetectionStrategy, Component, OnInit, inject, signal } from '@angular/core';
+import { ChangeDetectionStrategy, Component, OnInit, computed, inject, signal } from '@angular/core';
 import { DatePipe } from '@angular/common';
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import {
@@ -18,10 +18,22 @@ interface DraftLine {
   itemId: number | null;
   quantity: number | null;
   notes: string;
+  // Label shown as locked text instead of a <select> while !editingItem.
+  displayName: string;
+  // Existing lines are permanently locked to plain text — to change an
+  // item, remove the line and add a new one instead of swapping it in
+  // place. New lines start unlocked (editingItem: true) since there's no
+  // existing item to show as text yet. This sidesteps the Angular
+  // <select>/[value] timing bug for good: rendering several pre-filled
+  // <select>s simultaneously only ever reliably set the first one's value,
+  // and even swapping one row from text to a fresh <select> on demand
+  // turned out not to be worth the added interaction — simpler to never
+  // render a pre-filled <select> for an existing line at all.
+  editingItem: boolean;
 }
 
 function emptyLine(): DraftLine {
-  return { itemId: null, quantity: null, notes: '' };
+  return { itemId: null, quantity: null, notes: '', displayName: '', editingItem: true };
 }
 
 @Component({
@@ -40,6 +52,7 @@ export class PurchaseOrderDetailComponent implements OnInit {
 
   readonly canEdit = this.currentUser.hasPermission(Permission.PurchaseOrderEdit);
   readonly canClose = this.currentUser.hasPermission(Permission.PurchaseOrderClose);
+  readonly canDelete = this.currentUser.hasPermission(Permission.PurchaseOrderDelete);
 
   readonly order = signal<PurchaseOrderResponse | null>(null);
   readonly loading = signal(true);
@@ -51,10 +64,32 @@ export class PurchaseOrderDetailComponent implements OnInit {
   readonly closeDialogOpen = signal(false);
   readonly closing = signal(false);
 
+  readonly deleteDialogOpen = signal(false);
+  readonly deleting = signal(false);
+
   // ---- Edit mode ----
   readonly mode = signal<Mode>('view');
   readonly items = signal<ItemResponse[]>([]);
   readonly itemsLoaded = signal(false);
+
+  // items() only loads active items, so a line whose item has since been
+  // deactivated would otherwise have no matching <option> at all — the
+  // select would silently show blank even though the line's itemId is
+  // still perfectly valid. Union in the order's own lines (itemName/SKU are
+  // already on PurchaseOrderLineResponse, no extra fetch needed) so every
+  // currently-selected item always has an option, active or not.
+  readonly editItemOptions = computed<ItemResponse[]>(() => {
+    const active = this.items();
+    const knownIds = new Set(active.map((i) => i.id));
+    const fromOrder: ItemResponse[] = [];
+    for (const line of this.order()?.lines ?? []) {
+      if (line.itemId !== undefined && !knownIds.has(line.itemId)) {
+        knownIds.add(line.itemId);
+        fromOrder.push({ id: line.itemId, name: line.itemName, sku: line.itemSku });
+      }
+    }
+    return fromOrder.length > 0 ? [...active, ...fromOrder] : active;
+  });
 
   readonly editNotes = signal('');
   readonly editLines = signal<DraftLine[]>([emptyLine()]);
@@ -95,6 +130,11 @@ export class PurchaseOrderDetailComponent implements OnInit {
 
   canShowSubmit(order: PurchaseOrderResponse): boolean {
     return this.canEdit && order.status === PurchaseOrderResponse.StatusEnum.Draft;
+  }
+
+  // Delete is DRAFT-only (422 otherwise) — same status as Submit/Edit.
+  canShowDelete(order: PurchaseOrderResponse): boolean {
+    return this.canDelete && order.status === PurchaseOrderResponse.StatusEnum.Draft;
   }
 
   canShowClose(order: PurchaseOrderResponse): boolean {
@@ -189,18 +229,70 @@ export class PurchaseOrderDetailComponent implements OnInit {
     });
   }
 
+  // ---- Delete ----
+  openDeleteDialog(): void {
+    this.deleteDialogOpen.set(true);
+  }
+
+  closeDeleteDialog(): void {
+    this.deleteDialogOpen.set(false);
+  }
+
+  deleteOrder(): void {
+    const current = this.order();
+    if (!current || current.id === undefined) return;
+    const orderId = current.id;
+
+    this.deleting.set(true);
+    this.ordersService._delete(orderId).subscribe({
+      next: () => {
+        this.deleting.set(false);
+        this.router.navigate(['/inventory/purchase-orders']);
+      },
+      error: (err) => {
+        this.deleting.set(false);
+        this.deleteDialogOpen.set(false);
+        if (err?.status === 409) {
+          // A PurchaseReceipt was created against this order (allowed even
+          // while DRAFT) between page load and this click.
+          this.errorMessage.set(
+            err?.error?.message || 'This order can no longer be deleted — a Purchase Receipt already references it.',
+          );
+        } else if (err?.status === 422) {
+          this.errorMessage.set('This order can no longer be deleted — it has already been submitted.');
+        } else if (err?.status === 404) {
+          this.errorMessage.set('Purchase order not found.');
+        } else {
+          this.errorMessage.set('Could not delete this purchase order. Please try again.');
+        }
+        this.loadOrder(orderId);
+      },
+    });
+  }
+
   // ---- Enter/cancel edit ----
   enterEdit(): void {
     const current = this.order();
     if (!current) return;
 
     this.errorMessage.set(null);
-    this.mode.set('edit');
 
+    // mode is only flipped to 'edit' once editLines() already holds the
+    // real data — switching first and populating editLines() afterward
+    // would render the line rows once with the default single empty row,
+    // then replace it with the real N rows: row 0 gets reused/updated
+    // correctly, but rows 1+ are brand-new <select> elements whose [value]
+    // races their <option>s (the same class of bug fixed via frozen-fields
+    // elsewhere in this app — not an option here since these rows must
+    // stay freely editable).
     if (this.itemsLoaded()) {
       this.applyEditForm(current);
+      this.mode.set('edit');
     } else {
-      this.loadItems(() => this.applyEditForm(current));
+      this.loadItems(() => {
+        this.applyEditForm(current);
+        this.mode.set('edit');
+      });
     }
   }
 
@@ -225,6 +317,8 @@ export class PurchaseOrderDetailComponent implements OnInit {
               itemId: l.itemId ?? null,
               quantity: l.quantity ?? null,
               notes: l.notes ?? '',
+              displayName: l.itemSku ? `${l.itemName} (${l.itemSku})` : (l.itemName ?? ''),
+              editingItem: false,
             }),
           )
         : [emptyLine()],

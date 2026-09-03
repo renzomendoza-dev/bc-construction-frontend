@@ -110,6 +110,41 @@
 
 // ---- Filters ----
 
+.scope-banner {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+  background: var(--teal-tint);
+  color: var(--teal);
+  border-radius: 8px;
+  padding: 10px 14px;
+  font-size: 13px;
+  margin-bottom: 14px;
+
+  strong {
+    font-weight: 700;
+  }
+}
+
+.scope-banner__clear {
+  height: 26px;
+  padding: 0 10px;
+  border-radius: 6px;
+  border: 1px solid var(--teal);
+  background: transparent;
+  color: var(--teal);
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+  white-space: nowrap;
+
+  &:hover {
+    background: var(--teal);
+    color: #fff;
+  }
+}
+
 .filters {
   display: flex;
   gap: 12px;

@@ -2,6 +2,12 @@
 
 All notable changes to this project are documented here, newest first. Dates are when the change was committed.
 
+## 2026-09-03
+- Add Delete for Material Requests and Purchase Orders (matching the existing Transfer Batch delete), each with its own confirm dialog and locked to the same status/edit rules as the entity's own Edit action.
+- Add an "Awaiting Purchase" stat to the Dashboard's Inventory card, and a new Equipment card (Total Equipment, Checked Out, Overdue).
+- Fix Stock Levels not making it obvious when the list is scoped to a single warehouse — a banner now shows "Showing stock for [Warehouse] only" with a one-click "Show All Warehouses" reset whenever a warehouse filter is active.
+- Fix the item on a Material Request / Purchase Order edit form not displaying correctly, or only the first line item working, when editing an existing draft with more than one line — existing lines now show their item as fixed text (remove and re-add the line to pick a different item) instead of a native dropdown, sidestepping a persistent browser/Angular timing bug with pre-filled `<select>` elements.
+
 ## 2026-09-02
 - Add a "View Stock" shortcut on each warehouse card that jumps to Stock Levels pre-filtered to that warehouse, so browsing what's on hand no longer requires finding it in the filter dropdown.
 - Clean up equipment list/overdue/assignment-batches loading now that a backend spec regression (documented as returning a single object instead of an array) has been fixed — removed the array-cast workarounds.

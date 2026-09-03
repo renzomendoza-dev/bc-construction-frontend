@@ -134,7 +134,7 @@ export class TransferBatchDetailComponent implements OnInit {
     const batchId = current.id;
 
     this.deleting.set(true);
-    this.transferBatchesService._delete(batchId).subscribe({
+    this.transferBatchesService.delete2(batchId).subscribe({
       next: () => {
         this.deleting.set(false);
         this.router.navigate(['/inventory/transfers']);

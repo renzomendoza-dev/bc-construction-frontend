@@ -47,6 +47,9 @@
         @if (canShowClose(o)) {
           <button type="button" class="btn-danger-outline" (click)="openCloseDialog()">Close Order</button>
         }
+        @if (canShowDelete(o)) {
+          <button type="button" class="btn-danger-outline" (click)="openDeleteDialog()">Delete Draft</button>
+        }
       </div>
     }
 
@@ -87,12 +90,16 @@
 
         @for (line of editLines(); track $index) {
           <div class="lines-row lines-row--edit">
-            <select [value]="line.itemId" (change)="onEditLineItemChange($index, $any($event.target).value)">
-              <option value="">Select item…</option>
-              @for (item of items(); track item.id) {
-                <option [value]="item.id">{{ item.name }} ({{ item.sku }})</option>
-              }
-            </select>
+            @if (line.editingItem) {
+              <select [value]="line.itemId" (change)="onEditLineItemChange($index, $any($event.target).value)">
+                <option value="">Select item…</option>
+                @for (item of editItemOptions(); track item.id) {
+                  <option [value]="item.id">{{ item.name }} ({{ item.sku }})</option>
+                }
+              </select>
+            } @else {
+              <div class="frozen-field">{{ line.displayName }}</div>
+            }
             <input type="number" min="1" class="align-right" [value]="line.quantity" (change)="onEditLineQuantityChange($index, $any($event.target).value)" />
             <input type="text" placeholder="optional" [value]="line.notes" (change)="onEditLineNotesChange($index, $any($event.target).value)" />
             <button type="button" class="line-remove" [disabled]="editLines().length <= 1" (click)="removeEditLine($index)" aria-label="Remove line">✕</button>
@@ -144,6 +151,22 @@
         <button type="button" class="btn-secondary" [disabled]="closing()" (click)="closeCloseDialog()">Cancel</button>
         <button type="button" class="btn-danger-outline" [disabled]="closing()" (click)="closeOrder()">
           {{ closing() ? 'Closing…' : 'Yes, Close Order' }}
+        </button>
+      </div>
+    </div>
+  }
+
+  @if (deleteDialogOpen() && order(); as o) {
+    <div class="scrim" (click)="closeDeleteDialog()"></div>
+    <div class="dialog">
+      <div class="dialog__title">Delete this draft order?</div>
+      <div class="dialog__body">
+        This will permanently remove this draft purchase order for {{ o.supplierName }}. This action cannot be undone.
+      </div>
+      <div class="dialog__actions">
+        <button type="button" class="btn-secondary" [disabled]="deleting()" (click)="closeDeleteDialog()">Cancel</button>
+        <button type="button" class="btn-danger-outline" [disabled]="deleting()" (click)="deleteOrder()">
+          {{ deleting() ? 'Deleting…' : 'Yes, Delete Draft' }}
         </button>
       </div>
     </div>

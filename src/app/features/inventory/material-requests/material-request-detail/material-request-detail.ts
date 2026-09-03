@@ -1,4 +1,4 @@
-import { ChangeDetectionStrategy, Component, OnInit, inject, signal } from '@angular/core';
+import { ChangeDetectionStrategy, Component, OnInit, computed, inject, signal } from '@angular/core';
 import { DatePipe } from '@angular/common';
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import {
@@ -53,10 +53,14 @@ export class MaterialRequestDetailComponent implements OnInit {
 
   readonly canCreateDispatch = this.currentUser.hasPermission(Permission.TransferBatchCreate);
   readonly canEdit = this.currentUser.hasPermission(Permission.MaterialRequestEdit);
+  readonly canDelete = this.currentUser.hasPermission(Permission.MaterialRequestDelete);
 
   readonly request = signal<MaterialRequestResponse | null>(null);
   readonly loading = signal(true);
   readonly errorMessage = signal<string | null>(null);
+
+  readonly deleteDialogOpen = signal(false);
+  readonly deleting = signal(false);
 
   // ---- Edit mode ----
   // Locking rule confirmed directly against the backend's documented
@@ -66,6 +70,25 @@ export class MaterialRequestDetailComponent implements OnInit {
   readonly mode = signal<Mode>('view');
   readonly items = signal<ItemResponse[]>([]);
   readonly itemsLoaded = signal(false);
+
+  // items() only loads active items, so a line whose item has since been
+  // deactivated would otherwise have no matching <option> at all — the
+  // select would silently show blank even though the line's itemId is
+  // still perfectly valid. Union in the request's own lines (itemName is
+  // already on MaterialRequestLineItemResponse, no extra fetch needed) so
+  // every currently-selected item always has an option, active or not.
+  readonly editItemOptions = computed<ItemResponse[]>(() => {
+    const active = this.items();
+    const knownIds = new Set(active.map((i) => i.id));
+    const fromRequest: ItemResponse[] = [];
+    for (const line of this.request()?.lines ?? []) {
+      if (line.itemId !== undefined && !knownIds.has(line.itemId)) {
+        knownIds.add(line.itemId);
+        fromRequest.push({ id: line.itemId, name: line.itemName });
+      }
+    }
+    return fromRequest.length > 0 ? [...active, ...fromRequest] : active;
+  });
 
   readonly editDateNeeded = signal('');
   readonly editNotes = signal('');
@@ -99,6 +122,15 @@ export class MaterialRequestDetailComponent implements OnInit {
 
   canShowEdit(request: MaterialRequestResponse): boolean {
     return this.canEdit && !this.isLocked(request);
+  }
+
+  // Same lock rule as edit — confirmed directly against the backend's
+  // documented behavior for DELETE /api/inventory/material-requests/{id}:
+  // rejected with 422 once PARTIALLY_FULFILLED or FULFILLED, identical to
+  // PUT's rule. An unsubmitted TransferBatch referencing this request does
+  // NOT block deletion — it's just left with no request behind it.
+  canShowDelete(request: MaterialRequestResponse): boolean {
+    return this.canDelete && !this.isLocked(request);
   }
 
   statusLabel(request: MaterialRequestResponse): string {
@@ -150,16 +182,25 @@ export class MaterialRequestDetailComponent implements OnInit {
     if (!current) return;
 
     this.errorMessage.set(null);
-    this.mode.set('edit');
 
-    // The line items' <select> is bound to items() for its <option>s — its
-    // [value] binding silently fails to select an option that doesn't
-    // exist in the DOM yet, and Angular won't retry once it does. So the
-    // form can only be populated once items() has actually loaded.
+    // mode is only flipped to 'edit' once editLines() already holds the
+    // real data — switching first and populating editLines() afterward
+    // would render the line rows once with the default single empty row,
+    // then replace it with the real N rows: row 0 gets reused/updated
+    // correctly, but rows 1+ are brand-new <select> elements whose [value]
+    // races their <option>s (the same class of bug fixed via frozen-fields
+    // elsewhere in this app — not an option here since these rows must
+    // stay freely editable). Loading items() first is still necessary too,
+    // for the same underlying reason — its <option>s must exist before any
+    // row's [value] is set.
     if (this.itemsLoaded()) {
       this.applyEditForm(current);
+      this.mode.set('edit');
     } else {
-      this.loadItems(() => this.applyEditForm(current));
+      this.loadItems(() => {
+        this.applyEditForm(current);
+        this.mode.set('edit');
+      });
     }
   }
 
@@ -272,6 +313,42 @@ export class MaterialRequestDetailComponent implements OnInit {
           this.errorMessage.set('One of the items in this request could not be found.');
         } else {
           this.errorMessage.set('Could not save changes. Please check the line items and try again.');
+        }
+      },
+    });
+  }
+
+  // ---- Delete ----
+
+  openDeleteDialog(): void {
+    this.deleteDialogOpen.set(true);
+  }
+
+  closeDeleteDialog(): void {
+    this.deleteDialogOpen.set(false);
+  }
+
+  deleteRequest(): void {
+    const current = this.request();
+    if (!current || current.id === undefined) return;
+    const requestId = current.id;
+
+    this.deleting.set(true);
+    this.materialRequestsService.delete1(requestId).subscribe({
+      next: () => {
+        this.deleting.set(false);
+        this.router.navigate(['/inventory/material-requests']);
+      },
+      error: (err) => {
+        this.deleting.set(false);
+        this.deleteDialogOpen.set(false);
+        if (err?.status === 422) {
+          this.errorMessage.set('This request can no longer be deleted — it has already been partially or fully fulfilled.');
+          this.loadRequest(requestId);
+        } else if (err?.status === 404) {
+          this.errorMessage.set('Material request not found.');
+        } else {
+          this.errorMessage.set('Could not delete this request. Please try again.');
         }
       },
     });

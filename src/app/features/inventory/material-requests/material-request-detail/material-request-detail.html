@@ -18,10 +18,13 @@
       <div class="request-header__top">
         <div class="request-header__site">{{ r.siteWarehouseName }}</div>
         <span class="status-badge" [attr.data-status]="r.status">{{ statusLabel(r) }}</span>
-        @if (mode() === 'view' && (canShowEdit(r) || canDispatch(r))) {
+        @if (mode() === 'view' && (canShowEdit(r) || canShowDelete(r) || canDispatch(r))) {
           <div class="request-header__actions">
             @if (canShowEdit(r)) {
               <button type="button" class="btn-edit" (click)="enterEdit()">Edit</button>
+            }
+            @if (canShowDelete(r)) {
+              <button type="button" class="btn-danger-outline" (click)="openDeleteDialog()">Delete</button>
             }
             @if (canDispatch(r)) {
               <a class="btn-dispatch" [routerLink]="['/inventory/transfers/new']" [queryParams]="{ fromRequestId: r.id }">
@@ -93,7 +96,7 @@
           <div class="edit-lines-row">
             <select [value]="line.itemId" (change)="onEditLineItemChange($index, $any($event.target).value)">
               <option value="">Select item…</option>
-              @for (item of items(); track item.id) {
+              @for (item of editItemOptions(); track item.id) {
                 <option [value]="item.id">{{ item.name }}</option>
               }
             </select>
@@ -126,6 +129,22 @@
       </div>
     }
 
+  }
+
+  @if (deleteDialogOpen() && request(); as r) {
+    <div class="scrim" (click)="closeDeleteDialog()"></div>
+    <div class="dialog">
+      <div class="dialog__title">Delete this request?</div>
+      <div class="dialog__body">
+        This will permanently remove the material request for {{ r.siteWarehouseName }}. This action cannot be undone.
+      </div>
+      <div class="dialog__actions">
+        <button type="button" class="btn-secondary" [disabled]="deleting()" (click)="closeDeleteDialog()">Cancel</button>
+        <button type="button" class="btn-danger-outline" [disabled]="deleting()" (click)="deleteRequest()">
+          {{ deleting() ? 'Deleting…' : 'Yes, Delete Request' }}
+        </button>
+      </div>
+    </div>
   }
 
 </div>

@@ -254,6 +254,11 @@ export class StockLevelsComponent implements OnInit {
     this.page.set(1);
   }
 
+  clearWarehouseFilter(): void {
+    this.warehouseFilter.set('all');
+    this.page.set(1);
+  }
+
   onLocationFilterChange(value: string): void {
     this.locationFilter.set(value);
     this.page.set(1);
