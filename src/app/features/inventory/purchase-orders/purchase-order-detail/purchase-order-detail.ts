@@ -329,6 +329,19 @@ export class PurchaseOrderDetailComponent implements OnInit {
     this.editNotes.set(value);
   }
 
+  // Excludes items already picked on other lines (locked-text ones included)
+  // so the same item can't be added twice — the current line's own
+  // selection is excluded only from every *other* line's options.
+  editItemOptionsFor(index: number): ItemResponse[] {
+    const chosenElsewhere = new Set(
+      this.editLines()
+        .filter((_, i) => i !== index)
+        .map((l) => l.itemId)
+        .filter((id): id is number => id !== null),
+    );
+    return this.editItemOptions().filter((item) => item.id === undefined || !chosenElsewhere.has(item.id));
+  }
+
   onEditLineItemChange(index: number, value: string): void {
     this.editLines.update((rows) =>
       rows.map((r, i) => (i === index ? { ...r, itemId: value ? Number(value) : null } : r)),

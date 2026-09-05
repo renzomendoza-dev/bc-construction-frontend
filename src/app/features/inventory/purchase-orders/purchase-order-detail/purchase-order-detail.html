@@ -93,7 +93,7 @@
             @if (line.editingItem) {
               <select [value]="line.itemId" (change)="onEditLineItemChange($index, $any($event.target).value)">
                 <option value="">Select item…</option>
-                @for (item of editItemOptions(); track item.id) {
+                @for (item of editItemOptionsFor($index); track item.id) {
                   <option [value]="item.id">{{ item.name }} ({{ item.sku }})</option>
                 }
               </select>

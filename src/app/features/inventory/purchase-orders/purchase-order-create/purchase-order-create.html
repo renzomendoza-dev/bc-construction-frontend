@@ -47,12 +47,16 @@
 
     @for (line of lines(); track $index) {
       <div class="lines-row">
-        <select [value]="line.itemId" (change)="onLineItemChange($index, $any($event.target).value)">
-          <option value="">Select item…</option>
-          @for (item of items(); track item.id) {
-            <option [value]="item.id">{{ item.name }} ({{ item.sku }})</option>
-          }
-        </select>
+        @if (line.editingItem) {
+          <select [value]="line.itemId" (change)="onLineItemChange($index, $any($event.target).value)">
+            <option value="">Select item…</option>
+            @for (item of itemOptionsFor($index); track item.id) {
+              <option [value]="item.id">{{ item.name }} ({{ item.sku }})</option>
+            }
+          </select>
+        } @else {
+          <div class="frozen-field">{{ line.displayName }}</div>
+        }
         <input type="number" min="1" class="align-right" [value]="line.quantity" (change)="onLineQuantityChange($index, $any($event.target).value)" />
         <input type="text" placeholder="optional" [value]="line.notes" (change)="onLineNotesChange($index, $any($event.target).value)" />
         <button type="button" class="line-remove" [disabled]="lines().length <= 1" (click)="removeLine($index)" aria-label="Remove line">✕</button>

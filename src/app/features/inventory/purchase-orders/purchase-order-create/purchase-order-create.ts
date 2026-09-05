@@ -16,10 +16,20 @@ interface DraftLine {
   itemId: number | null;
   quantity: number | null;
   notes: string;
+  // Label shown as locked text instead of a <select> while !editingItem.
+  displayName: string;
+  // Lines pre-filled from GET /suggestions are locked to plain text instead
+  // of a <select> — setting several lines' itemId at once (one HTTP
+  // response mapped straight into N rows) only ever reliably applies to the
+  // first freshly-created <select>, the same native-select timing bug
+  // fixed the same way on the Purchase Order detail page's edit form. To
+  // change a suggested line's item, remove it and use "+ Add Line" instead,
+  // which always starts as a single fresh <select> (the case that works).
+  editingItem: boolean;
 }
 
 function emptyLine(): DraftLine {
-  return { itemId: null, quantity: null, notes: '' };
+  return { itemId: null, quantity: null, notes: '', displayName: '', editingItem: true };
 }
 
 @Component({
@@ -93,6 +103,19 @@ export class PurchaseOrderCreateComponent implements OnInit {
 
   onNotesChange(value: string): void {
     this.notes.set(value);
+  }
+
+  // Excludes items already picked on other lines, so the same item can't be
+  // added twice — the current line's own selection is excluded only from
+  // every *other* line's options, so it still shows as selected there.
+  itemOptionsFor(index: number): ItemResponse[] {
+    const chosenElsewhere = new Set(
+      this.lines()
+        .filter((_, i) => i !== index)
+        .map((l) => l.itemId)
+        .filter((id): id is number => id !== null),
+    );
+    return this.items().filter((item) => item.id === undefined || !chosenElsewhere.has(item.id));
   }
 
   onLineItemChange(index: number, value: string): void {
@@ -177,6 +200,8 @@ export class PurchaseOrderCreateComponent implements OnInit {
                 itemId: s.itemId ?? null,
                 quantity: s.suggestedQuantity ?? null,
                 notes: '',
+                displayName: s.itemSku ? `${s.itemName} (${s.itemSku})` : (s.itemName ?? ''),
+                editingItem: false,
               }),
             ),
           );

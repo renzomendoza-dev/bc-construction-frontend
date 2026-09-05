@@ -185,6 +185,19 @@ export class TransferBatchCreateComponent implements OnInit {
     this.notes.set(value);
   }
 
+  // Excludes items already picked on other lines, so the same item can't be
+  // added twice — the current line's own selection is excluded only from
+  // every *other* line's options, so it still shows as selected there.
+  itemOptionsFor(index: number): ItemResponse[] {
+    const chosenElsewhere = new Set(
+      this.lines()
+        .filter((_, i) => i !== index)
+        .map((l) => l.itemId)
+        .filter((id): id is number => id !== null),
+    );
+    return this.items().filter((item) => item.id === undefined || !chosenElsewhere.has(item.id));
+  }
+
   onLineItemChange(index: number, value: string): void {
     const itemId = value ? Number(value) : null;
     this.lines.update((rows) => rows.map((r, i) => (i === index ? { ...r, itemId } : r)));

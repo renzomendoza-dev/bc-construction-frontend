@@ -46,7 +46,7 @@
       <div class="lines-row">
         <select [value]="line.itemId" (change)="onLineItemChange($index, $any($event.target).value)">
           <option value="">Select item…</option>
-          @for (item of items(); track item.id) {
+          @for (item of itemOptionsFor($index); track item.id) {
             <option [value]="item.id">{{ item.name }} ({{ item.sku }})</option>
           }
         </select>

@@ -2,6 +2,11 @@
 
 All notable changes to this project are documented here, newest first. Dates are when the change was committed.
 
+## 2026-09-05
+- Set the browser tab title to "BC Construction Services" and the favicon to the app's own logo, replacing the unconfigured Angular CLI defaults.
+- Prevent picking the same item twice on one document — every item line form (Material Request, Transfer Batch, Purchase Receipt, Purchase Order, and their edit-in-place forms) now excludes items already chosen on another line of that same form from the dropdown.
+- Fix New Purchase Order's auto-suggested line items not displaying correctly when a supplier has more than one suggestion (the same native-`<select>` timing issue fixed elsewhere) — suggested lines now show their item as fixed text; remove and re-add a line to pick a different item.
+
 ## 2026-09-03
 - Add Delete for Material Requests and Purchase Orders (matching the existing Transfer Batch delete), each with its own confirm dialog and locked to the same status/edit rules as the entity's own Edit action.
 - Add an "Awaiting Purchase" stat to the Dashboard's Inventory card, and a new Equipment card (Total Equipment, Checked Out, Overdue).
