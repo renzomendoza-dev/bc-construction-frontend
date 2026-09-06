@@ -2,6 +2,11 @@
 
 All notable changes to this project are documented here, newest first. Dates are when the change was committed.
 
+## 2026-09-06
+- Add Projects: track a project's code/name/budget/dates through an Active → On Hold → Completed lifecycle, with manual expense entry (Labor/Material/Other), a running expense summary against budget, and a filterable expense history.
+- Add a Projects card to the Dashboard (Active Projects, Total Budget, and an Over Budget count across open projects).
+- Fix Movement History showing every Transfer as a decrease, even on the destination side where stock actually increased — now driven by the backend's own direction signal per movement.
+
 ## 2026-09-05
 - Set the browser tab title to "BC Construction Services" and the favicon to the app's own logo, replacing the unconfigured Angular CLI defaults.
 - Prevent picking the same item twice on one document — every item line form (Material Request, Transfer Batch, Purchase Receipt, Purchase Order, and their edit-in-place forms) now excludes items already chosen on another line of that same form from the dropdown.

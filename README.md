@@ -4,7 +4,7 @@ Angular frontend for BC Construction Services' inventory, equipment, and admin o
 
 ## Features
 
-- **Dashboard** — module overview cards with live inventory and equipment stats.
+- **Dashboard** — module overview cards with live inventory, equipment, and project stats.
 - **Inventory**
   - Items — list, detail (view/edit toggle), create, images, linked suppliers, categories.
   - Suppliers — list with create/edit drawer.
@@ -16,6 +16,7 @@ Angular frontend for BC Construction Services' inventory, equipment, and admin o
   - Material Requests — a site's request for materials, with edit-in-place support, deletable drafts, stock availability hints, and a shortcut to create a fulfilling dispatch transfer.
   - Every line-item form above (Material Requests, Transfers, Purchase Receipts, Purchase Orders) prevents picking the same item twice within one document.
 - **Equipment** — list, checkout/checkin, create/edit, batch assignment/return/transfer (assign to a site, return to a warehouse, or transfer directly between two sites), all linked to real Warehouse records instead of a free-text site.
+- **Projects** — code/name/budget/dates through an Active → On Hold → Completed lifecycle, manual expense entry (Labor/Material/Other), a running expense summary against budget, and a filterable expense history.
 - **Admin** — user list with activate/deactivate and Keycloak realm-role assignment.
 - **Access control** — mutating UI actions are gated behind fine-grained permissions read from the authenticated user's Keycloak JWT.
 - Responsive layout (collapsible/overlay sidebar, scrollable tables, stacked forms on narrow screens).

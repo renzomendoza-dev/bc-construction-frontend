@@ -220,7 +220,7 @@ export class PurchaseReceiptCreateComponent implements OnInit {
   }
 
   private loadFulfillingBatch(batchId: number): void {
-    this.transferBatchesService.getById2(batchId).subscribe({
+    this.transferBatchesService.getById3(batchId).subscribe({
       next: (batch) => {
         this.fulfillingBatch.set(batch);
         this.fulfillsTransferBatchId.set(batch.id ?? null);

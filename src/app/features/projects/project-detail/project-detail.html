@@ -1,0 +1,218 @@
+<div class="project-detail-page">
+
+  <button type="button" class="back-btn" (click)="backToList()">
+    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+      <path d="M19 12H5"></path>
+      <path d="m12 19-7-7 7-7"></path>
+    </svg>
+    Back to Projects
+  </button>
+
+  @if (loading()) {
+    <div class="state-message">Loading…</div>
+  } @else if (errorMessage() && !project()) {
+    <div class="state-message state-message--error">{{ errorMessage() }}</div>
+  } @else if (project(); as p) {
+
+    <div class="project-header">
+      <div class="project-header__top">
+        <div class="project-header__name">{{ p.name }}</div>
+        <span class="status-badge" [attr.data-status]="p.status">{{ statusLabel(p) }}</span>
+      </div>
+      <div class="project-header__meta">
+        <div><span class="project-header__meta-label">Code:</span> {{ p.code }}</div>
+        <div><span class="project-header__meta-label">Budget:</span> {{ p.budget !== undefined ? formatPeso(p.budget) : '—' }}</div>
+        <div><span class="project-header__meta-label">Start:</span> {{ p.startDate | date: 'mediumDate' }}</div>
+        @if (p.endDate) {
+          <div><span class="project-header__meta-label">End:</span> {{ p.endDate | date: 'mediumDate' }}</div>
+        }
+        <div><span class="project-header__meta-label">Initiated by:</span> {{ p.initiatedByName || '—' }}</div>
+      </div>
+      @if (mode() === 'view' && p.description) {
+        <div class="project-header__description">{{ p.description }}</div>
+      }
+    </div>
+
+    @if (mode() === 'view') {
+      <div class="action-row">
+        @if (canShowEdit(p)) {
+          <button type="button" class="btn-secondary" (click)="enterEdit()">Edit</button>
+        }
+        @if (canShowAddExpense(p)) {
+          <button type="button" class="btn-primary" (click)="openExpenseDialog()">+ Add Expense</button>
+        }
+        @if (canShowComplete(p)) {
+          <button type="button" class="btn-danger-outline" (click)="openCompleteDialog()">Mark Completed</button>
+        }
+      </div>
+    }
+
+    @if (errorMessage()) {
+      <div class="form-error">{{ errorMessage() }}</div>
+    }
+
+    @if (mode() === 'edit') {
+      <div class="card">
+        <div class="card__title">Edit Project</div>
+        <div class="form-grid">
+          <div class="form-field form-field--full">
+            <label>Name *</label>
+            <input type="text" [value]="editName()" (change)="onEditNameChange($any($event.target).value)" />
+          </div>
+          <div class="form-field">
+            <label>Budget</label>
+            <input type="text" placeholder="e.g. 2500000" [value]="editBudget()" (change)="onEditBudgetChange($any($event.target).value)" />
+          </div>
+          <div class="form-field">
+            <label>Start Date *</label>
+            <input type="date" [value]="editStartDate()" (change)="onEditStartDateChange($any($event.target).value)" />
+          </div>
+          <div class="form-field">
+            <label>End Date</label>
+            <input type="date" [value]="editEndDate()" (change)="onEditEndDateChange($any($event.target).value)" />
+          </div>
+          <div class="form-field form-field--full">
+            <label>Description</label>
+            <textarea placeholder="Optional description…" [value]="editDescription()" (change)="onEditDescriptionChange($any($event.target).value)"></textarea>
+          </div>
+        </div>
+        <div class="form-actions">
+          <button type="button" class="btn-primary" [disabled]="saving()" (click)="saveEdit()">
+            {{ saving() ? 'Saving…' : 'Save Changes' }}
+          </button>
+          <button type="button" class="btn-secondary" [disabled]="saving()" (click)="cancelEdit()">Cancel</button>
+        </div>
+      </div>
+    }
+
+    <!-- ===== Expense summary ===== -->
+    <div class="summary-card">
+      <div class="card__title">Expense Summary</div>
+      @if (summaryLoading()) {
+        <div class="table-state">Loading…</div>
+      } @else if (summary(); as s) {
+        <div class="summary-grid">
+          <div class="summary-stat">
+            <div class="summary-stat__label">Labor</div>
+            <div class="summary-stat__value">{{ formatPeso(s.totalLabor) }}</div>
+          </div>
+          <div class="summary-stat">
+            <div class="summary-stat__label">Material</div>
+            <div class="summary-stat__value">{{ formatPeso(s.totalMaterial) }}</div>
+          </div>
+          <div class="summary-stat">
+            <div class="summary-stat__label">Other</div>
+            <div class="summary-stat__value">{{ formatPeso(s.totalOther) }}</div>
+          </div>
+          <div class="summary-stat summary-stat--total">
+            <div class="summary-stat__label">Total Expenses</div>
+            <div class="summary-stat__value">{{ formatPeso(s.totalExpenses) }}</div>
+          </div>
+          @if (s.budget !== undefined) {
+            <div class="summary-stat" [class.summary-stat--danger]="(s.budgetRemaining ?? 0) < 0">
+              <div class="summary-stat__label">Budget Remaining</div>
+              <div class="summary-stat__value">{{ formatPeso(s.budgetRemaining) }}</div>
+            </div>
+          }
+        </div>
+      }
+    </div>
+
+    <!-- ===== Expenses list ===== -->
+    <div class="card">
+      <div class="expenses-header">
+        <div class="card__title">Expenses</div>
+        <select class="filter-select" [value]="categoryFilter()" (change)="onCategoryFilterChange($any($event.target).value)">
+          <option value="all">All Categories</option>
+          <option value="LABOR">Labor</option>
+          <option value="MATERIAL">Material</option>
+          <option value="OTHER">Other</option>
+        </select>
+      </div>
+
+      @if (expensesLoading()) {
+        <div class="table-state">Loading…</div>
+      } @else if (expensesError()) {
+        <div class="table-state table-state--error">{{ expensesError() }}</div>
+      } @else if (filteredExpenses().length > 0) {
+        <div class="expenses-head">
+          <div>Category</div>
+          <div>Description</div>
+          <div class="align-right">Amount</div>
+          <div>Date</div>
+          <div>Recorded By</div>
+        </div>
+        @for (e of filteredExpenses(); track e.id) {
+          <div class="expenses-row">
+            <div><span class="category-badge" [attr.data-category]="e.category">{{ categoryLabel(e.category) }}</span></div>
+            <div class="expenses-row__desc">{{ e.description }}</div>
+            <div class="align-right expenses-row__amount">{{ formatPeso(e.amount) }}</div>
+            <div class="expenses-row__date">{{ e.expenseDate | date: 'mediumDate' }}</div>
+            <div class="expenses-row__by">{{ e.recordedByName || '—' }}</div>
+          </div>
+        }
+      } @else {
+        <div class="table-state">No expenses recorded yet.</div>
+      }
+    </div>
+
+  }
+
+  @if (completeDialogOpen() && project(); as p) {
+    <div class="scrim" (click)="closeCompleteDialog()"></div>
+    <div class="dialog">
+      <div class="dialog__title">Mark "{{ p.name }}" as Completed?</div>
+      <div class="dialog__body">
+        This is terminal — no further edits or expenses can be recorded against this project afterward. This action cannot be undone.
+      </div>
+      <div class="dialog__actions">
+        <button type="button" class="btn-secondary" [disabled]="completing()" (click)="closeCompleteDialog()">Cancel</button>
+        <button type="button" class="btn-danger-outline" [disabled]="completing()" (click)="completeProject()">
+          {{ completing() ? 'Completing…' : 'Yes, Mark Completed' }}
+        </button>
+      </div>
+    </div>
+  }
+
+  @if (expenseDialogOpen()) {
+    <div class="scrim" (click)="closeExpenseDialog()"></div>
+    <div class="dialog">
+      <div class="dialog__title">Add Expense</div>
+
+      @if (expenseError()) {
+        <div class="form-error">{{ expenseError() }}</div>
+      }
+
+      <div class="dialog-form">
+        <div class="form-field">
+          <label>Category</label>
+          <select [value]="expenseCategory()" (change)="onExpenseCategoryChange($any($event.target).value)">
+            <option value="LABOR">Labor</option>
+            <option value="MATERIAL">Material</option>
+            <option value="OTHER">Other</option>
+          </select>
+        </div>
+        <div class="form-field">
+          <label>Description</label>
+          <input type="text" placeholder="e.g. 50 bags of Portland cement" [value]="expenseDescription()" (change)="onExpenseDescriptionChange($any($event.target).value)" />
+        </div>
+        <div class="form-field">
+          <label>Amount</label>
+          <input type="number" min="0" step="0.01" placeholder="e.g. 14500" [value]="expenseAmount()" (change)="onExpenseAmountChange($any($event.target).value)" />
+        </div>
+        <div class="form-field">
+          <label>Expense Date</label>
+          <input type="date" [value]="expenseDate()" (change)="onExpenseDateChange($any($event.target).value)" />
+        </div>
+      </div>
+
+      <div class="dialog__actions">
+        <button type="button" class="btn-secondary" [disabled]="expenseSaving()" (click)="closeExpenseDialog()">Cancel</button>
+        <button type="button" class="btn-primary" [disabled]="expenseSaving()" (click)="submitExpense()">
+          {{ expenseSaving() ? 'Saving…' : 'Add Expense' }}
+        </button>
+      </div>
+    </div>
+  }
+
+</div>

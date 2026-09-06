@@ -363,10 +363,20 @@ export class StockLevelsComponent implements OnInit {
     this.historyTypeFilter.set(value);
   }
 
+  // Uses the backend's own `direction` field rather than inferring from
+  // `type` alone — a cross-warehouse TRANSFER writes two rows (one per
+  // warehouse), and only `direction` reliably says whether *this* row's
+  // warehouse gained or lost stock (fromLocationId/toLocationId presence
+  // isn't a safe signal — confirmed with backend, not assumed).
   movementQtyLabel(h: StockMovementResponse): string {
     const qty = h.quantity ?? 0;
-    const negative = h.type === 'OUT' || h.type === 'TRANSFER';
-    return negative ? `-${qty}` : `+${qty}`;
+    if (h.direction === StockMovementResponse.DirectionEnum.Out) return `-${qty}`;
+    if (h.direction === StockMovementResponse.DirectionEnum.Within) return `±${qty}`;
+    return `+${qty}`;
+  }
+
+  isMovementOut(h: StockMovementResponse): boolean {
+    return h.direction === StockMovementResponse.DirectionEnum.Out;
   }
 
   // StockMovementResponse only carries warehouseId, not a warehouseName

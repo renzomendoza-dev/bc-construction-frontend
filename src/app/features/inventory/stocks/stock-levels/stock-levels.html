@@ -274,7 +274,7 @@
               <div>
                 <span class="type-badge" [attr.data-type]="h.type">{{ h.type }}</span>
               </div>
-              <div class="align-right qty-value" [class.qty-value--low]="h.type === 'OUT' || h.type === 'TRANSFER'">
+              <div class="align-right qty-value" [class.qty-value--low]="isMovementOut(h)">
                 {{ movementQtyLabel(h) }}
               </div>
               <div class="table__cell-mid table__cell-truncate">{{ h.reason || '—' }}</div>

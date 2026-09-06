@@ -121,7 +121,7 @@ export class TransferBatchesListComponent implements OnInit {
     this.loading.set(true);
     this.errorMessage.set(null);
 
-    this.transferBatchesService.search1(undefined, undefined, undefined, 0, FETCH_SIZE, undefined).subscribe({
+    this.transferBatchesService.search3(undefined, undefined, undefined, 0, FETCH_SIZE, undefined).subscribe({
       next: (result) => {
         this.allBatches.set((result.content ?? []) as TransferBatchResponse[]);
         this.loading.set(false);

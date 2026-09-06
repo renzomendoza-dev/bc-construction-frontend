@@ -182,6 +182,29 @@ export const routes: Routes = [
   },
 
   {
+    path: 'projects',
+    children: [
+      {
+        path: '',
+        pathMatch: 'full',
+        loadComponent: () =>
+          import('./features/projects/projects-list/projects-list').then((m) => m.ProjectsListComponent),
+      },
+      {
+        path: 'new',
+        canActivate: [permissionGuard(Permission.ProjectCreate, '/projects')],
+        loadComponent: () =>
+          import('./features/projects/project-create/project-create').then((m) => m.ProjectCreateComponent),
+      },
+      {
+        path: ':id',
+        loadComponent: () =>
+          import('./features/projects/project-detail/project-detail').then((m) => m.ProjectDetailComponent),
+      },
+    ],
+  },
+
+  {
     path: 'users',
     canActivate: [adminGuard],
     loadComponent: () =>

@@ -177,7 +177,7 @@ export class MaterialRequestCreateComponent implements OnInit {
       ),
     };
 
-    this.materialRequestsService.create(body).subscribe({
+    this.materialRequestsService.create2(body).subscribe({
       next: (created) => {
         this.saving.set(false);
         this.router.navigate(['/inventory/material-requests', created.id]);

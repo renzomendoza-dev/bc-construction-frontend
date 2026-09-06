@@ -1,0 +1,67 @@
+<div class="projects-page">
+
+  <div class="projects-page__header">
+    <div class="projects-page__title">Projects</div>
+    @if (canCreate) {
+      <button type="button" class="btn-primary" (click)="createNew()">+ New Project</button>
+    }
+  </div>
+
+  <div class="projects-page__filters">
+    <select class="filter-select" [value]="statusFilter()" (change)="onStatusFilterChange($any($event.target).value)">
+      <option value="all">All Statuses</option>
+      <option value="ACTIVE">Active</option>
+      <option value="ON_HOLD">On Hold</option>
+      <option value="COMPLETED">Completed</option>
+      <option value="CANCELLED">Cancelled</option>
+    </select>
+  </div>
+
+  <div class="projects-table">
+
+    @if (loading()) {
+      <div class="table-state">Loading…</div>
+    } @else if (errorMessage()) {
+      <div class="table-state table-state--error">{{ errorMessage() }}</div>
+    } @else if (hasResults()) {
+      <div class="projects-table__head">
+        <div>Code</div>
+        <div>Name</div>
+        <div>Status</div>
+        <div class="align-right">Budget</div>
+        <div>Start Date</div>
+        <div>Initiated By</div>
+      </div>
+
+      @for (p of pageItems(); track p.id) {
+        <div class="projects-table__row" (click)="openProject(p.id)">
+          <div class="projects-table__code">{{ p.code }}</div>
+          <div class="projects-table__name">{{ p.name }}</div>
+          <div>
+            <span class="status-badge" [attr.data-status]="p.status">{{ statusLabel(p) }}</span>
+          </div>
+          <div class="align-right projects-table__budget">{{ p.budget !== undefined ? formatPeso(p.budget) : '—' }}</div>
+          <div class="projects-table__date">{{ p.startDate | date: 'mediumDate' }}</div>
+          <div class="projects-table__by">{{ p.initiatedByName || '—' }}</div>
+        </div>
+      }
+    } @else {
+      <div class="empty-state">
+        <div class="empty-state__title">No projects match your filters</div>
+        <div class="empty-state__subtitle">Try adjusting the status filter.</div>
+      </div>
+    }
+
+  </div>
+
+  @if (!loading() && hasResults()) {
+    <div class="projects-pagination">
+      <div class="projects-pagination__summary">{{ pageSummary() }}</div>
+      <div class="projects-pagination__controls">
+        <button type="button" [disabled]="currentPage() <= 1" (click)="prevPage()">Previous</button>
+        <button type="button" [disabled]="currentPage() >= totalPages()" (click)="nextPage()">Next</button>
+      </div>
+    </div>
+  }
+
+</div>

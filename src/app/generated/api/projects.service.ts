@@ -21,9 +21,13 @@ import { ErrorResponse } from '../model/errorResponse';
 // @ts-ignore
 import { PageResponse } from '../model/pageResponse';
 // @ts-ignore
-import { TransferBatchCreateRequest } from '../model/transferBatchCreateRequest';
+import { ProjectCreateRequest } from '../model/projectCreateRequest';
 // @ts-ignore
-import { TransferBatchResponse } from '../model/transferBatchResponse';
+import { ProjectResponse } from '../model/projectResponse';
+// @ts-ignore
+import { ProjectUpdateRequest } from '../model/projectUpdateRequest';
+// @ts-ignore
+import { ValidationErrorResponse } from '../model/validationErrorResponse';
 
 // @ts-ignore
 import { BASE_PATH, COLLECTION_FORMATS }                     from '../variables';
@@ -35,27 +39,87 @@ import { BaseService } from '../api.base.service';
 @Injectable({
   providedIn: 'root'
 })
-export class TransferBatchesService extends BaseService {
+export class ProjectsService extends BaseService {
 
     constructor(protected httpClient: HttpClient, @Optional() @Inject(BASE_PATH) basePath: string|string[], @Optional() configuration?: Configuration) {
         super(basePath, configuration);
     }
 
     /**
-     * Create a draft transfer batch
-     * Records a transfer batch and its line items as a draft. This step does NOT move stock — it\&#39;s a plan/count only. The batch must be submitted via POST /{id}/submit before it changes inventory. originWarehouseId and destinationWarehouseId must reference different, active warehouses (a \&quot;site\&quot; is just a Warehouse with type SITE).
-     * @endpoint post /api/inventory/transfer-batches
-     * @param transferBatchCreateRequest 
+     * Mark a project COMPLETED
+     * ACTIVE/ON_HOLD -&gt; COMPLETED, only while ACTIVE/ON_HOLD (422 otherwise). Terminal — no further edits or expenses can be recorded against this project afterward.
+     * @endpoint post /api/projects/{id}/complete
+     * @param id Identifier of the project to complete
      * @param observe set whether or not to return the data Observable as the body, response or events. defaults to returning the body.
      * @param reportProgress flag to report request and response progress.
      * @param options additional options
      */
-    public createDraft1(transferBatchCreateRequest: TransferBatchCreateRequest, observe?: 'body', reportProgress?: boolean, options?: {httpHeaderAccept?: 'application/json', context?: HttpContext, transferCache?: boolean}): Observable<TransferBatchResponse>;
-    public createDraft1(transferBatchCreateRequest: TransferBatchCreateRequest, observe?: 'response', reportProgress?: boolean, options?: {httpHeaderAccept?: 'application/json', context?: HttpContext, transferCache?: boolean}): Observable<HttpResponse<TransferBatchResponse>>;
-    public createDraft1(transferBatchCreateRequest: TransferBatchCreateRequest, observe?: 'events', reportProgress?: boolean, options?: {httpHeaderAccept?: 'application/json', context?: HttpContext, transferCache?: boolean}): Observable<HttpEvent<TransferBatchResponse>>;
-    public createDraft1(transferBatchCreateRequest: TransferBatchCreateRequest, observe: any = 'body', reportProgress: boolean = false, options?: {httpHeaderAccept?: 'application/json', context?: HttpContext, transferCache?: boolean}): Observable<any> {
-        if (transferBatchCreateRequest === null || transferBatchCreateRequest === undefined) {
-            throw new Error('Required parameter transferBatchCreateRequest was null or undefined when calling createDraft1.');
+    public complete(id: number, observe?: 'body', reportProgress?: boolean, options?: {httpHeaderAccept?: 'application/json', context?: HttpContext, transferCache?: boolean}): Observable<ProjectResponse>;
+    public complete(id: number, observe?: 'response', reportProgress?: boolean, options?: {httpHeaderAccept?: 'application/json', context?: HttpContext, transferCache?: boolean}): Observable<HttpResponse<ProjectResponse>>;
+    public complete(id: number, observe?: 'events', reportProgress?: boolean, options?: {httpHeaderAccept?: 'application/json', context?: HttpContext, transferCache?: boolean}): Observable<HttpEvent<ProjectResponse>>;
+    public complete(id: number, observe: any = 'body', reportProgress: boolean = false, options?: {httpHeaderAccept?: 'application/json', context?: HttpContext, transferCache?: boolean}): Observable<any> {
+        if (id === null || id === undefined) {
+            throw new Error('Required parameter id was null or undefined when calling complete.');
+        }
+
+        let localVarHeaders = this.defaultHeaders;
+
+        // authentication (bearerAuth) required
+        localVarHeaders = this.configuration.addCredentialToHeaders('bearerAuth', 'Authorization', localVarHeaders, 'Bearer ');
+
+        const localVarHttpHeaderAcceptSelected: string | undefined = options?.httpHeaderAccept ?? this.configuration.selectHeaderAccept([
+            'application/json'
+        ]);
+        if (localVarHttpHeaderAcceptSelected !== undefined) {
+            localVarHeaders = localVarHeaders.set('Accept', localVarHttpHeaderAcceptSelected);
+        }
+
+        const localVarHttpContext: HttpContext = options?.context ?? new HttpContext();
+
+        const localVarTransferCache: boolean = options?.transferCache ?? true;
+
+
+        let responseType_: 'text' | 'json' | 'blob' = 'json';
+        if (localVarHttpHeaderAcceptSelected) {
+            if (localVarHttpHeaderAcceptSelected.startsWith('text')) {
+                responseType_ = 'text';
+            } else if (this.configuration.isJsonMime(localVarHttpHeaderAcceptSelected)) {
+                responseType_ = 'json';
+            } else {
+                responseType_ = 'blob';
+            }
+        }
+
+        let localVarPath = `/api/projects/${this.configuration.encodeParam({name: "id", value: id, in: "path", style: "simple", explode: false, dataType: "number", dataFormat: "int64"})}/complete`;
+        const { basePath, withCredentials } = this.configuration;
+        return this.httpClient.request<ProjectResponse>('post', `${basePath}${localVarPath}`,
+            {
+                context: localVarHttpContext,
+                responseType: <any>responseType_,
+                ...(withCredentials ? { withCredentials } : {}),
+                headers: localVarHeaders,
+                observe: observe,
+                ...(localVarTransferCache !== undefined ? { transferCache: localVarTransferCache } : {}),
+                reportProgress: reportProgress
+            }
+        );
+    }
+
+    /**
+     * Create a project
+     * Records a new project, starting at status ACTIVE. code must be unique (409 if already in use).
+     * @endpoint post /api/projects
+     * @param projectCreateRequest 
+     * @param observe set whether or not to return the data Observable as the body, response or events. defaults to returning the body.
+     * @param reportProgress flag to report request and response progress.
+     * @param options additional options
+     */
+    public create(projectCreateRequest: ProjectCreateRequest, observe?: 'body', reportProgress?: boolean, options?: {httpHeaderAccept?: 'application/json', context?: HttpContext, transferCache?: boolean}): Observable<ProjectResponse>;
+    public create(projectCreateRequest: ProjectCreateRequest, observe?: 'response', reportProgress?: boolean, options?: {httpHeaderAccept?: 'application/json', context?: HttpContext, transferCache?: boolean}): Observable<HttpResponse<ProjectResponse>>;
+    public create(projectCreateRequest: ProjectCreateRequest, observe?: 'events', reportProgress?: boolean, options?: {httpHeaderAccept?: 'application/json', context?: HttpContext, transferCache?: boolean}): Observable<HttpEvent<ProjectResponse>>;
+    public create(projectCreateRequest: ProjectCreateRequest, observe: any = 'body', reportProgress: boolean = false, options?: {httpHeaderAccept?: 'application/json', context?: HttpContext, transferCache?: boolean}): Observable<any> {
+        if (projectCreateRequest === null || projectCreateRequest === undefined) {
+            throw new Error('Required parameter projectCreateRequest was null or undefined when calling create.');
         }
 
         let localVarHeaders = this.defaultHeaders;
@@ -95,12 +159,12 @@ export class TransferBatchesService extends BaseService {
             }
         }
 
-        let localVarPath = `/api/inventory/transfer-batches`;
+        let localVarPath = `/api/projects`;
         const { basePath, withCredentials } = this.configuration;
-        return this.httpClient.request<TransferBatchResponse>('post', `${basePath}${localVarPath}`,
+        return this.httpClient.request<ProjectResponse>('post', `${basePath}${localVarPath}`,
             {
                 context: localVarHttpContext,
-                body: transferBatchCreateRequest,
+                body: projectCreateRequest,
                 responseType: <any>responseType_,
                 ...(withCredentials ? { withCredentials } : {}),
                 headers: localVarHeaders,
@@ -112,20 +176,19 @@ export class TransferBatchesService extends BaseService {
     }
 
     /**
-     * Delete a draft transfer batch
-     * Only a DRAFT batch can be deleted (422 otherwise) — SUBMITTED and COMPLETED batches have already moved stock, and AWAITING_PURCHASE batches are actively referenced by a fulfilling PurchaseReceipt. If this batch has sourceMaterialRequestId set, deleting it does NOT touch that MaterialRequest — the request is simply left with no draft transfer against it, same as if this batch had never been created.
-     * @endpoint delete /api/inventory/transfer-batches/{id}
-     * @param id Identifier of the transfer batch to delete
+     * Get a project by id
+     * @endpoint get /api/projects/{id}
+     * @param id Identifier of the project to retrieve
      * @param observe set whether or not to return the data Observable as the body, response or events. defaults to returning the body.
      * @param reportProgress flag to report request and response progress.
      * @param options additional options
      */
-    public delete2(id: number, observe?: 'body', reportProgress?: boolean, options?: {httpHeaderAccept?: 'application/json', context?: HttpContext, transferCache?: boolean}): Observable<any>;
-    public delete2(id: number, observe?: 'response', reportProgress?: boolean, options?: {httpHeaderAccept?: 'application/json', context?: HttpContext, transferCache?: boolean}): Observable<HttpResponse<any>>;
-    public delete2(id: number, observe?: 'events', reportProgress?: boolean, options?: {httpHeaderAccept?: 'application/json', context?: HttpContext, transferCache?: boolean}): Observable<HttpEvent<any>>;
-    public delete2(id: number, observe: any = 'body', reportProgress: boolean = false, options?: {httpHeaderAccept?: 'application/json', context?: HttpContext, transferCache?: boolean}): Observable<any> {
+    public getById1(id: number, observe?: 'body', reportProgress?: boolean, options?: {httpHeaderAccept?: 'application/json', context?: HttpContext, transferCache?: boolean}): Observable<ProjectResponse>;
+    public getById1(id: number, observe?: 'response', reportProgress?: boolean, options?: {httpHeaderAccept?: 'application/json', context?: HttpContext, transferCache?: boolean}): Observable<HttpResponse<ProjectResponse>>;
+    public getById1(id: number, observe?: 'events', reportProgress?: boolean, options?: {httpHeaderAccept?: 'application/json', context?: HttpContext, transferCache?: boolean}): Observable<HttpEvent<ProjectResponse>>;
+    public getById1(id: number, observe: any = 'body', reportProgress: boolean = false, options?: {httpHeaderAccept?: 'application/json', context?: HttpContext, transferCache?: boolean}): Observable<any> {
         if (id === null || id === undefined) {
-            throw new Error('Required parameter id was null or undefined when calling delete2.');
+            throw new Error('Required parameter id was null or undefined when calling getById1.');
         }
 
         let localVarHeaders = this.defaultHeaders;
@@ -156,9 +219,9 @@ export class TransferBatchesService extends BaseService {
             }
         }
 
-        let localVarPath = `/api/inventory/transfer-batches/${this.configuration.encodeParam({name: "id", value: id, in: "path", style: "simple", explode: false, dataType: "number", dataFormat: "int64"})}`;
+        let localVarPath = `/api/projects/${this.configuration.encodeParam({name: "id", value: id, in: "path", style: "simple", explode: false, dataType: "number", dataFormat: "int64"})}`;
         const { basePath, withCredentials } = this.configuration;
-        return this.httpClient.request<any>('delete', `${basePath}${localVarPath}`,
+        return this.httpClient.request<ProjectResponse>('get', `${basePath}${localVarPath}`,
             {
                 context: localVarHttpContext,
                 responseType: <any>responseType_,
@@ -172,71 +235,9 @@ export class TransferBatchesService extends BaseService {
     }
 
     /**
-     * Get a transfer batch by id
-     * Retrieves a single transfer batch, including its line items and status.
-     * @endpoint get /api/inventory/transfer-batches/{id}
-     * @param id Identifier of the transfer batch to retrieve
-     * @param observe set whether or not to return the data Observable as the body, response or events. defaults to returning the body.
-     * @param reportProgress flag to report request and response progress.
-     * @param options additional options
-     */
-    public getById3(id: number, observe?: 'body', reportProgress?: boolean, options?: {httpHeaderAccept?: 'application/json', context?: HttpContext, transferCache?: boolean}): Observable<TransferBatchResponse>;
-    public getById3(id: number, observe?: 'response', reportProgress?: boolean, options?: {httpHeaderAccept?: 'application/json', context?: HttpContext, transferCache?: boolean}): Observable<HttpResponse<TransferBatchResponse>>;
-    public getById3(id: number, observe?: 'events', reportProgress?: boolean, options?: {httpHeaderAccept?: 'application/json', context?: HttpContext, transferCache?: boolean}): Observable<HttpEvent<TransferBatchResponse>>;
-    public getById3(id: number, observe: any = 'body', reportProgress: boolean = false, options?: {httpHeaderAccept?: 'application/json', context?: HttpContext, transferCache?: boolean}): Observable<any> {
-        if (id === null || id === undefined) {
-            throw new Error('Required parameter id was null or undefined when calling getById3.');
-        }
-
-        let localVarHeaders = this.defaultHeaders;
-
-        // authentication (bearerAuth) required
-        localVarHeaders = this.configuration.addCredentialToHeaders('bearerAuth', 'Authorization', localVarHeaders, 'Bearer ');
-
-        const localVarHttpHeaderAcceptSelected: string | undefined = options?.httpHeaderAccept ?? this.configuration.selectHeaderAccept([
-            'application/json'
-        ]);
-        if (localVarHttpHeaderAcceptSelected !== undefined) {
-            localVarHeaders = localVarHeaders.set('Accept', localVarHttpHeaderAcceptSelected);
-        }
-
-        const localVarHttpContext: HttpContext = options?.context ?? new HttpContext();
-
-        const localVarTransferCache: boolean = options?.transferCache ?? true;
-
-
-        let responseType_: 'text' | 'json' | 'blob' = 'json';
-        if (localVarHttpHeaderAcceptSelected) {
-            if (localVarHttpHeaderAcceptSelected.startsWith('text')) {
-                responseType_ = 'text';
-            } else if (this.configuration.isJsonMime(localVarHttpHeaderAcceptSelected)) {
-                responseType_ = 'json';
-            } else {
-                responseType_ = 'blob';
-            }
-        }
-
-        let localVarPath = `/api/inventory/transfer-batches/${this.configuration.encodeParam({name: "id", value: id, in: "path", style: "simple", explode: false, dataType: "number", dataFormat: "int64"})}`;
-        const { basePath, withCredentials } = this.configuration;
-        return this.httpClient.request<TransferBatchResponse>('get', `${basePath}${localVarPath}`,
-            {
-                context: localVarHttpContext,
-                responseType: <any>responseType_,
-                ...(withCredentials ? { withCredentials } : {}),
-                headers: localVarHeaders,
-                observe: observe,
-                ...(localVarTransferCache !== undefined ? { transferCache: localVarTransferCache } : {}),
-                reportProgress: reportProgress
-            }
-        );
-    }
-
-    /**
-     * List transfer batches
-     * Returns a paged list of transfer batches, optionally filtered by origin warehouse, destination warehouse, and/or status.
-     * @endpoint get /api/inventory/transfer-batches
-     * @param originWarehouseId Filter by origin warehouse id
-     * @param destinationWarehouseId Filter by destination warehouse id
+     * List projects
+     * Returns a paged list of projects, optionally filtered by status.
+     * @endpoint get /api/projects
      * @param status Filter by status
      * @param page Zero-based page index (0..N)
      * @param size The size of the page to be returned
@@ -245,30 +246,12 @@ export class TransferBatchesService extends BaseService {
      * @param reportProgress flag to report request and response progress.
      * @param options additional options
      */
-    public search3(originWarehouseId?: number, destinationWarehouseId?: number, status?: 'DRAFT' | 'SUBMITTED' | 'COMPLETED' | 'AWAITING_PURCHASE', page?: number, size?: number, sort?: Array<string>, observe?: 'body', reportProgress?: boolean, options?: {httpHeaderAccept?: 'application/json', context?: HttpContext, transferCache?: boolean}): Observable<PageResponse>;
-    public search3(originWarehouseId?: number, destinationWarehouseId?: number, status?: 'DRAFT' | 'SUBMITTED' | 'COMPLETED' | 'AWAITING_PURCHASE', page?: number, size?: number, sort?: Array<string>, observe?: 'response', reportProgress?: boolean, options?: {httpHeaderAccept?: 'application/json', context?: HttpContext, transferCache?: boolean}): Observable<HttpResponse<PageResponse>>;
-    public search3(originWarehouseId?: number, destinationWarehouseId?: number, status?: 'DRAFT' | 'SUBMITTED' | 'COMPLETED' | 'AWAITING_PURCHASE', page?: number, size?: number, sort?: Array<string>, observe?: 'events', reportProgress?: boolean, options?: {httpHeaderAccept?: 'application/json', context?: HttpContext, transferCache?: boolean}): Observable<HttpEvent<PageResponse>>;
-    public search3(originWarehouseId?: number, destinationWarehouseId?: number, status?: 'DRAFT' | 'SUBMITTED' | 'COMPLETED' | 'AWAITING_PURCHASE', page?: number, size?: number, sort?: Array<string>, observe: any = 'body', reportProgress: boolean = false, options?: {httpHeaderAccept?: 'application/json', context?: HttpContext, transferCache?: boolean}): Observable<any> {
+    public search1(status?: 'ACTIVE' | 'ON_HOLD' | 'COMPLETED' | 'CANCELLED', page?: number, size?: number, sort?: Array<string>, observe?: 'body', reportProgress?: boolean, options?: {httpHeaderAccept?: 'application/json', context?: HttpContext, transferCache?: boolean}): Observable<PageResponse>;
+    public search1(status?: 'ACTIVE' | 'ON_HOLD' | 'COMPLETED' | 'CANCELLED', page?: number, size?: number, sort?: Array<string>, observe?: 'response', reportProgress?: boolean, options?: {httpHeaderAccept?: 'application/json', context?: HttpContext, transferCache?: boolean}): Observable<HttpResponse<PageResponse>>;
+    public search1(status?: 'ACTIVE' | 'ON_HOLD' | 'COMPLETED' | 'CANCELLED', page?: number, size?: number, sort?: Array<string>, observe?: 'events', reportProgress?: boolean, options?: {httpHeaderAccept?: 'application/json', context?: HttpContext, transferCache?: boolean}): Observable<HttpEvent<PageResponse>>;
+    public search1(status?: 'ACTIVE' | 'ON_HOLD' | 'COMPLETED' | 'CANCELLED', page?: number, size?: number, sort?: Array<string>, observe: any = 'body', reportProgress: boolean = false, options?: {httpHeaderAccept?: 'application/json', context?: HttpContext, transferCache?: boolean}): Observable<any> {
 
         let localVarQueryParameters = new OpenApiHttpParams(this.encoder);
-
-        localVarQueryParameters = this.addToHttpParams(
-            localVarQueryParameters,
-            'originWarehouseId',
-            <any>originWarehouseId,
-            QueryParamStyle.Form,
-            true,
-        );
-
-
-        localVarQueryParameters = this.addToHttpParams(
-            localVarQueryParameters,
-            'destinationWarehouseId',
-            <any>destinationWarehouseId,
-            QueryParamStyle.Form,
-            true,
-        );
-
 
         localVarQueryParameters = this.addToHttpParams(
             localVarQueryParameters,
@@ -334,7 +317,7 @@ export class TransferBatchesService extends BaseService {
             }
         }
 
-        let localVarPath = `/api/inventory/transfer-batches`;
+        let localVarPath = `/api/projects`;
         const { basePath, withCredentials } = this.configuration;
         return this.httpClient.request<PageResponse>('get', `${basePath}${localVarPath}`,
             {
@@ -351,20 +334,24 @@ export class TransferBatchesService extends BaseService {
     }
 
     /**
-     * Submit a draft transfer batch
-     * Applies a draft batch to inventory: this is the step that actually moves stock. For each line item, InventoryService.transferWarehouseStock is called to move that quantity from the batch\&#39;s origin warehouse to its destination warehouse — checked and debited against the origin warehouse\&#39;s TOTAL balance for the item (summed across every storage location plus the no-location bucket), not one specific location, since a batch line only ever specifies warehouses. If the total is spread across more than one location, they\&#39;re drained in a fixed order (no-location bucket first, then each location by id ascending) and each debited location gets its own accurate movement record; the destination side always lands in the destination warehouse\&#39;s no-location bucket. The whole operation is one transaction — if any line fails (e.g. insufficient stock), nothing is applied and the batch stays in its prior state. If this batch fulfills a MaterialRequest (sourceMaterialRequestId was set on creation), that request\&#39;s status is updated to FULFILLED or PARTIALLY_FULFILLED depending on whether every requested quantity was covered. If the failure was specifically insufficient stock (409), this batch\&#39;s status is also set to AWAITING_PURCHASE — create a PurchaseReceipt with fulfillsTransferBatchId set to this batch\&#39;s id for the shortfall item(s); confirming that receipt flips this batch back to DRAFT so it can be resubmitted (see POST /api/purchase-receipts).
-     * @endpoint post /api/inventory/transfer-batches/{id}/submit
-     * @param id Identifier of the transfer batch to submit
+     * Replace a project\&#39;s editable fields
+     * Full-replacement update, only while ACTIVE/ON_HOLD (422 otherwise). code is immutable and not part of this request body. description/budget/endDate are copied as given, including null (clearing the field).
+     * @endpoint put /api/projects/{id}
+     * @param id Identifier of the project to update
+     * @param projectUpdateRequest 
      * @param observe set whether or not to return the data Observable as the body, response or events. defaults to returning the body.
      * @param reportProgress flag to report request and response progress.
      * @param options additional options
      */
-    public submit1(id: number, observe?: 'body', reportProgress?: boolean, options?: {httpHeaderAccept?: 'application/json', context?: HttpContext, transferCache?: boolean}): Observable<TransferBatchResponse>;
-    public submit1(id: number, observe?: 'response', reportProgress?: boolean, options?: {httpHeaderAccept?: 'application/json', context?: HttpContext, transferCache?: boolean}): Observable<HttpResponse<TransferBatchResponse>>;
-    public submit1(id: number, observe?: 'events', reportProgress?: boolean, options?: {httpHeaderAccept?: 'application/json', context?: HttpContext, transferCache?: boolean}): Observable<HttpEvent<TransferBatchResponse>>;
-    public submit1(id: number, observe: any = 'body', reportProgress: boolean = false, options?: {httpHeaderAccept?: 'application/json', context?: HttpContext, transferCache?: boolean}): Observable<any> {
+    public update1(id: number, projectUpdateRequest: ProjectUpdateRequest, observe?: 'body', reportProgress?: boolean, options?: {httpHeaderAccept?: 'application/json', context?: HttpContext, transferCache?: boolean}): Observable<ProjectResponse>;
+    public update1(id: number, projectUpdateRequest: ProjectUpdateRequest, observe?: 'response', reportProgress?: boolean, options?: {httpHeaderAccept?: 'application/json', context?: HttpContext, transferCache?: boolean}): Observable<HttpResponse<ProjectResponse>>;
+    public update1(id: number, projectUpdateRequest: ProjectUpdateRequest, observe?: 'events', reportProgress?: boolean, options?: {httpHeaderAccept?: 'application/json', context?: HttpContext, transferCache?: boolean}): Observable<HttpEvent<ProjectResponse>>;
+    public update1(id: number, projectUpdateRequest: ProjectUpdateRequest, observe: any = 'body', reportProgress: boolean = false, options?: {httpHeaderAccept?: 'application/json', context?: HttpContext, transferCache?: boolean}): Observable<any> {
         if (id === null || id === undefined) {
-            throw new Error('Required parameter id was null or undefined when calling submit1.');
+            throw new Error('Required parameter id was null or undefined when calling update1.');
+        }
+        if (projectUpdateRequest === null || projectUpdateRequest === undefined) {
+            throw new Error('Required parameter projectUpdateRequest was null or undefined when calling update1.');
         }
 
         let localVarHeaders = this.defaultHeaders;
@@ -384,6 +371,15 @@ export class TransferBatchesService extends BaseService {
         const localVarTransferCache: boolean = options?.transferCache ?? true;
 
 
+        // to determine the Content-Type header
+        const consumes: string[] = [
+            'application/json'
+        ];
+        const httpContentTypeSelected: string | undefined = this.configuration.selectHeaderContentType(consumes);
+        if (httpContentTypeSelected !== undefined) {
+            localVarHeaders = localVarHeaders.set('Content-Type', httpContentTypeSelected);
+        }
+
         let responseType_: 'text' | 'json' | 'blob' = 'json';
         if (localVarHttpHeaderAcceptSelected) {
             if (localVarHttpHeaderAcceptSelected.startsWith('text')) {
@@ -395,11 +391,12 @@ export class TransferBatchesService extends BaseService {
             }
         }
 
-        let localVarPath = `/api/inventory/transfer-batches/${this.configuration.encodeParam({name: "id", value: id, in: "path", style: "simple", explode: false, dataType: "number", dataFormat: "int64"})}/submit`;
+        let localVarPath = `/api/projects/${this.configuration.encodeParam({name: "id", value: id, in: "path", style: "simple", explode: false, dataType: "number", dataFormat: "int64"})}`;
         const { basePath, withCredentials } = this.configuration;
-        return this.httpClient.request<TransferBatchResponse>('post', `${basePath}${localVarPath}`,
+        return this.httpClient.request<ProjectResponse>('put', `${basePath}${localVarPath}`,
             {
                 context: localVarHttpContext,
+                body: projectUpdateRequest,
                 responseType: <any>responseType_,
                 ...(withCredentials ? { withCredentials } : {}),
                 headers: localVarHeaders,

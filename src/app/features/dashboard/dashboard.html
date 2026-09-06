@@ -68,6 +68,33 @@
         </div>
       </a>
 
+      <!-- Projects: active module -->
+      <a routerLink="/projects" class="card card--active">
+        <div class="card__header">
+          <div class="card__icon card__icon--teal">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#1B6E76" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <rect x="2" y="7" width="20" height="14" rx="2"></rect>
+              <path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"></path>
+            </svg>
+          </div>
+          <div class="card__title">Projects</div>
+        </div>
+        <div class="card__stats">
+          <div class="stat-row">
+            <span class="stat-label">Active Projects</span>
+            <span class="stat-value">{{ statsLoading() ? '—' : projectStats().active }}</span>
+          </div>
+          <div class="stat-row">
+            <span class="stat-label">Total Budget</span>
+            <span class="stat-value">{{ statsLoading() ? '—' : formatPeso(projectStats().totalBudget) }}</span>
+          </div>
+          <div class="stat-row">
+            <span class="stat-label">Over Budget</span>
+            <span class="stat-value stat-value--danger">{{ overBudgetLoading() ? '—' : projectStats().overBudget }}</span>
+          </div>
+        </div>
+      </a>
+
       <!-- Sales: not built yet -->
       <div class="card card--disabled">
         <div class="card__badge">Coming Soon</div>

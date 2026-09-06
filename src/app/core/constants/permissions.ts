@@ -72,6 +72,14 @@ export const Permission = {
   // PurchaseReceipt already references it, 404 if missing) but no
   // @PreAuthorize role name, the third unanswered ask for a PO permission.
   PurchaseOrderDelete: 'PURCHASE_ORDER_DELETE',
+
+  // Also unverified (see comment above) — the new Project + Project Expense
+  // feature's endpoints never state @PreAuthorize role names either, same
+  // as everything else in this project.
+  ProjectCreate: 'PROJECT_CREATE',
+  ProjectEdit: 'PROJECT_EDIT',
+  ProjectComplete: 'PROJECT_COMPLETE',
+  ProjectExpenseCreate: 'PROJECT_EXPENSE_CREATE',
 } as const;
 
 export type PermissionValue = (typeof Permission)[keyof typeof Permission];

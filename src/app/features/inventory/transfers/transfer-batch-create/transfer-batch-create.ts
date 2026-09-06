@@ -283,7 +283,7 @@ export class TransferBatchCreateComponent implements OnInit {
   }
 
   private loadFulfillingRequest(requestId: number): void {
-    this.materialRequestsService.getById1(requestId).subscribe({
+    this.materialRequestsService.getById2(requestId).subscribe({
       next: (request) => {
         this.fulfillingRequest.set(request);
         this.sourceMaterialRequestId.set(request.id ?? null);

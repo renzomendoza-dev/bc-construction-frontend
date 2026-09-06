@@ -39,6 +39,10 @@ export interface StockMovementResponse {
      */
     type?: StockMovementResponse.TypeEnum;
     /**
+     * Net effect of this row on its OWN warehouseId\'s stock level: IN (increased), OUT (decreased), or WITHIN (net-zero — an internal move between two locations in the same warehouse; only occurs for a same-warehouse TRANSFER, the single row that sets both fromLocationId and toLocationId). For a cross-warehouse TRANSFER, this is the reliable way to tell the origin-side row from the destination-side row — fromLocationId/toLocationId nullability alone is not, since the origin side can legitimately be null too (e.g. when the debited quantity came from the no-location bucket).
+     */
+    direction?: StockMovementResponse.DirectionEnum;
+    /**
      * Quantity of stock involved in the movement
      */
     quantity?: number;
@@ -67,6 +71,12 @@ export namespace StockMovementResponse {
         Adjustment: 'ADJUSTMENT'
     } as const;
     export type TypeEnum = typeof TypeEnum[keyof typeof TypeEnum];
+    export const DirectionEnum = {
+        In: 'IN',
+        Out: 'OUT',
+        Within: 'WITHIN'
+    } as const;
+    export type DirectionEnum = typeof DirectionEnum[keyof typeof DirectionEnum];
 }
 
 

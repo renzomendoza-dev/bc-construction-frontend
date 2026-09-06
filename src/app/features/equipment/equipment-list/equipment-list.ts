@@ -454,7 +454,7 @@ export class EquipmentListComponent implements OnInit {
 
     this.newSaving.set(true);
     this.newError.set(null);
-    this.equipmentService.create1(request, 'body', undefined, this.jsonAccept).subscribe({
+    this.equipmentService.create3(request, 'body', undefined, this.jsonAccept).subscribe({
       next: () => {
         this.newSaving.set(false);
         this.newOpen.set(false);
@@ -518,7 +518,7 @@ export class EquipmentListComponent implements OnInit {
 
     this.editSaving.set(true);
     this.editError.set(null);
-    this.equipmentService.update2(target.id, request, 'body', undefined, this.jsonAccept).subscribe({
+    this.equipmentService.update3(target.id, request, 'body', undefined, this.jsonAccept).subscribe({
       next: () => {
         this.editSaving.set(false);
         this.editOpen.set(false);

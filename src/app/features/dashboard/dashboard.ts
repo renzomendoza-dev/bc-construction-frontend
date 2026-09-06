@@ -4,11 +4,15 @@ import { forkJoin, of } from 'rxjs';
 import { catchError } from 'rxjs/operators';
 import { ThemeService } from '../../core/services/theme';
 import { CurrentUserService } from '../../core/services/current-user';
+import { formatPeso } from '../../core/model.currency';
 import {
   EquipmentResponse,
   EquipmentService,
   InventoryService,
   ItemsService,
+  ProjectExpensesService,
+  ProjectResponse,
+  ProjectsService,
   PurchaseReceiptsService,
   TransferBatchesService,
 } from '../../generated';
@@ -26,14 +30,27 @@ interface EquipmentStats {
   overdue: number;
 }
 
+interface ProjectStats {
+  active: number;
+  totalBudget: number;
+  overBudget: number;
+}
+
 const EMPTY_STATS: InventoryStats = { items: 0, lowStock: 0, pendingReceipts: 0, awaitingPurchase: 0 };
 const EMPTY_EQUIPMENT_STATS: EquipmentStats = { total: 0, checkedOut: 0, overdue: 0 };
+const EMPTY_PROJECT_STATS: ProjectStats = { active: 0, totalBudget: 0, overBudget: 0 };
 
 // GET /api/purchase-receipts has no "confirmed" filter, so counting
 // drafts means fetching a batch and filtering client-side — same gap
 // noted on the Purchase Receipts list page. Fine at current volume;
 // revisit if receipt count grows past a single fetch.
 const RECEIPTS_FETCH_SIZE = 300;
+
+// search() only takes one status value, so fetching ACTIVE and ON_HOLD in
+// one request isn't possible — fetch everything once and filter client-side
+// to "open" (non-terminal) projects instead, same tradeoff already made for
+// receipts/equipment above.
+const PROJECTS_FETCH_SIZE = 300;
 
 // Matches the Equipment page's own default overdue threshold
 // (OVERDUE_DAY_OPTIONS' initial '7') so this card's number lines up with
@@ -54,6 +71,8 @@ export class Dashboard implements OnInit {
   private readonly receiptsService = inject(PurchaseReceiptsService);
   private readonly transferBatchesService = inject(TransferBatchesService);
   private readonly equipmentService = inject(EquipmentService);
+  private readonly projectsService = inject(ProjectsService);
+  private readonly projectExpensesService = inject(ProjectExpensesService);
 
   // The Equipment module's endpoints declare their response content-type as
   // `*/*` in the OpenAPI spec, so the generated client falls back to
@@ -62,6 +81,8 @@ export class Dashboard implements OnInit {
   private readonly jsonAccept = { httpHeaderAccept: 'application/json' } as unknown as {
     httpHeaderAccept?: '*/*';
   };
+
+  protected readonly formatPeso = formatPeso;
 
   protected readonly isDark = computed(() => this.themeService.theme() === 'dark');
   protected readonly userName = this.currentUser.fullName;
@@ -81,7 +102,12 @@ export class Dashboard implements OnInit {
 
   protected readonly inventoryStats = signal<InventoryStats>(EMPTY_STATS);
   protected readonly equipmentStats = signal<EquipmentStats>(EMPTY_EQUIPMENT_STATS);
+  protected readonly projectStats = signal<ProjectStats>(EMPTY_PROJECT_STATS);
   protected readonly statsLoading = signal(true);
+  // Over-budget is a second wave of per-project summary calls, kept
+  // separate from statsLoading so it doesn't hold up the rest of the
+  // dashboard while it resolves.
+  protected readonly overBudgetLoading = signal(true);
 
   ngOnInit(): void {
     this.loadStats();
@@ -110,7 +136,7 @@ export class Dashboard implements OnInit {
       // supports server-side status filtering, so no need to fetch and
       // count every AWAITING_PURCHASE batch just for this number.
       awaitingPurchase: this.transferBatchesService
-        .search1(undefined, undefined, 'AWAITING_PURCHASE', 0, 1, undefined)
+        .search3(undefined, undefined, 'AWAITING_PURCHASE', 0, 1, undefined)
         .pipe(catchError(() => of(null))),
       // Equipment's list/overdue endpoints return a flat array with no
       // page/size params, so counting means fetching the whole thing —
@@ -121,7 +147,10 @@ export class Dashboard implements OnInit {
       overdueEquipment: this.equipmentService.findOverdue(OVERDUE_DAYS, 'body', undefined, this.jsonAccept).pipe(
         catchError(() => of([] as EquipmentResponse[])),
       ),
-    }).subscribe(({ items, lowStock, receipts, awaitingPurchase, equipment, overdueEquipment }) => {
+      projects: this.projectsService.search1(undefined, 0, PROJECTS_FETCH_SIZE, undefined).pipe(
+        catchError(() => of(null)),
+      ),
+    }).subscribe(({ items, lowStock, receipts, awaitingPurchase, equipment, overdueEquipment, projects }) => {
       const pendingReceipts = (receipts?.content ?? []).filter((r) => !r.confirmed).length;
       const equipmentList = equipment ?? [];
 
@@ -139,6 +168,42 @@ export class Dashboard implements OnInit {
         overdue: (overdueEquipment ?? []).length,
       });
       this.statsLoading.set(false);
+
+      this.loadProjectStats((projects?.content ?? []) as ProjectResponse[]);
+    });
+  }
+
+  private loadProjectStats(allProjects: ProjectResponse[]): void {
+    const open = allProjects.filter(
+      (p) => p.status === ProjectResponse.StatusEnum.Active || p.status === ProjectResponse.StatusEnum.OnHold,
+    );
+    const totalBudget = open.reduce((sum, p) => sum + (p.budget ?? 0), 0);
+
+    this.projectStats.set({
+      active: allProjects.filter((p) => p.status === ProjectResponse.StatusEnum.Active).length,
+      totalBudget,
+      overBudget: 0,
+    });
+
+    // Only a project with a budget set can be "over budget" — skip fetching
+    // a summary for the rest. GET .../summary has no bulk equivalent, so
+    // this is one request per budgeted open project; fine at the project
+    // counts this app deals with, revisit if that grows large.
+    const budgeted = open.filter((p) => p.budget !== undefined && p.budget !== null && p.id !== undefined);
+    if (budgeted.length === 0) {
+      this.overBudgetLoading.set(false);
+      return;
+    }
+
+    this.overBudgetLoading.set(true);
+    forkJoin(
+      budgeted.map((p) =>
+        this.projectExpensesService.getSummary(p.id!).pipe(catchError(() => of(null))),
+      ),
+    ).subscribe((summaries) => {
+      const overBudget = summaries.filter((s) => (s?.budgetRemaining ?? 0) < 0).length;
+      this.projectStats.update((stats) => ({ ...stats, overBudget }));
+      this.overBudgetLoading.set(false);
     });
   }
 }
