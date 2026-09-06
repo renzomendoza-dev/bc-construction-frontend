@@ -1,12 +1,15 @@
 import { ChangeDetectionStrategy, Component, OnInit, computed, inject, signal } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
-import { forkJoin } from 'rxjs';
+import { forkJoin, of } from 'rxjs';
+import { catchError } from 'rxjs/operators';
 import {
   InventoryService,
   ItemResponse,
   ItemsService,
   MaterialRequestResponse,
   MaterialRequestsService,
+  ProjectResponse,
+  ProjectsService,
   StockLevelResponse,
   TransferBatchCreateRequest,
   TransferLineItemRequest,
@@ -14,6 +17,11 @@ import {
   WarehouseResponse,
   WarehousesService,
 } from '../../../../generated';
+
+// search2()'s status filter only takes one value, so — same tradeoff already
+// made throughout this app (Dashboard, Worker detail's project picker,
+// etc.) — fetch everything once and filter to open (non-terminal) projects.
+const PROJECTS_FETCH_SIZE = 300;
 
 interface WarehouseAvailability {
   warehouseId: number;
@@ -55,6 +63,7 @@ export class TransferBatchCreateComponent implements OnInit {
   private readonly warehousesService = inject(WarehousesService);
   private readonly itemsService = inject(ItemsService);
   private readonly inventoryService = inject(InventoryService);
+  private readonly projectsService = inject(ProjectsService);
   private readonly router = inject(Router);
   private readonly route = inject(ActivatedRoute);
 
@@ -84,6 +93,17 @@ export class TransferBatchCreateComponent implements OnInit {
   readonly destinationWarehouseId = signal<number | null>(null);
   readonly notes = signal('');
   readonly lines = signal<DraftLine[]>([emptyLine()]);
+
+  // A project can only be attributed to a transfer touching a SITE warehouse
+  // on at least one side (backend rule) — a plain warehouse-to-warehouse
+  // restock has nothing to do with any project.
+  readonly projectOptions = signal<ProjectResponse[]>([]);
+  readonly projectId = signal<number | null>(null);
+  readonly showProjectField = computed(() => {
+    const origin = this.warehouses().find((w) => w.id === this.originWarehouseId());
+    const destination = this.warehouses().find((w) => w.id === this.destinationWarehouseId());
+    return origin?.type === WarehouseResponse.TypeEnum.Site || destination?.type === WarehouseResponse.TypeEnum.Site;
+  });
 
   readonly saving = signal(false);
   readonly errorMessage = signal<string | null>(null);
@@ -181,6 +201,10 @@ export class TransferBatchCreateComponent implements OnInit {
     this.destinationWarehouseId.set(value ? Number(value) : null);
   }
 
+  onProjectChange(value: string): void {
+    this.projectId.set(value ? Number(value) : null);
+  }
+
   onNotesChange(value: string): void {
     this.notes.set(value);
   }
@@ -253,6 +277,10 @@ export class TransferBatchCreateComponent implements OnInit {
       originWarehouseId,
       destinationWarehouseId,
       sourceMaterialRequestId: this.sourceMaterialRequestId() ?? undefined,
+      // Only sent while a SITE warehouse is actually involved — matches the
+      // backend's own validation, and avoids submitting a stale projectId
+      // left over from before the warehouses were changed.
+      projectId: this.showProjectField() ? this.projectId() ?? undefined : undefined,
       notes: this.notes().trim() || undefined,
       lines: validLines.map(
         (l): TransferLineItemRequest => ({
@@ -283,7 +311,7 @@ export class TransferBatchCreateComponent implements OnInit {
   }
 
   private loadFulfillingRequest(requestId: number): void {
-    this.materialRequestsService.getById2(requestId).subscribe({
+    this.materialRequestsService.getById3(requestId).subscribe({
       next: (request) => {
         this.fulfillingRequest.set(request);
         this.sourceMaterialRequestId.set(request.id ?? null);
@@ -341,10 +369,20 @@ export class TransferBatchCreateComponent implements OnInit {
     forkJoin({
       warehouses: this.warehousesService.listWarehouses(true, 0, 200, undefined),
       items: this.itemsService.listItems(undefined, true, undefined, 0, 300, undefined),
+      // Non-critical: a failed fetch just means the optional project picker
+      // has no options, not a form-blocking error like warehouses/items.
+      projects: this.projectsService
+        .search2(undefined, 0, PROJECTS_FETCH_SIZE, undefined)
+        .pipe(catchError(() => of({ content: [] as ProjectResponse[] }))),
     }).subscribe({
-      next: ({ warehouses, items }) => {
+      next: ({ warehouses, items, projects }) => {
         this.warehouses.set(warehouses.content ?? []);
         this.items.set(items.content ?? []);
+        this.projectOptions.set(
+          ((projects.content ?? []) as ProjectResponse[]).filter(
+            (p) => p.status === ProjectResponse.StatusEnum.Active || p.status === ProjectResponse.StatusEnum.OnHold,
+          ),
+        );
         this.loadingOptions.set(false);
         if (fromRequestId) {
           this.loadFulfillingRequest(fromRequestId);

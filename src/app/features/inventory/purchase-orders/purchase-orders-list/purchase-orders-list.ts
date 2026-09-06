@@ -120,7 +120,7 @@ export class PurchaseOrdersListComponent implements OnInit {
     this.loading.set(true);
     this.errorMessage.set(null);
 
-    this.ordersService.search(undefined, undefined, 0, FETCH_SIZE, undefined).subscribe({
+    this.ordersService.search1(undefined, undefined, 0, FETCH_SIZE, undefined).subscribe({
       next: (result) => {
         this.allOrders.set((result.content ?? []) as PurchaseOrderResponse[]);
         this.loading.set(false);

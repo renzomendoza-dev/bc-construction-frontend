@@ -1,0 +1,187 @@
+<div class="worker-detail-page">
+
+  <button type="button" class="back-btn" (click)="backToList()">
+    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+      <path d="M19 12H5"></path>
+      <path d="m12 19-7-7 7-7"></path>
+    </svg>
+    Back to Workers
+  </button>
+
+  @if (loading()) {
+    <div class="state-message">Loading…</div>
+  } @else if (errorMessage() && !worker()) {
+    <div class="state-message state-message--error">{{ errorMessage() }}</div>
+  } @else if (worker(); as w) {
+
+    <div class="worker-header">
+      <div class="worker-header__top">
+        <div class="worker-header__name">{{ w.name }}</div>
+        <span class="status-badge" [class.status-badge--inactive]="w.active === false">
+          {{ w.active === false ? 'Inactive' : 'Active' }}
+        </span>
+      </div>
+      <div class="worker-header__meta">
+        <div><span class="worker-header__meta-label">Position:</span> {{ w.position || '—' }}</div>
+        <div><span class="worker-header__meta-label">Daily Rate:</span> {{ w.dailyRate !== undefined ? formatPeso(w.dailyRate) : '—' }}</div>
+        <div><span class="worker-header__meta-label">Added by:</span> {{ w.createdByName || '—' }}</div>
+      </div>
+    </div>
+
+    @if (mode() === 'view') {
+      <div class="action-row">
+        @if (canShowEdit()) {
+          <button type="button" class="btn-secondary" (click)="enterEdit()">Edit</button>
+        }
+        @if (canShowRecordAttendance(w)) {
+          <button type="button" class="btn-primary" (click)="openAttendanceDialog()">+ Record Attendance</button>
+        }
+        @if (canShowDeactivate(w)) {
+          <button type="button" class="btn-danger-outline" (click)="openDeactivateDialog()">Deactivate</button>
+        }
+      </div>
+    }
+
+    @if (errorMessage()) {
+      <div class="form-error">{{ errorMessage() }}</div>
+    }
+
+    @if (mode() === 'edit') {
+      <div class="card">
+        <div class="card__title">Edit Worker</div>
+        <div class="form-grid">
+          <div class="form-field">
+            <label>Name *</label>
+            <input type="text" [value]="editName()" (change)="onEditNameChange($any($event.target).value)" />
+          </div>
+          <div class="form-field">
+            <label>Position</label>
+            <input type="text" [value]="editPosition()" (change)="onEditPositionChange($any($event.target).value)" />
+          </div>
+          <div class="form-field">
+            <label>Daily Rate (PHP) *</label>
+            <input type="number" min="0" step="0.01" [value]="editDailyRate()" (change)="onEditDailyRateChange($any($event.target).value)" />
+          </div>
+        </div>
+        <div class="form-actions">
+          <button type="button" class="btn-primary" [disabled]="saving()" (click)="saveEdit()">
+            {{ saving() ? 'Saving…' : 'Save Changes' }}
+          </button>
+          <button type="button" class="btn-secondary" [disabled]="saving()" (click)="cancelEdit()">Cancel</button>
+        </div>
+      </div>
+    }
+
+    <!-- ===== Attendance history ===== -->
+    <div class="card">
+      <div class="card__title">Attendance History</div>
+
+      @if (attendanceLoading()) {
+        <div class="table-state">Loading…</div>
+      } @else if (attendanceError()) {
+        <div class="table-state table-state--error">{{ attendanceError() }}</div>
+      } @else if (attendanceRecords().length > 0) {
+        <div class="attendance-head">
+          <div>Project</div>
+          <div>Date</div>
+          <div class="align-right">Days</div>
+          <div class="align-right">Amount</div>
+          <div>Notes</div>
+          <div></div>
+        </div>
+        @for (a of attendanceRecords(); track a.id) {
+          <div class="attendance-row">
+            <div class="attendance-row__project">{{ a.projectName || '—' }}</div>
+            <div class="attendance-row__date">{{ a.attendanceDate | date: 'mediumDate' }}</div>
+            <div class="align-right">{{ a.daysPresent }}</div>
+            <div class="align-right attendance-row__amount">{{ a.amount !== undefined ? formatPeso(a.amount) : '—' }}</div>
+            <div class="attendance-row__notes">{{ a.notes || '—' }}</div>
+            <div class="align-right">
+              @if (canDeleteAttendance) {
+                <button type="button" class="btn-link-danger" (click)="openDeleteAttendanceDialog(a)">Delete</button>
+              }
+            </div>
+          </div>
+        }
+      } @else {
+        <div class="table-state">No attendance recorded yet.</div>
+      }
+    </div>
+
+  }
+
+  @if (deactivateDialogOpen() && worker(); as w) {
+    <div class="scrim" (click)="closeDeactivateDialog()"></div>
+    <div class="dialog">
+      <div class="dialog__title">Deactivate "{{ w.name }}"?</div>
+      <div class="dialog__body">
+        The worker's attendance history is preserved, not deleted — this only retires them from the active roster. They can still be viewed here afterward.
+      </div>
+      <div class="dialog__actions">
+        <button type="button" class="btn-secondary" [disabled]="deactivating()" (click)="closeDeactivateDialog()">Cancel</button>
+        <button type="button" class="btn-danger-outline" [disabled]="deactivating()" (click)="deactivateWorker()">
+          {{ deactivating() ? 'Deactivating…' : 'Yes, Deactivate' }}
+        </button>
+      </div>
+    </div>
+  }
+
+  @if (attendanceDialogOpen()) {
+    <div class="scrim" (click)="closeAttendanceDialog()"></div>
+    <div class="dialog">
+      <div class="dialog__title">Record Attendance</div>
+
+      @if (attendanceFormError()) {
+        <div class="form-error">{{ attendanceFormError() }}</div>
+      }
+
+      <div class="dialog-form">
+        <div class="form-field">
+          <label>Project *</label>
+          <select [value]="attendanceProjectId() ?? ''" (change)="onAttendanceProjectChange($any($event.target).value)">
+            <option value="" disabled>Select a project…</option>
+            @for (p of projectOptions(); track p.id) {
+              <option [value]="p.id">{{ p.name }}</option>
+            }
+          </select>
+        </div>
+        <div class="form-field">
+          <label>Date *</label>
+          <input type="date" [value]="attendanceDate()" (change)="onAttendanceDateChange($any($event.target).value)" />
+        </div>
+        <div class="form-field">
+          <label>Days Present *</label>
+          <input type="number" min="0" max="1" step="0.5" [value]="attendanceDaysPresent()" (change)="onAttendanceDaysPresentChange($any($event.target).value)" />
+        </div>
+        <div class="form-field">
+          <label>Notes</label>
+          <input type="text" placeholder="Optional, e.g. Rebar tying, Building A" [value]="attendanceNotes()" (change)="onAttendanceNotesChange($any($event.target).value)" />
+        </div>
+      </div>
+
+      <div class="dialog__actions">
+        <button type="button" class="btn-secondary" [disabled]="attendanceSaving()" (click)="closeAttendanceDialog()">Cancel</button>
+        <button type="button" class="btn-primary" [disabled]="attendanceSaving()" (click)="submitAttendance()">
+          {{ attendanceSaving() ? 'Saving…' : 'Record Attendance' }}
+        </button>
+      </div>
+    </div>
+  }
+
+  @if (deleteAttendanceTarget(); as target) {
+    <div class="scrim" (click)="closeDeleteAttendanceDialog()"></div>
+    <div class="dialog">
+      <div class="dialog__title">Delete this attendance record?</div>
+      <div class="dialog__body">
+        This also deletes the LABOR expense it generated on {{ target.projectName || 'that project' }}. This is the only fix path for a mis-entered record — there's no edit.
+      </div>
+      <div class="dialog__actions">
+        <button type="button" class="btn-secondary" [disabled]="deletingAttendance()" (click)="closeDeleteAttendanceDialog()">Cancel</button>
+        <button type="button" class="btn-danger-outline" [disabled]="deletingAttendance()" (click)="deleteAttendance()">
+          {{ deletingAttendance() ? 'Deleting…' : 'Yes, Delete' }}
+        </button>
+      </div>
+    </div>
+  }
+
+</div>

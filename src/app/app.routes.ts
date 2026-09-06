@@ -205,6 +205,29 @@ export const routes: Routes = [
   },
 
   {
+    path: 'workers',
+    children: [
+      {
+        path: '',
+        pathMatch: 'full',
+        loadComponent: () =>
+          import('./features/workers/workers-list/workers-list').then((m) => m.WorkersListComponent),
+      },
+      {
+        path: 'new',
+        canActivate: [permissionGuard(Permission.WorkerCreate, '/workers')],
+        loadComponent: () =>
+          import('./features/workers/worker-create/worker-create').then((m) => m.WorkerCreateComponent),
+      },
+      {
+        path: ':id',
+        loadComponent: () =>
+          import('./features/workers/worker-detail/worker-detail').then((m) => m.WorkerDetailComponent),
+      },
+    ],
+  },
+
+  {
     path: 'users',
     canActivate: [adminGuard],
     loadComponent: () =>

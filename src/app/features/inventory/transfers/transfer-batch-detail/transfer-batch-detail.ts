@@ -2,6 +2,8 @@ import { ChangeDetectionStrategy, Component, OnInit, inject, signal } from '@ang
 import { DatePipe } from '@angular/common';
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import {
+  ProjectResponse,
+  ProjectsService,
   PurchaseReceiptResponse,
   PurchaseReceiptsService,
   TransferBatchResponse,
@@ -22,6 +24,7 @@ export class TransferBatchDetailComponent implements OnInit {
   private readonly router = inject(Router);
   private readonly transferBatchesService = inject(TransferBatchesService);
   private readonly purchaseReceiptsService = inject(PurchaseReceiptsService);
+  private readonly projectsService = inject(ProjectsService);
   private readonly currentUser = inject(CurrentUserService);
 
   readonly canSubmit = this.currentUser.hasPermission(Permission.TransferBatchSubmit);
@@ -42,6 +45,11 @@ export class TransferBatchDetailComponent implements OnInit {
   // create a duplicate one.
   readonly linkedReceipt = signal<PurchaseReceiptResponse | null>(null);
   readonly linkedReceiptChecked = signal(false);
+
+  // Only populated when the batch has a projectId — TransferBatchResponse
+  // carries the id but not a display name (unlike originWarehouseName etc.),
+  // so it's looked up separately, same as other cross-module id-only refs.
+  readonly linkedProject = signal<ProjectResponse | null>(null);
 
   ngOnInit(): void {
     const id = Number(this.route.snapshot.paramMap.get('id'));
@@ -156,18 +164,28 @@ export class TransferBatchDetailComponent implements OnInit {
 
   private loadBatch(id: number): void {
     this.loading.set(true);
-    this.transferBatchesService.getById3(id).subscribe({
+    this.transferBatchesService.getById4(id).subscribe({
       next: (batch) => {
         this.batch.set(batch);
         this.loading.set(false);
         if (batch.status === TransferBatchResponse.StatusEnum.AwaitingPurchase) {
           this.checkLinkedReceipt(id);
         }
+        if (batch.projectId !== undefined) {
+          this.loadLinkedProject(batch.projectId);
+        }
       },
       error: () => {
         this.errorMessage.set('Transfer batch not found.');
         this.loading.set(false);
       },
+    });
+  }
+
+  private loadLinkedProject(projectId: number): void {
+    this.projectsService.getById2(projectId).subscribe({
+      next: (project) => this.linkedProject.set(project),
+      error: () => this.linkedProject.set(null),
     });
   }
 

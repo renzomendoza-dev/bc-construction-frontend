@@ -53,7 +53,23 @@
           </select>
         }
       </div>
+      @if (showProjectField()) {
+        <div class="form-field">
+          <label>Project (optional)</label>
+          <select [value]="projectId() ?? ''" (change)="onProjectChange($any($event.target).value)">
+            <option value="">No project</option>
+            @for (p of projectOptions(); track p.id) {
+              <option [value]="p.id">{{ p.name }}</option>
+            }
+          </select>
+        </div>
+      }
     </div>
+    @if (showProjectField() && projectId()) {
+      <div class="lines-hint">
+        Each line will auto-record a MATERIAL expense on this project when the batch is submitted — {{ direction() === 'PULL_OUT' ? 'a credit, since pulling stock out of a site reverses an earlier dispatch cost' : 'a cost, using each item\'s standard cost price' }}.
+      </div>
+    }
   </div>
 
   <div class="card">

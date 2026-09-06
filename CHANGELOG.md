@@ -6,6 +6,8 @@ All notable changes to this project are documented here, newest first. Dates are
 - Add Projects: track a project's code/name/budget/dates through an Active → On Hold → Completed lifecycle, with manual expense entry (Labor/Material/Other), a running expense summary against budget, and a filterable expense history.
 - Add a Projects card to the Dashboard (Active Projects, Total Budget, and an Over Budget count across open projects).
 - Fix Movement History showing every Transfer as a decrease, even on the destination side where stock actually increased — now driven by the backend's own direction signal per movement.
+- Add Workers: a field-labor roster (name/position/daily rate, active/inactive) with a daily Attendance log per worker, where each recorded attendance auto-generates a Labor expense on the chosen project.
+- Add an optional Project field to Transfers involving a site — submitting the transfer auto-records a Material expense on that project (a cost when dispatching to the site, a credit when pulling out), linked back to the transfer for reference.
 
 ## 2026-09-05
 - Set the browser tab title to "BC Construction Services" and the favicon to the app's own logo, replacing the unconfigured Angular CLI defaults.

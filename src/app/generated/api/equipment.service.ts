@@ -202,12 +202,12 @@ export class EquipmentService extends BaseService {
      * @param reportProgress flag to report request and response progress.
      * @param options additional options
      */
-    public create3(equipmentCreateRequest: EquipmentCreateRequest, observe?: 'body', reportProgress?: boolean, options?: {httpHeaderAccept?: '*/*', context?: HttpContext, transferCache?: boolean}): Observable<EquipmentResponse>;
-    public create3(equipmentCreateRequest: EquipmentCreateRequest, observe?: 'response', reportProgress?: boolean, options?: {httpHeaderAccept?: '*/*', context?: HttpContext, transferCache?: boolean}): Observable<HttpResponse<EquipmentResponse>>;
-    public create3(equipmentCreateRequest: EquipmentCreateRequest, observe?: 'events', reportProgress?: boolean, options?: {httpHeaderAccept?: '*/*', context?: HttpContext, transferCache?: boolean}): Observable<HttpEvent<EquipmentResponse>>;
-    public create3(equipmentCreateRequest: EquipmentCreateRequest, observe: any = 'body', reportProgress: boolean = false, options?: {httpHeaderAccept?: '*/*', context?: HttpContext, transferCache?: boolean}): Observable<any> {
+    public create4(equipmentCreateRequest: EquipmentCreateRequest, observe?: 'body', reportProgress?: boolean, options?: {httpHeaderAccept?: '*/*', context?: HttpContext, transferCache?: boolean}): Observable<EquipmentResponse>;
+    public create4(equipmentCreateRequest: EquipmentCreateRequest, observe?: 'response', reportProgress?: boolean, options?: {httpHeaderAccept?: '*/*', context?: HttpContext, transferCache?: boolean}): Observable<HttpResponse<EquipmentResponse>>;
+    public create4(equipmentCreateRequest: EquipmentCreateRequest, observe?: 'events', reportProgress?: boolean, options?: {httpHeaderAccept?: '*/*', context?: HttpContext, transferCache?: boolean}): Observable<HttpEvent<EquipmentResponse>>;
+    public create4(equipmentCreateRequest: EquipmentCreateRequest, observe: any = 'body', reportProgress: boolean = false, options?: {httpHeaderAccept?: '*/*', context?: HttpContext, transferCache?: boolean}): Observable<any> {
         if (equipmentCreateRequest === null || equipmentCreateRequest === undefined) {
-            throw new Error('Required parameter equipmentCreateRequest was null or undefined when calling create3.');
+            throw new Error('Required parameter equipmentCreateRequest was null or undefined when calling create4.');
         }
 
         let localVarHeaders = this.defaultHeaders;
@@ -471,15 +471,15 @@ export class EquipmentService extends BaseService {
      * @param reportProgress flag to report request and response progress.
      * @param options additional options
      */
-    public update3(id: number, equipmentUpdateRequest: EquipmentUpdateRequest, observe?: 'body', reportProgress?: boolean, options?: {httpHeaderAccept?: '*/*', context?: HttpContext, transferCache?: boolean}): Observable<EquipmentResponse>;
-    public update3(id: number, equipmentUpdateRequest: EquipmentUpdateRequest, observe?: 'response', reportProgress?: boolean, options?: {httpHeaderAccept?: '*/*', context?: HttpContext, transferCache?: boolean}): Observable<HttpResponse<EquipmentResponse>>;
-    public update3(id: number, equipmentUpdateRequest: EquipmentUpdateRequest, observe?: 'events', reportProgress?: boolean, options?: {httpHeaderAccept?: '*/*', context?: HttpContext, transferCache?: boolean}): Observable<HttpEvent<EquipmentResponse>>;
-    public update3(id: number, equipmentUpdateRequest: EquipmentUpdateRequest, observe: any = 'body', reportProgress: boolean = false, options?: {httpHeaderAccept?: '*/*', context?: HttpContext, transferCache?: boolean}): Observable<any> {
+    public update4(id: number, equipmentUpdateRequest: EquipmentUpdateRequest, observe?: 'body', reportProgress?: boolean, options?: {httpHeaderAccept?: '*/*', context?: HttpContext, transferCache?: boolean}): Observable<EquipmentResponse>;
+    public update4(id: number, equipmentUpdateRequest: EquipmentUpdateRequest, observe?: 'response', reportProgress?: boolean, options?: {httpHeaderAccept?: '*/*', context?: HttpContext, transferCache?: boolean}): Observable<HttpResponse<EquipmentResponse>>;
+    public update4(id: number, equipmentUpdateRequest: EquipmentUpdateRequest, observe?: 'events', reportProgress?: boolean, options?: {httpHeaderAccept?: '*/*', context?: HttpContext, transferCache?: boolean}): Observable<HttpEvent<EquipmentResponse>>;
+    public update4(id: number, equipmentUpdateRequest: EquipmentUpdateRequest, observe: any = 'body', reportProgress: boolean = false, options?: {httpHeaderAccept?: '*/*', context?: HttpContext, transferCache?: boolean}): Observable<any> {
         if (id === null || id === undefined) {
-            throw new Error('Required parameter id was null or undefined when calling update3.');
+            throw new Error('Required parameter id was null or undefined when calling update4.');
         }
         if (equipmentUpdateRequest === null || equipmentUpdateRequest === undefined) {
-            throw new Error('Required parameter equipmentUpdateRequest was null or undefined when calling update3.');
+            throw new Error('Required parameter equipmentUpdateRequest was null or undefined when calling update4.');
         }
 
         let localVarHeaders = this.defaultHeaders;

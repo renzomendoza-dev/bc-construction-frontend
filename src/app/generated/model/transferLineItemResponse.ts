@@ -34,5 +34,9 @@ export interface TransferLineItemResponse {
      * Optional free-text notes, e.g. condition remarks from counting
      */
     notes?: string;
+    /**
+     * Identifier of the MATERIAL ProjectExpense this line auto-generated on submit, if the batch\'s projectId was set; null for a DRAFT line or a batch with no project
+     */
+    projectExpenseId?: number;
 }
 

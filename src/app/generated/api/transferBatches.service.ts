@@ -180,12 +180,12 @@ export class TransferBatchesService extends BaseService {
      * @param reportProgress flag to report request and response progress.
      * @param options additional options
      */
-    public getById3(id: number, observe?: 'body', reportProgress?: boolean, options?: {httpHeaderAccept?: 'application/json', context?: HttpContext, transferCache?: boolean}): Observable<TransferBatchResponse>;
-    public getById3(id: number, observe?: 'response', reportProgress?: boolean, options?: {httpHeaderAccept?: 'application/json', context?: HttpContext, transferCache?: boolean}): Observable<HttpResponse<TransferBatchResponse>>;
-    public getById3(id: number, observe?: 'events', reportProgress?: boolean, options?: {httpHeaderAccept?: 'application/json', context?: HttpContext, transferCache?: boolean}): Observable<HttpEvent<TransferBatchResponse>>;
-    public getById3(id: number, observe: any = 'body', reportProgress: boolean = false, options?: {httpHeaderAccept?: 'application/json', context?: HttpContext, transferCache?: boolean}): Observable<any> {
+    public getById4(id: number, observe?: 'body', reportProgress?: boolean, options?: {httpHeaderAccept?: 'application/json', context?: HttpContext, transferCache?: boolean}): Observable<TransferBatchResponse>;
+    public getById4(id: number, observe?: 'response', reportProgress?: boolean, options?: {httpHeaderAccept?: 'application/json', context?: HttpContext, transferCache?: boolean}): Observable<HttpResponse<TransferBatchResponse>>;
+    public getById4(id: number, observe?: 'events', reportProgress?: boolean, options?: {httpHeaderAccept?: 'application/json', context?: HttpContext, transferCache?: boolean}): Observable<HttpEvent<TransferBatchResponse>>;
+    public getById4(id: number, observe: any = 'body', reportProgress: boolean = false, options?: {httpHeaderAccept?: 'application/json', context?: HttpContext, transferCache?: boolean}): Observable<any> {
         if (id === null || id === undefined) {
-            throw new Error('Required parameter id was null or undefined when calling getById3.');
+            throw new Error('Required parameter id was null or undefined when calling getById4.');
         }
 
         let localVarHeaders = this.defaultHeaders;
@@ -245,10 +245,10 @@ export class TransferBatchesService extends BaseService {
      * @param reportProgress flag to report request and response progress.
      * @param options additional options
      */
-    public search3(originWarehouseId?: number, destinationWarehouseId?: number, status?: 'DRAFT' | 'SUBMITTED' | 'COMPLETED' | 'AWAITING_PURCHASE', page?: number, size?: number, sort?: Array<string>, observe?: 'body', reportProgress?: boolean, options?: {httpHeaderAccept?: 'application/json', context?: HttpContext, transferCache?: boolean}): Observable<PageResponse>;
-    public search3(originWarehouseId?: number, destinationWarehouseId?: number, status?: 'DRAFT' | 'SUBMITTED' | 'COMPLETED' | 'AWAITING_PURCHASE', page?: number, size?: number, sort?: Array<string>, observe?: 'response', reportProgress?: boolean, options?: {httpHeaderAccept?: 'application/json', context?: HttpContext, transferCache?: boolean}): Observable<HttpResponse<PageResponse>>;
-    public search3(originWarehouseId?: number, destinationWarehouseId?: number, status?: 'DRAFT' | 'SUBMITTED' | 'COMPLETED' | 'AWAITING_PURCHASE', page?: number, size?: number, sort?: Array<string>, observe?: 'events', reportProgress?: boolean, options?: {httpHeaderAccept?: 'application/json', context?: HttpContext, transferCache?: boolean}): Observable<HttpEvent<PageResponse>>;
-    public search3(originWarehouseId?: number, destinationWarehouseId?: number, status?: 'DRAFT' | 'SUBMITTED' | 'COMPLETED' | 'AWAITING_PURCHASE', page?: number, size?: number, sort?: Array<string>, observe: any = 'body', reportProgress: boolean = false, options?: {httpHeaderAccept?: 'application/json', context?: HttpContext, transferCache?: boolean}): Observable<any> {
+    public search4(originWarehouseId?: number, destinationWarehouseId?: number, status?: 'DRAFT' | 'SUBMITTED' | 'COMPLETED' | 'AWAITING_PURCHASE', page?: number, size?: number, sort?: Array<string>, observe?: 'body', reportProgress?: boolean, options?: {httpHeaderAccept?: 'application/json', context?: HttpContext, transferCache?: boolean}): Observable<PageResponse>;
+    public search4(originWarehouseId?: number, destinationWarehouseId?: number, status?: 'DRAFT' | 'SUBMITTED' | 'COMPLETED' | 'AWAITING_PURCHASE', page?: number, size?: number, sort?: Array<string>, observe?: 'response', reportProgress?: boolean, options?: {httpHeaderAccept?: 'application/json', context?: HttpContext, transferCache?: boolean}): Observable<HttpResponse<PageResponse>>;
+    public search4(originWarehouseId?: number, destinationWarehouseId?: number, status?: 'DRAFT' | 'SUBMITTED' | 'COMPLETED' | 'AWAITING_PURCHASE', page?: number, size?: number, sort?: Array<string>, observe?: 'events', reportProgress?: boolean, options?: {httpHeaderAccept?: 'application/json', context?: HttpContext, transferCache?: boolean}): Observable<HttpEvent<PageResponse>>;
+    public search4(originWarehouseId?: number, destinationWarehouseId?: number, status?: 'DRAFT' | 'SUBMITTED' | 'COMPLETED' | 'AWAITING_PURCHASE', page?: number, size?: number, sort?: Array<string>, observe: any = 'body', reportProgress: boolean = false, options?: {httpHeaderAccept?: 'application/json', context?: HttpContext, transferCache?: boolean}): Observable<any> {
 
         let localVarQueryParameters = new OpenApiHttpParams(this.encoder);
 

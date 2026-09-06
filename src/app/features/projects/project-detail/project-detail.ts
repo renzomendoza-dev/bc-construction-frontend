@@ -250,7 +250,7 @@ export class ProjectDetailComponent implements OnInit {
       endDate: this.editEndDate() || undefined,
     };
 
-    this.projectsService.update1(current.id, body).subscribe({
+    this.projectsService.update2(current.id, body).subscribe({
       next: (updated) => {
         this.project.set(updated);
         this.saving.set(false);
@@ -331,7 +331,7 @@ export class ProjectDetailComponent implements OnInit {
     this.expenseSaving.set(true);
     this.expenseError.set(null);
 
-    this.expensesService.create1(projectId, body).subscribe({
+    this.expensesService.create2(projectId, body).subscribe({
       next: () => {
         this.expenseSaving.set(false);
         this.expenseDialogOpen.set(false);
@@ -351,7 +351,7 @@ export class ProjectDetailComponent implements OnInit {
 
   private loadProject(id: number): void {
     this.loading.set(true);
-    this.projectsService.getById1(id).subscribe({
+    this.projectsService.getById2(id).subscribe({
       next: (project) => {
         this.project.set(project);
         this.loading.set(false);
@@ -379,7 +379,7 @@ export class ProjectDetailComponent implements OnInit {
   private loadExpenses(projectId: number): void {
     this.expensesLoading.set(true);
     this.expensesError.set(null);
-    this.expensesService.search2(projectId, undefined, 0, EXPENSES_FETCH_SIZE, undefined).subscribe({
+    this.expensesService.search3(projectId, undefined, 0, EXPENSES_FETCH_SIZE, undefined).subscribe({
       next: (result) => {
         this.allExpenses.set((result.content ?? []) as ProjectExpenseResponse[]);
         this.expensesLoading.set(false);

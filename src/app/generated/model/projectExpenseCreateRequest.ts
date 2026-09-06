@@ -22,7 +22,7 @@ export interface ProjectExpenseCreateRequest {
      */
     description: string;
     /**
-     * Cost of this expense
+     * Cost of this expense. Normally positive; a negative value represents a credit or reversal (e.g. inventory.TransferBatchService auto-generates one when materials are pulled back out of a project site) and reduces the category\'s running total accordingly.
      */
     amount: number;
     /**

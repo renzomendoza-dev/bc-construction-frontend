@@ -48,6 +48,10 @@ export interface TransferBatchResponse {
      */
     sourceMaterialRequestId?: number;
     /**
+     * Identifier of the Project this transfer\'s cost is attributed to, if any
+     */
+    projectId?: number;
+    /**
      * Optional free-text notes about the transfer
      */
     notes?: string;

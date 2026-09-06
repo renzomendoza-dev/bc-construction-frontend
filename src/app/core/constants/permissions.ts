@@ -80,6 +80,15 @@ export const Permission = {
   ProjectEdit: 'PROJECT_EDIT',
   ProjectComplete: 'PROJECT_COMPLETE',
   ProjectExpenseCreate: 'PROJECT_EXPENSE_CREATE',
+
+  // Verified directly against WorkerController/AttendanceController source
+  // (@PreAuthorize("hasRole('...')")), unlike every unverified block above —
+  // the Workers module backend prompt explicitly asked for these and got them.
+  WorkerCreate: 'WORKER_CREATE',
+  WorkerEdit: 'WORKER_EDIT',
+  WorkerDeactivate: 'WORKER_DEACTIVATE',
+  AttendanceCreate: 'ATTENDANCE_CREATE',
+  AttendanceDelete: 'ATTENDANCE_DELETE',
 } as const;
 
 export type PermissionValue = (typeof Permission)[keyof typeof Permission];

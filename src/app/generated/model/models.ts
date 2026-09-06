@@ -1,4 +1,6 @@
 export * from './adminUserResponse';
+export * from './attendanceCreateRequest';
+export * from './attendanceResponse';
 export * from './equipmentAssignmentBatchCreateRequest';
 export * from './equipmentAssignmentBatchLineRequest';
 export * from './equipmentAssignmentBatchLineResponse';
@@ -63,3 +65,6 @@ export * from './validationErrorResponse';
 export * from './warehouseCreateRequest';
 export * from './warehouseResponse';
 export * from './warehouseUpdateRequest';
+export * from './workerCreateRequest';
+export * from './workerResponse';
+export * from './workerUpdateRequest';

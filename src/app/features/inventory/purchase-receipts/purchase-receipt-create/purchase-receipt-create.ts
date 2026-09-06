@@ -220,7 +220,7 @@ export class PurchaseReceiptCreateComponent implements OnInit {
   }
 
   private loadFulfillingBatch(batchId: number): void {
-    this.transferBatchesService.getById3(batchId).subscribe({
+    this.transferBatchesService.getById4(batchId).subscribe({
       next: (batch) => {
         this.fulfillingBatch.set(batch);
         this.fulfillsTransferBatchId.set(batch.id ?? null);
@@ -253,7 +253,7 @@ export class PurchaseReceiptCreateComponent implements OnInit {
   // outstanding are included — a line already fully received by prior
   // receipts against this order has nothing left to receive.
   private loadFulfillingOrder(orderId: number): void {
-    this.purchaseOrdersService.getById(orderId).subscribe({
+    this.purchaseOrdersService.getById1(orderId).subscribe({
       next: (order) => {
         this.fulfillingOrder.set(order);
         this.purchaseOrderId.set(order.id ?? null);

@@ -5,6 +5,7 @@ api.module.ts
 api/adminRoles.service.ts
 api/adminUsers.service.ts
 api/api.ts
+api/attendance.service.ts
 api/equipment.service.ts
 api/equipmentAssignmentBatches.service.ts
 api/inventory.service.ts
@@ -19,11 +20,14 @@ api/suppliers.service.ts
 api/transferBatches.service.ts
 api/user.service.ts
 api/warehouses.service.ts
+api/workers.service.ts
 configuration.ts
 encoder.ts
 git_push.sh
 index.ts
 model/adminUserResponse.ts
+model/attendanceCreateRequest.ts
+model/attendanceResponse.ts
 model/equipmentAssignmentBatchCreateRequest.ts
 model/equipmentAssignmentBatchLineRequest.ts
 model/equipmentAssignmentBatchLineResponse.ts
@@ -89,6 +93,9 @@ model/validationErrorResponse.ts
 model/warehouseCreateRequest.ts
 model/warehouseResponse.ts
 model/warehouseUpdateRequest.ts
+model/workerCreateRequest.ts
+model/workerResponse.ts
+model/workerUpdateRequest.ts
 param.ts
 provide-api.ts
 query.params.ts

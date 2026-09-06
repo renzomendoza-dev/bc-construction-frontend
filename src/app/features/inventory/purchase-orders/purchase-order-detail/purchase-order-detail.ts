@@ -390,7 +390,7 @@ export class PurchaseOrderDetailComponent implements OnInit {
       ),
     };
 
-    this.ordersService.update(current.id, body).subscribe({
+    this.ordersService.update1(current.id, body).subscribe({
       next: (updated) => {
         this.order.set(updated);
         this.saving.set(false);
@@ -423,7 +423,7 @@ export class PurchaseOrderDetailComponent implements OnInit {
 
   private loadOrder(id: number): void {
     this.loading.set(true);
-    this.ordersService.getById(id).subscribe({
+    this.ordersService.getById1(id).subscribe({
       next: (order) => {
         this.order.set(order);
         this.loading.set(false);

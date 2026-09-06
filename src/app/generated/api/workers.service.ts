@@ -21,13 +21,13 @@ import { ErrorResponse } from '../model/errorResponse';
 // @ts-ignore
 import { PageResponse } from '../model/pageResponse';
 // @ts-ignore
-import { ProjectCreateRequest } from '../model/projectCreateRequest';
-// @ts-ignore
-import { ProjectResponse } from '../model/projectResponse';
-// @ts-ignore
-import { ProjectUpdateRequest } from '../model/projectUpdateRequest';
-// @ts-ignore
 import { ValidationErrorResponse } from '../model/validationErrorResponse';
+// @ts-ignore
+import { WorkerCreateRequest } from '../model/workerCreateRequest';
+// @ts-ignore
+import { WorkerResponse } from '../model/workerResponse';
+// @ts-ignore
+import { WorkerUpdateRequest } from '../model/workerUpdateRequest';
 
 // @ts-ignore
 import { BASE_PATH, COLLECTION_FORMATS }                     from '../variables';
@@ -39,87 +39,26 @@ import { BaseService } from '../api.base.service';
 @Injectable({
   providedIn: 'root'
 })
-export class ProjectsService extends BaseService {
+export class WorkersService extends BaseService {
 
     constructor(protected httpClient: HttpClient, @Optional() @Inject(BASE_PATH) basePath: string|string[], @Optional() configuration?: Configuration) {
         super(basePath, configuration);
     }
 
     /**
-     * Mark a project COMPLETED
-     * ACTIVE/ON_HOLD -&gt; COMPLETED, only while ACTIVE/ON_HOLD (422 otherwise). Terminal — no further edits or expenses can be recorded against this project afterward.
-     * @endpoint post /api/projects/{id}/complete
-     * @param id Identifier of the project to complete
+     * Add a worker to the roster
+     * @endpoint post /api/workers
+     * @param workerCreateRequest 
      * @param observe set whether or not to return the data Observable as the body, response or events. defaults to returning the body.
      * @param reportProgress flag to report request and response progress.
      * @param options additional options
      */
-    public complete(id: number, observe?: 'body', reportProgress?: boolean, options?: {httpHeaderAccept?: 'application/json', context?: HttpContext, transferCache?: boolean}): Observable<ProjectResponse>;
-    public complete(id: number, observe?: 'response', reportProgress?: boolean, options?: {httpHeaderAccept?: 'application/json', context?: HttpContext, transferCache?: boolean}): Observable<HttpResponse<ProjectResponse>>;
-    public complete(id: number, observe?: 'events', reportProgress?: boolean, options?: {httpHeaderAccept?: 'application/json', context?: HttpContext, transferCache?: boolean}): Observable<HttpEvent<ProjectResponse>>;
-    public complete(id: number, observe: any = 'body', reportProgress: boolean = false, options?: {httpHeaderAccept?: 'application/json', context?: HttpContext, transferCache?: boolean}): Observable<any> {
-        if (id === null || id === undefined) {
-            throw new Error('Required parameter id was null or undefined when calling complete.');
-        }
-
-        let localVarHeaders = this.defaultHeaders;
-
-        // authentication (bearerAuth) required
-        localVarHeaders = this.configuration.addCredentialToHeaders('bearerAuth', 'Authorization', localVarHeaders, 'Bearer ');
-
-        const localVarHttpHeaderAcceptSelected: string | undefined = options?.httpHeaderAccept ?? this.configuration.selectHeaderAccept([
-            'application/json'
-        ]);
-        if (localVarHttpHeaderAcceptSelected !== undefined) {
-            localVarHeaders = localVarHeaders.set('Accept', localVarHttpHeaderAcceptSelected);
-        }
-
-        const localVarHttpContext: HttpContext = options?.context ?? new HttpContext();
-
-        const localVarTransferCache: boolean = options?.transferCache ?? true;
-
-
-        let responseType_: 'text' | 'json' | 'blob' = 'json';
-        if (localVarHttpHeaderAcceptSelected) {
-            if (localVarHttpHeaderAcceptSelected.startsWith('text')) {
-                responseType_ = 'text';
-            } else if (this.configuration.isJsonMime(localVarHttpHeaderAcceptSelected)) {
-                responseType_ = 'json';
-            } else {
-                responseType_ = 'blob';
-            }
-        }
-
-        let localVarPath = `/api/projects/${this.configuration.encodeParam({name: "id", value: id, in: "path", style: "simple", explode: false, dataType: "number", dataFormat: "int64"})}/complete`;
-        const { basePath, withCredentials } = this.configuration;
-        return this.httpClient.request<ProjectResponse>('post', `${basePath}${localVarPath}`,
-            {
-                context: localVarHttpContext,
-                responseType: <any>responseType_,
-                ...(withCredentials ? { withCredentials } : {}),
-                headers: localVarHeaders,
-                observe: observe,
-                ...(localVarTransferCache !== undefined ? { transferCache: localVarTransferCache } : {}),
-                reportProgress: reportProgress
-            }
-        );
-    }
-
-    /**
-     * Create a project
-     * Records a new project, starting at status ACTIVE. code must be unique (409 if already in use).
-     * @endpoint post /api/projects
-     * @param projectCreateRequest 
-     * @param observe set whether or not to return the data Observable as the body, response or events. defaults to returning the body.
-     * @param reportProgress flag to report request and response progress.
-     * @param options additional options
-     */
-    public create1(projectCreateRequest: ProjectCreateRequest, observe?: 'body', reportProgress?: boolean, options?: {httpHeaderAccept?: 'application/json', context?: HttpContext, transferCache?: boolean}): Observable<ProjectResponse>;
-    public create1(projectCreateRequest: ProjectCreateRequest, observe?: 'response', reportProgress?: boolean, options?: {httpHeaderAccept?: 'application/json', context?: HttpContext, transferCache?: boolean}): Observable<HttpResponse<ProjectResponse>>;
-    public create1(projectCreateRequest: ProjectCreateRequest, observe?: 'events', reportProgress?: boolean, options?: {httpHeaderAccept?: 'application/json', context?: HttpContext, transferCache?: boolean}): Observable<HttpEvent<ProjectResponse>>;
-    public create1(projectCreateRequest: ProjectCreateRequest, observe: any = 'body', reportProgress: boolean = false, options?: {httpHeaderAccept?: 'application/json', context?: HttpContext, transferCache?: boolean}): Observable<any> {
-        if (projectCreateRequest === null || projectCreateRequest === undefined) {
-            throw new Error('Required parameter projectCreateRequest was null or undefined when calling create1.');
+    public create(workerCreateRequest: WorkerCreateRequest, observe?: 'body', reportProgress?: boolean, options?: {httpHeaderAccept?: 'application/json', context?: HttpContext, transferCache?: boolean}): Observable<WorkerResponse>;
+    public create(workerCreateRequest: WorkerCreateRequest, observe?: 'response', reportProgress?: boolean, options?: {httpHeaderAccept?: 'application/json', context?: HttpContext, transferCache?: boolean}): Observable<HttpResponse<WorkerResponse>>;
+    public create(workerCreateRequest: WorkerCreateRequest, observe?: 'events', reportProgress?: boolean, options?: {httpHeaderAccept?: 'application/json', context?: HttpContext, transferCache?: boolean}): Observable<HttpEvent<WorkerResponse>>;
+    public create(workerCreateRequest: WorkerCreateRequest, observe: any = 'body', reportProgress: boolean = false, options?: {httpHeaderAccept?: 'application/json', context?: HttpContext, transferCache?: boolean}): Observable<any> {
+        if (workerCreateRequest === null || workerCreateRequest === undefined) {
+            throw new Error('Required parameter workerCreateRequest was null or undefined when calling create.');
         }
 
         let localVarHeaders = this.defaultHeaders;
@@ -159,12 +98,12 @@ export class ProjectsService extends BaseService {
             }
         }
 
-        let localVarPath = `/api/projects`;
+        let localVarPath = `/api/workers`;
         const { basePath, withCredentials } = this.configuration;
-        return this.httpClient.request<ProjectResponse>('post', `${basePath}${localVarPath}`,
+        return this.httpClient.request<WorkerResponse>('post', `${basePath}${localVarPath}`,
             {
                 context: localVarHttpContext,
-                body: projectCreateRequest,
+                body: workerCreateRequest,
                 responseType: <any>responseType_,
                 ...(withCredentials ? { withCredentials } : {}),
                 headers: localVarHeaders,
@@ -176,19 +115,20 @@ export class ProjectsService extends BaseService {
     }
 
     /**
-     * Get a project by id
-     * @endpoint get /api/projects/{id}
-     * @param id Identifier of the project to retrieve
+     * Deactivate a worker
+     * Soft-retires a worker by setting active to false. The worker and its attendance history are preserved, not deleted — workers are never hard-deletable.
+     * @endpoint patch /api/workers/{id}/deactivate
+     * @param id Identifier of the worker to deactivate
      * @param observe set whether or not to return the data Observable as the body, response or events. defaults to returning the body.
      * @param reportProgress flag to report request and response progress.
      * @param options additional options
      */
-    public getById2(id: number, observe?: 'body', reportProgress?: boolean, options?: {httpHeaderAccept?: 'application/json', context?: HttpContext, transferCache?: boolean}): Observable<ProjectResponse>;
-    public getById2(id: number, observe?: 'response', reportProgress?: boolean, options?: {httpHeaderAccept?: 'application/json', context?: HttpContext, transferCache?: boolean}): Observable<HttpResponse<ProjectResponse>>;
-    public getById2(id: number, observe?: 'events', reportProgress?: boolean, options?: {httpHeaderAccept?: 'application/json', context?: HttpContext, transferCache?: boolean}): Observable<HttpEvent<ProjectResponse>>;
-    public getById2(id: number, observe: any = 'body', reportProgress: boolean = false, options?: {httpHeaderAccept?: 'application/json', context?: HttpContext, transferCache?: boolean}): Observable<any> {
+    public deactivate(id: number, observe?: 'body', reportProgress?: boolean, options?: {httpHeaderAccept?: 'application/json', context?: HttpContext, transferCache?: boolean}): Observable<any>;
+    public deactivate(id: number, observe?: 'response', reportProgress?: boolean, options?: {httpHeaderAccept?: 'application/json', context?: HttpContext, transferCache?: boolean}): Observable<HttpResponse<any>>;
+    public deactivate(id: number, observe?: 'events', reportProgress?: boolean, options?: {httpHeaderAccept?: 'application/json', context?: HttpContext, transferCache?: boolean}): Observable<HttpEvent<any>>;
+    public deactivate(id: number, observe: any = 'body', reportProgress: boolean = false, options?: {httpHeaderAccept?: 'application/json', context?: HttpContext, transferCache?: boolean}): Observable<any> {
         if (id === null || id === undefined) {
-            throw new Error('Required parameter id was null or undefined when calling getById2.');
+            throw new Error('Required parameter id was null or undefined when calling deactivate.');
         }
 
         let localVarHeaders = this.defaultHeaders;
@@ -219,9 +159,9 @@ export class ProjectsService extends BaseService {
             }
         }
 
-        let localVarPath = `/api/projects/${this.configuration.encodeParam({name: "id", value: id, in: "path", style: "simple", explode: false, dataType: "number", dataFormat: "int64"})}`;
+        let localVarPath = `/api/workers/${this.configuration.encodeParam({name: "id", value: id, in: "path", style: "simple", explode: false, dataType: "number", dataFormat: "int64"})}/deactivate`;
         const { basePath, withCredentials } = this.configuration;
-        return this.httpClient.request<ProjectResponse>('get', `${basePath}${localVarPath}`,
+        return this.httpClient.request<any>('patch', `${basePath}${localVarPath}`,
             {
                 context: localVarHttpContext,
                 responseType: <any>responseType_,
@@ -235,10 +175,69 @@ export class ProjectsService extends BaseService {
     }
 
     /**
-     * List projects
-     * Returns a paged list of projects, optionally filtered by status.
-     * @endpoint get /api/projects
-     * @param status Filter by status
+     * Get a worker by id
+     * @endpoint get /api/workers/{id}
+     * @param id Identifier of the worker to retrieve
+     * @param observe set whether or not to return the data Observable as the body, response or events. defaults to returning the body.
+     * @param reportProgress flag to report request and response progress.
+     * @param options additional options
+     */
+    public getById(id: number, observe?: 'body', reportProgress?: boolean, options?: {httpHeaderAccept?: 'application/json', context?: HttpContext, transferCache?: boolean}): Observable<WorkerResponse>;
+    public getById(id: number, observe?: 'response', reportProgress?: boolean, options?: {httpHeaderAccept?: 'application/json', context?: HttpContext, transferCache?: boolean}): Observable<HttpResponse<WorkerResponse>>;
+    public getById(id: number, observe?: 'events', reportProgress?: boolean, options?: {httpHeaderAccept?: 'application/json', context?: HttpContext, transferCache?: boolean}): Observable<HttpEvent<WorkerResponse>>;
+    public getById(id: number, observe: any = 'body', reportProgress: boolean = false, options?: {httpHeaderAccept?: 'application/json', context?: HttpContext, transferCache?: boolean}): Observable<any> {
+        if (id === null || id === undefined) {
+            throw new Error('Required parameter id was null or undefined when calling getById.');
+        }
+
+        let localVarHeaders = this.defaultHeaders;
+
+        // authentication (bearerAuth) required
+        localVarHeaders = this.configuration.addCredentialToHeaders('bearerAuth', 'Authorization', localVarHeaders, 'Bearer ');
+
+        const localVarHttpHeaderAcceptSelected: string | undefined = options?.httpHeaderAccept ?? this.configuration.selectHeaderAccept([
+            'application/json'
+        ]);
+        if (localVarHttpHeaderAcceptSelected !== undefined) {
+            localVarHeaders = localVarHeaders.set('Accept', localVarHttpHeaderAcceptSelected);
+        }
+
+        const localVarHttpContext: HttpContext = options?.context ?? new HttpContext();
+
+        const localVarTransferCache: boolean = options?.transferCache ?? true;
+
+
+        let responseType_: 'text' | 'json' | 'blob' = 'json';
+        if (localVarHttpHeaderAcceptSelected) {
+            if (localVarHttpHeaderAcceptSelected.startsWith('text')) {
+                responseType_ = 'text';
+            } else if (this.configuration.isJsonMime(localVarHttpHeaderAcceptSelected)) {
+                responseType_ = 'json';
+            } else {
+                responseType_ = 'blob';
+            }
+        }
+
+        let localVarPath = `/api/workers/${this.configuration.encodeParam({name: "id", value: id, in: "path", style: "simple", explode: false, dataType: "number", dataFormat: "int64"})}`;
+        const { basePath, withCredentials } = this.configuration;
+        return this.httpClient.request<WorkerResponse>('get', `${basePath}${localVarPath}`,
+            {
+                context: localVarHttpContext,
+                responseType: <any>responseType_,
+                ...(withCredentials ? { withCredentials } : {}),
+                headers: localVarHeaders,
+                observe: observe,
+                ...(localVarTransferCache !== undefined ? { transferCache: localVarTransferCache } : {}),
+                reportProgress: reportProgress
+            }
+        );
+    }
+
+    /**
+     * List workers
+     * Returns a paged list of workers, optionally filtered by active.
+     * @endpoint get /api/workers
+     * @param active Filter by active flag
      * @param page Zero-based page index (0..N)
      * @param size The size of the page to be returned
      * @param sort Sorting criteria in the format: property,(asc|desc). Default sort order is ascending. Multiple sort criteria are supported.
@@ -246,17 +245,17 @@ export class ProjectsService extends BaseService {
      * @param reportProgress flag to report request and response progress.
      * @param options additional options
      */
-    public search2(status?: 'ACTIVE' | 'ON_HOLD' | 'COMPLETED' | 'CANCELLED', page?: number, size?: number, sort?: Array<string>, observe?: 'body', reportProgress?: boolean, options?: {httpHeaderAccept?: 'application/json', context?: HttpContext, transferCache?: boolean}): Observable<PageResponse>;
-    public search2(status?: 'ACTIVE' | 'ON_HOLD' | 'COMPLETED' | 'CANCELLED', page?: number, size?: number, sort?: Array<string>, observe?: 'response', reportProgress?: boolean, options?: {httpHeaderAccept?: 'application/json', context?: HttpContext, transferCache?: boolean}): Observable<HttpResponse<PageResponse>>;
-    public search2(status?: 'ACTIVE' | 'ON_HOLD' | 'COMPLETED' | 'CANCELLED', page?: number, size?: number, sort?: Array<string>, observe?: 'events', reportProgress?: boolean, options?: {httpHeaderAccept?: 'application/json', context?: HttpContext, transferCache?: boolean}): Observable<HttpEvent<PageResponse>>;
-    public search2(status?: 'ACTIVE' | 'ON_HOLD' | 'COMPLETED' | 'CANCELLED', page?: number, size?: number, sort?: Array<string>, observe: any = 'body', reportProgress: boolean = false, options?: {httpHeaderAccept?: 'application/json', context?: HttpContext, transferCache?: boolean}): Observable<any> {
+    public search(active?: boolean, page?: number, size?: number, sort?: Array<string>, observe?: 'body', reportProgress?: boolean, options?: {httpHeaderAccept?: 'application/json', context?: HttpContext, transferCache?: boolean}): Observable<PageResponse>;
+    public search(active?: boolean, page?: number, size?: number, sort?: Array<string>, observe?: 'response', reportProgress?: boolean, options?: {httpHeaderAccept?: 'application/json', context?: HttpContext, transferCache?: boolean}): Observable<HttpResponse<PageResponse>>;
+    public search(active?: boolean, page?: number, size?: number, sort?: Array<string>, observe?: 'events', reportProgress?: boolean, options?: {httpHeaderAccept?: 'application/json', context?: HttpContext, transferCache?: boolean}): Observable<HttpEvent<PageResponse>>;
+    public search(active?: boolean, page?: number, size?: number, sort?: Array<string>, observe: any = 'body', reportProgress: boolean = false, options?: {httpHeaderAccept?: 'application/json', context?: HttpContext, transferCache?: boolean}): Observable<any> {
 
         let localVarQueryParameters = new OpenApiHttpParams(this.encoder);
 
         localVarQueryParameters = this.addToHttpParams(
             localVarQueryParameters,
-            'status',
-            <any>status,
+            'active',
+            <any>active,
             QueryParamStyle.Form,
             true,
         );
@@ -317,7 +316,7 @@ export class ProjectsService extends BaseService {
             }
         }
 
-        let localVarPath = `/api/projects`;
+        let localVarPath = `/api/workers`;
         const { basePath, withCredentials } = this.configuration;
         return this.httpClient.request<PageResponse>('get', `${basePath}${localVarPath}`,
             {
@@ -334,24 +333,24 @@ export class ProjectsService extends BaseService {
     }
 
     /**
-     * Replace a project\&#39;s editable fields
-     * Full-replacement update, only while ACTIVE/ON_HOLD (422 otherwise). code is immutable and not part of this request body. description/budget/endDate are copied as given, including null (clearing the field).
-     * @endpoint put /api/projects/{id}
-     * @param id Identifier of the project to update
-     * @param projectUpdateRequest 
+     * Replace a worker\&#39;s editable fields
+     * Full-replacement update of name/position/dailyRate. Allowed regardless of the active flag; active is only ever changed via PATCH /{id}/deactivate.
+     * @endpoint put /api/workers/{id}
+     * @param id Identifier of the worker to update
+     * @param workerUpdateRequest 
      * @param observe set whether or not to return the data Observable as the body, response or events. defaults to returning the body.
      * @param reportProgress flag to report request and response progress.
      * @param options additional options
      */
-    public update2(id: number, projectUpdateRequest: ProjectUpdateRequest, observe?: 'body', reportProgress?: boolean, options?: {httpHeaderAccept?: 'application/json', context?: HttpContext, transferCache?: boolean}): Observable<ProjectResponse>;
-    public update2(id: number, projectUpdateRequest: ProjectUpdateRequest, observe?: 'response', reportProgress?: boolean, options?: {httpHeaderAccept?: 'application/json', context?: HttpContext, transferCache?: boolean}): Observable<HttpResponse<ProjectResponse>>;
-    public update2(id: number, projectUpdateRequest: ProjectUpdateRequest, observe?: 'events', reportProgress?: boolean, options?: {httpHeaderAccept?: 'application/json', context?: HttpContext, transferCache?: boolean}): Observable<HttpEvent<ProjectResponse>>;
-    public update2(id: number, projectUpdateRequest: ProjectUpdateRequest, observe: any = 'body', reportProgress: boolean = false, options?: {httpHeaderAccept?: 'application/json', context?: HttpContext, transferCache?: boolean}): Observable<any> {
+    public update(id: number, workerUpdateRequest: WorkerUpdateRequest, observe?: 'body', reportProgress?: boolean, options?: {httpHeaderAccept?: 'application/json', context?: HttpContext, transferCache?: boolean}): Observable<WorkerResponse>;
+    public update(id: number, workerUpdateRequest: WorkerUpdateRequest, observe?: 'response', reportProgress?: boolean, options?: {httpHeaderAccept?: 'application/json', context?: HttpContext, transferCache?: boolean}): Observable<HttpResponse<WorkerResponse>>;
+    public update(id: number, workerUpdateRequest: WorkerUpdateRequest, observe?: 'events', reportProgress?: boolean, options?: {httpHeaderAccept?: 'application/json', context?: HttpContext, transferCache?: boolean}): Observable<HttpEvent<WorkerResponse>>;
+    public update(id: number, workerUpdateRequest: WorkerUpdateRequest, observe: any = 'body', reportProgress: boolean = false, options?: {httpHeaderAccept?: 'application/json', context?: HttpContext, transferCache?: boolean}): Observable<any> {
         if (id === null || id === undefined) {
-            throw new Error('Required parameter id was null or undefined when calling update2.');
+            throw new Error('Required parameter id was null or undefined when calling update.');
         }
-        if (projectUpdateRequest === null || projectUpdateRequest === undefined) {
-            throw new Error('Required parameter projectUpdateRequest was null or undefined when calling update2.');
+        if (workerUpdateRequest === null || workerUpdateRequest === undefined) {
+            throw new Error('Required parameter workerUpdateRequest was null or undefined when calling update.');
         }
 
         let localVarHeaders = this.defaultHeaders;
@@ -391,12 +390,12 @@ export class ProjectsService extends BaseService {
             }
         }
 
-        let localVarPath = `/api/projects/${this.configuration.encodeParam({name: "id", value: id, in: "path", style: "simple", explode: false, dataType: "number", dataFormat: "int64"})}`;
+        let localVarPath = `/api/workers/${this.configuration.encodeParam({name: "id", value: id, in: "path", style: "simple", explode: false, dataType: "number", dataFormat: "int64"})}`;
         const { basePath, withCredentials } = this.configuration;
-        return this.httpClient.request<ProjectResponse>('put', `${basePath}${localVarPath}`,
+        return this.httpClient.request<WorkerResponse>('put', `${basePath}${localVarPath}`,
             {
                 context: localVarHttpContext,
-                body: projectUpdateRequest,
+                body: workerUpdateRequest,
                 responseType: <any>responseType_,
                 ...(withCredentials ? { withCredentials } : {}),
                 headers: localVarHeaders,

@@ -25,6 +25,12 @@
         @if (b.updatedAt) {
           <div><span class="batch-header__meta-label">Last updated:</span> {{ b.updatedAt | date: 'medium' }}</div>
         }
+        @if (linkedProject(); as project) {
+          <div>
+            <span class="batch-header__meta-label">Project:</span>
+            <a [routerLink]="['/projects', project.id]">{{ project.name }}</a>
+          </div>
+        }
       </div>
       @if (b.notes) {
         <div class="batch-header__notes">{{ b.notes }}</div>

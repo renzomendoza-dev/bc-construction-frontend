@@ -1,0 +1,63 @@
+<div class="workers-page">
+
+  <div class="workers-page__header">
+    <div class="workers-page__title">Workers</div>
+    @if (canCreate) {
+      <button type="button" class="btn-primary" (click)="createNew()">+ New Worker</button>
+    }
+  </div>
+
+  <div class="workers-page__filters">
+    <select class="filter-select" [value]="activeFilter()" (change)="onActiveFilterChange($any($event.target).value)">
+      <option value="active">Active</option>
+      <option value="inactive">Inactive</option>
+      <option value="all">All</option>
+    </select>
+  </div>
+
+  <div class="workers-table">
+
+    @if (loading()) {
+      <div class="table-state">Loading…</div>
+    } @else if (errorMessage()) {
+      <div class="table-state table-state--error">{{ errorMessage() }}</div>
+    } @else if (hasResults()) {
+      <div class="workers-table__head">
+        <div>Name</div>
+        <div>Position</div>
+        <div class="align-right">Daily Rate</div>
+        <div>Status</div>
+      </div>
+
+      @for (w of pageItems(); track w.id) {
+        <div class="workers-table__row" (click)="openWorker(w.id)">
+          <div class="workers-table__name">{{ w.name }}</div>
+          <div class="workers-table__position">{{ w.position || '—' }}</div>
+          <div class="align-right workers-table__rate">{{ w.dailyRate !== undefined ? formatPeso(w.dailyRate) : '—' }}</div>
+          <div>
+            <span class="status-badge" [class.status-badge--inactive]="w.active === false">
+              {{ w.active === false ? 'Inactive' : 'Active' }}
+            </span>
+          </div>
+        </div>
+      }
+    } @else {
+      <div class="empty-state">
+        <div class="empty-state__title">No workers match your filters</div>
+        <div class="empty-state__subtitle">Try adjusting the status filter.</div>
+      </div>
+    }
+
+  </div>
+
+  @if (!loading() && hasResults()) {
+    <div class="workers-pagination">
+      <div class="workers-pagination__summary">{{ pageSummary() }}</div>
+      <div class="workers-pagination__controls">
+        <button type="button" [disabled]="currentPage() <= 1" (click)="prevPage()">Previous</button>
+        <button type="button" [disabled]="currentPage() >= totalPages()" (click)="nextPage()">Next</button>
+      </div>
+    </div>
+  }
+
+</div>

@@ -80,7 +80,7 @@ export class ProjectCreateComponent {
       endDate: this.endDate() || undefined,
     };
 
-    this.projectsService.create(body).subscribe({
+    this.projectsService.create1(body).subscribe({
       next: (created) => {
         this.saving.set(false);
         this.router.navigate(['/projects', created.id]);
