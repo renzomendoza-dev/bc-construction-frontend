@@ -55,15 +55,15 @@ export class ProjectExpensesService extends BaseService {
      * @param reportProgress flag to report request and response progress.
      * @param options additional options
      */
-    public create2(projectId: number, projectExpenseCreateRequest: ProjectExpenseCreateRequest, observe?: 'body', reportProgress?: boolean, options?: {httpHeaderAccept?: 'application/json', context?: HttpContext, transferCache?: boolean}): Observable<ProjectExpenseResponse>;
-    public create2(projectId: number, projectExpenseCreateRequest: ProjectExpenseCreateRequest, observe?: 'response', reportProgress?: boolean, options?: {httpHeaderAccept?: 'application/json', context?: HttpContext, transferCache?: boolean}): Observable<HttpResponse<ProjectExpenseResponse>>;
-    public create2(projectId: number, projectExpenseCreateRequest: ProjectExpenseCreateRequest, observe?: 'events', reportProgress?: boolean, options?: {httpHeaderAccept?: 'application/json', context?: HttpContext, transferCache?: boolean}): Observable<HttpEvent<ProjectExpenseResponse>>;
-    public create2(projectId: number, projectExpenseCreateRequest: ProjectExpenseCreateRequest, observe: any = 'body', reportProgress: boolean = false, options?: {httpHeaderAccept?: 'application/json', context?: HttpContext, transferCache?: boolean}): Observable<any> {
+    public create3(projectId: number, projectExpenseCreateRequest: ProjectExpenseCreateRequest, observe?: 'body', reportProgress?: boolean, options?: {httpHeaderAccept?: 'application/json', context?: HttpContext, transferCache?: boolean}): Observable<ProjectExpenseResponse>;
+    public create3(projectId: number, projectExpenseCreateRequest: ProjectExpenseCreateRequest, observe?: 'response', reportProgress?: boolean, options?: {httpHeaderAccept?: 'application/json', context?: HttpContext, transferCache?: boolean}): Observable<HttpResponse<ProjectExpenseResponse>>;
+    public create3(projectId: number, projectExpenseCreateRequest: ProjectExpenseCreateRequest, observe?: 'events', reportProgress?: boolean, options?: {httpHeaderAccept?: 'application/json', context?: HttpContext, transferCache?: boolean}): Observable<HttpEvent<ProjectExpenseResponse>>;
+    public create3(projectId: number, projectExpenseCreateRequest: ProjectExpenseCreateRequest, observe: any = 'body', reportProgress: boolean = false, options?: {httpHeaderAccept?: 'application/json', context?: HttpContext, transferCache?: boolean}): Observable<any> {
         if (projectId === null || projectId === undefined) {
-            throw new Error('Required parameter projectId was null or undefined when calling create2.');
+            throw new Error('Required parameter projectId was null or undefined when calling create3.');
         }
         if (projectExpenseCreateRequest === null || projectExpenseCreateRequest === undefined) {
-            throw new Error('Required parameter projectExpenseCreateRequest was null or undefined when calling create2.');
+            throw new Error('Required parameter projectExpenseCreateRequest was null or undefined when calling create3.');
         }
 
         let localVarHeaders = this.defaultHeaders;
@@ -256,12 +256,12 @@ export class ProjectExpensesService extends BaseService {
      * @param reportProgress flag to report request and response progress.
      * @param options additional options
      */
-    public search3(projectId: number, category?: 'LABOR' | 'MATERIAL' | 'OTHER', page?: number, size?: number, sort?: Array<string>, observe?: 'body', reportProgress?: boolean, options?: {httpHeaderAccept?: 'application/json', context?: HttpContext, transferCache?: boolean}): Observable<PageResponse>;
-    public search3(projectId: number, category?: 'LABOR' | 'MATERIAL' | 'OTHER', page?: number, size?: number, sort?: Array<string>, observe?: 'response', reportProgress?: boolean, options?: {httpHeaderAccept?: 'application/json', context?: HttpContext, transferCache?: boolean}): Observable<HttpResponse<PageResponse>>;
-    public search3(projectId: number, category?: 'LABOR' | 'MATERIAL' | 'OTHER', page?: number, size?: number, sort?: Array<string>, observe?: 'events', reportProgress?: boolean, options?: {httpHeaderAccept?: 'application/json', context?: HttpContext, transferCache?: boolean}): Observable<HttpEvent<PageResponse>>;
-    public search3(projectId: number, category?: 'LABOR' | 'MATERIAL' | 'OTHER', page?: number, size?: number, sort?: Array<string>, observe: any = 'body', reportProgress: boolean = false, options?: {httpHeaderAccept?: 'application/json', context?: HttpContext, transferCache?: boolean}): Observable<any> {
+    public search4(projectId: number, category?: 'LABOR' | 'MATERIAL' | 'OTHER', page?: number, size?: number, sort?: Array<string>, observe?: 'body', reportProgress?: boolean, options?: {httpHeaderAccept?: 'application/json', context?: HttpContext, transferCache?: boolean}): Observable<PageResponse>;
+    public search4(projectId: number, category?: 'LABOR' | 'MATERIAL' | 'OTHER', page?: number, size?: number, sort?: Array<string>, observe?: 'response', reportProgress?: boolean, options?: {httpHeaderAccept?: 'application/json', context?: HttpContext, transferCache?: boolean}): Observable<HttpResponse<PageResponse>>;
+    public search4(projectId: number, category?: 'LABOR' | 'MATERIAL' | 'OTHER', page?: number, size?: number, sort?: Array<string>, observe?: 'events', reportProgress?: boolean, options?: {httpHeaderAccept?: 'application/json', context?: HttpContext, transferCache?: boolean}): Observable<HttpEvent<PageResponse>>;
+    public search4(projectId: number, category?: 'LABOR' | 'MATERIAL' | 'OTHER', page?: number, size?: number, sort?: Array<string>, observe: any = 'body', reportProgress: boolean = false, options?: {httpHeaderAccept?: 'application/json', context?: HttpContext, transferCache?: boolean}): Observable<any> {
         if (projectId === null || projectId === undefined) {
-            throw new Error('Required parameter projectId was null or undefined when calling search3.');
+            throw new Error('Required parameter projectId was null or undefined when calling search4.');
         }
 
         let localVarQueryParameters = new OpenApiHttpParams(this.encoder);

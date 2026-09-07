@@ -220,6 +220,13 @@ export const routes: Routes = [
           import('./features/workers/worker-create/worker-create').then((m) => m.WorkerCreateComponent),
       },
       {
+        path: 'calendar',
+        loadComponent: () =>
+          import('./features/workers/attendance-calendar/attendance-calendar').then(
+            (m) => m.AttendanceCalendarComponent,
+          ),
+      },
+      {
         path: ':id',
         loadComponent: () =>
           import('./features/workers/worker-detail/worker-detail').then((m) => m.WorkerDetailComponent),

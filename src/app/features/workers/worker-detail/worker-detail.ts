@@ -267,7 +267,7 @@ export class WorkerDetailComponent implements OnInit {
     this.attendanceSaving.set(true);
     this.attendanceFormError.set(null);
 
-    this.attendanceService.create5(body).subscribe({
+    this.attendanceService.create6(body).subscribe({
       next: () => {
         this.attendanceSaving.set(false);
         this.attendanceDialogOpen.set(false);
@@ -340,7 +340,7 @@ export class WorkerDetailComponent implements OnInit {
   private loadAttendance(workerId: number): void {
     this.attendanceLoading.set(true);
     this.attendanceError.set(null);
-    this.attendanceService.search6(workerId, undefined, undefined, undefined, 0, ATTENDANCE_FETCH_SIZE, undefined).subscribe({
+    this.attendanceService.search7(workerId, undefined, undefined, undefined, 0, ATTENDANCE_FETCH_SIZE, undefined).subscribe({
       next: (result) => {
         this.attendanceRecords.set((result.content ?? []) as AttendanceResponse[]);
         this.attendanceLoading.set(false);
@@ -353,7 +353,7 @@ export class WorkerDetailComponent implements OnInit {
   }
 
   private loadOpenProjects(): void {
-    this.projectsService.search2(undefined, 0, PROJECTS_FETCH_SIZE, undefined).subscribe({
+    this.projectsService.search3(undefined, 0, PROJECTS_FETCH_SIZE, undefined).subscribe({
       next: (result) => {
         const all = (result.content ?? []) as ProjectResponse[];
         this.projectOptions.set(

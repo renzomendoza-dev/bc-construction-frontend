@@ -25,6 +25,12 @@
   color: var(--heading-text);
 }
 
+.workers-page__header-actions {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
 .btn-primary {
   height: 38px;
   padding: 0 18px;
@@ -39,6 +45,23 @@
 
   &:hover:not(:disabled) {
     filter: brightness(1.08);
+  }
+}
+
+.btn-secondary {
+  height: 38px;
+  padding: 0 16px;
+  border-radius: 8px;
+  border: 1px solid var(--border);
+  background: var(--panel-bg);
+  color: var(--label-text);
+  font-family: 'IBM Plex Sans', sans-serif;
+  font-weight: 600;
+  font-size: 13.5px;
+  cursor: pointer;
+
+  &:hover:not(:disabled) {
+    background: var(--hover-bg);
   }
 }
 

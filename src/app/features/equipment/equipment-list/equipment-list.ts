@@ -454,7 +454,7 @@ export class EquipmentListComponent implements OnInit {
 
     this.newSaving.set(true);
     this.newError.set(null);
-    this.equipmentService.create4(request, 'body', undefined, this.jsonAccept).subscribe({
+    this.equipmentService.create5(request, 'body', undefined, this.jsonAccept).subscribe({
       next: () => {
         this.newSaving.set(false);
         this.newOpen.set(false);

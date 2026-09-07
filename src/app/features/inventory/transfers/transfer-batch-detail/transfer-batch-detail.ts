@@ -164,7 +164,7 @@ export class TransferBatchDetailComponent implements OnInit {
 
   private loadBatch(id: number): void {
     this.loading.set(true);
-    this.transferBatchesService.getById4(id).subscribe({
+    this.transferBatchesService.getById5(id).subscribe({
       next: (batch) => {
         this.batch.set(batch);
         this.loading.set(false);

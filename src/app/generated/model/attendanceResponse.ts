@@ -51,6 +51,14 @@ export interface AttendanceResponse {
      */
     notes?: string;
     /**
+     * Clock-in time — only set for a record created via the batch attendance endpoint
+     */
+    timeIn?: string;
+    /**
+     * Clock-out time — only set for a record created via the batch attendance endpoint
+     */
+    timeOut?: string;
+    /**
      * Identifier of the LABOR ProjectExpense this attendance record generated
      */
     projectExpenseId?: number;

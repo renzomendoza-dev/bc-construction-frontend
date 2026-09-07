@@ -17,11 +17,15 @@ import { Observable }                                        from 'rxjs';
 import { OpenApiHttpParams, QueryParamStyle } from '../query.params';
 
 // @ts-ignore
-import { EquipmentAssignmentBatchCreateRequest } from '../model/equipmentAssignmentBatchCreateRequest';
-// @ts-ignore
-import { EquipmentAssignmentBatchResponse } from '../model/equipmentAssignmentBatchResponse';
-// @ts-ignore
 import { ErrorResponse } from '../model/errorResponse';
+// @ts-ignore
+import { PageResponse } from '../model/pageResponse';
+// @ts-ignore
+import { ValidationErrorResponse } from '../model/validationErrorResponse';
+// @ts-ignore
+import { WorkerProjectAssignmentCreateRequest } from '../model/workerProjectAssignmentCreateRequest';
+// @ts-ignore
+import { WorkerProjectAssignmentResponse } from '../model/workerProjectAssignmentResponse';
 
 // @ts-ignore
 import { BASE_PATH, COLLECTION_FORMATS }                     from '../variables';
@@ -33,27 +37,27 @@ import { BaseService } from '../api.base.service';
 @Injectable({
   providedIn: 'root'
 })
-export class EquipmentAssignmentBatchesService extends BaseService {
+export class WorkerAssignmentsService extends BaseService {
 
     constructor(protected httpClient: HttpClient, @Optional() @Inject(BASE_PATH) basePath: string|string[], @Optional() configuration?: Configuration) {
         super(basePath, configuration);
     }
 
     /**
-     * Create a draft equipment assignment batch
-     * Records a batch of equipment assignments (checkouts), site-to-site transfers, or returns (check-ins) as a draft. This step does NOT change any equipment\&#39;s status — the batch must be submitted via POST /{id}/submit before it takes effect. destinationWarehouseId\&#39;s type only determines whether holderId is required, not which of assign-out/transfer this turns out to be per line: a SITE-type destination requires holderId (it covers BOTH assign-out, for equipment that\&#39;s currently AVAILABLE, and a direct transfer, for equipment that\&#39;s already CHECKED_OUT/IN_USE at a different site — which one a given line actually is depends on that equipment\&#39;s status at submit time, not anything checked here); a MAIN-type destination is always a return and holderId must be omitted.
-     * @endpoint post /api/equipment/assignment-batches
-     * @param equipmentAssignmentBatchCreateRequest 
+     * Assign a worker to a project
+     * 409 if the worker already has an active assignment — deactivate it first (PATCH /{id}/deactivate), then reassign; this endpoint never silently transfers.
+     * @endpoint post /api/worker-assignments
+     * @param workerProjectAssignmentCreateRequest 
      * @param observe set whether or not to return the data Observable as the body, response or events. defaults to returning the body.
      * @param reportProgress flag to report request and response progress.
      * @param options additional options
      */
-    public createDraft2(equipmentAssignmentBatchCreateRequest: EquipmentAssignmentBatchCreateRequest, observe?: 'body', reportProgress?: boolean, options?: {httpHeaderAccept?: '*/*', context?: HttpContext, transferCache?: boolean}): Observable<EquipmentAssignmentBatchResponse>;
-    public createDraft2(equipmentAssignmentBatchCreateRequest: EquipmentAssignmentBatchCreateRequest, observe?: 'response', reportProgress?: boolean, options?: {httpHeaderAccept?: '*/*', context?: HttpContext, transferCache?: boolean}): Observable<HttpResponse<EquipmentAssignmentBatchResponse>>;
-    public createDraft2(equipmentAssignmentBatchCreateRequest: EquipmentAssignmentBatchCreateRequest, observe?: 'events', reportProgress?: boolean, options?: {httpHeaderAccept?: '*/*', context?: HttpContext, transferCache?: boolean}): Observable<HttpEvent<EquipmentAssignmentBatchResponse>>;
-    public createDraft2(equipmentAssignmentBatchCreateRequest: EquipmentAssignmentBatchCreateRequest, observe: any = 'body', reportProgress: boolean = false, options?: {httpHeaderAccept?: '*/*', context?: HttpContext, transferCache?: boolean}): Observable<any> {
-        if (equipmentAssignmentBatchCreateRequest === null || equipmentAssignmentBatchCreateRequest === undefined) {
-            throw new Error('Required parameter equipmentAssignmentBatchCreateRequest was null or undefined when calling createDraft2.');
+    public create1(workerProjectAssignmentCreateRequest: WorkerProjectAssignmentCreateRequest, observe?: 'body', reportProgress?: boolean, options?: {httpHeaderAccept?: 'application/json', context?: HttpContext, transferCache?: boolean}): Observable<WorkerProjectAssignmentResponse>;
+    public create1(workerProjectAssignmentCreateRequest: WorkerProjectAssignmentCreateRequest, observe?: 'response', reportProgress?: boolean, options?: {httpHeaderAccept?: 'application/json', context?: HttpContext, transferCache?: boolean}): Observable<HttpResponse<WorkerProjectAssignmentResponse>>;
+    public create1(workerProjectAssignmentCreateRequest: WorkerProjectAssignmentCreateRequest, observe?: 'events', reportProgress?: boolean, options?: {httpHeaderAccept?: 'application/json', context?: HttpContext, transferCache?: boolean}): Observable<HttpEvent<WorkerProjectAssignmentResponse>>;
+    public create1(workerProjectAssignmentCreateRequest: WorkerProjectAssignmentCreateRequest, observe: any = 'body', reportProgress: boolean = false, options?: {httpHeaderAccept?: 'application/json', context?: HttpContext, transferCache?: boolean}): Observable<any> {
+        if (workerProjectAssignmentCreateRequest === null || workerProjectAssignmentCreateRequest === undefined) {
+            throw new Error('Required parameter workerProjectAssignmentCreateRequest was null or undefined when calling create1.');
         }
 
         let localVarHeaders = this.defaultHeaders;
@@ -62,7 +66,7 @@ export class EquipmentAssignmentBatchesService extends BaseService {
         localVarHeaders = this.configuration.addCredentialToHeaders('bearerAuth', 'Authorization', localVarHeaders, 'Bearer ');
 
         const localVarHttpHeaderAcceptSelected: string | undefined = options?.httpHeaderAccept ?? this.configuration.selectHeaderAccept([
-            '*/*'
+            'application/json'
         ]);
         if (localVarHttpHeaderAcceptSelected !== undefined) {
             localVarHeaders = localVarHeaders.set('Accept', localVarHttpHeaderAcceptSelected);
@@ -93,12 +97,12 @@ export class EquipmentAssignmentBatchesService extends BaseService {
             }
         }
 
-        let localVarPath = `/api/equipment/assignment-batches`;
+        let localVarPath = `/api/worker-assignments`;
         const { basePath, withCredentials } = this.configuration;
-        return this.httpClient.request<EquipmentAssignmentBatchResponse>('post', `${basePath}${localVarPath}`,
+        return this.httpClient.request<WorkerProjectAssignmentResponse>('post', `${basePath}${localVarPath}`,
             {
                 context: localVarHttpContext,
-                body: equipmentAssignmentBatchCreateRequest,
+                body: workerProjectAssignmentCreateRequest,
                 responseType: <any>responseType_,
                 ...(withCredentials ? { withCredentials } : {}),
                 headers: localVarHeaders,
@@ -110,24 +114,184 @@ export class EquipmentAssignmentBatchesService extends BaseService {
     }
 
     /**
-     * List equipment assignment batches, optionally filtered by status
-     * @endpoint get /api/equipment/assignment-batches
-     * @param status Optional status filter
+     * End a worker\&#39;s project assignment
+     * Idempotent — sets active to false. History is preserved, not deleted.
+     * @endpoint patch /api/worker-assignments/{id}/deactivate
+     * @param id Identifier of the assignment to deactivate
      * @param observe set whether or not to return the data Observable as the body, response or events. defaults to returning the body.
      * @param reportProgress flag to report request and response progress.
      * @param options additional options
      */
-    public findAll1(status?: 'DRAFT' | 'SUBMITTED' | 'COMPLETED', observe?: 'body', reportProgress?: boolean, options?: {httpHeaderAccept?: '*/*', context?: HttpContext, transferCache?: boolean}): Observable<Array<EquipmentAssignmentBatchResponse>>;
-    public findAll1(status?: 'DRAFT' | 'SUBMITTED' | 'COMPLETED', observe?: 'response', reportProgress?: boolean, options?: {httpHeaderAccept?: '*/*', context?: HttpContext, transferCache?: boolean}): Observable<HttpResponse<Array<EquipmentAssignmentBatchResponse>>>;
-    public findAll1(status?: 'DRAFT' | 'SUBMITTED' | 'COMPLETED', observe?: 'events', reportProgress?: boolean, options?: {httpHeaderAccept?: '*/*', context?: HttpContext, transferCache?: boolean}): Observable<HttpEvent<Array<EquipmentAssignmentBatchResponse>>>;
-    public findAll1(status?: 'DRAFT' | 'SUBMITTED' | 'COMPLETED', observe: any = 'body', reportProgress: boolean = false, options?: {httpHeaderAccept?: '*/*', context?: HttpContext, transferCache?: boolean}): Observable<any> {
+    public deactivate1(id: number, observe?: 'body', reportProgress?: boolean, options?: {httpHeaderAccept?: 'application/json', context?: HttpContext, transferCache?: boolean}): Observable<any>;
+    public deactivate1(id: number, observe?: 'response', reportProgress?: boolean, options?: {httpHeaderAccept?: 'application/json', context?: HttpContext, transferCache?: boolean}): Observable<HttpResponse<any>>;
+    public deactivate1(id: number, observe?: 'events', reportProgress?: boolean, options?: {httpHeaderAccept?: 'application/json', context?: HttpContext, transferCache?: boolean}): Observable<HttpEvent<any>>;
+    public deactivate1(id: number, observe: any = 'body', reportProgress: boolean = false, options?: {httpHeaderAccept?: 'application/json', context?: HttpContext, transferCache?: boolean}): Observable<any> {
+        if (id === null || id === undefined) {
+            throw new Error('Required parameter id was null or undefined when calling deactivate1.');
+        }
+
+        let localVarHeaders = this.defaultHeaders;
+
+        // authentication (bearerAuth) required
+        localVarHeaders = this.configuration.addCredentialToHeaders('bearerAuth', 'Authorization', localVarHeaders, 'Bearer ');
+
+        const localVarHttpHeaderAcceptSelected: string | undefined = options?.httpHeaderAccept ?? this.configuration.selectHeaderAccept([
+            'application/json'
+        ]);
+        if (localVarHttpHeaderAcceptSelected !== undefined) {
+            localVarHeaders = localVarHeaders.set('Accept', localVarHttpHeaderAcceptSelected);
+        }
+
+        const localVarHttpContext: HttpContext = options?.context ?? new HttpContext();
+
+        const localVarTransferCache: boolean = options?.transferCache ?? true;
+
+
+        let responseType_: 'text' | 'json' | 'blob' = 'json';
+        if (localVarHttpHeaderAcceptSelected) {
+            if (localVarHttpHeaderAcceptSelected.startsWith('text')) {
+                responseType_ = 'text';
+            } else if (this.configuration.isJsonMime(localVarHttpHeaderAcceptSelected)) {
+                responseType_ = 'json';
+            } else {
+                responseType_ = 'blob';
+            }
+        }
+
+        let localVarPath = `/api/worker-assignments/${this.configuration.encodeParam({name: "id", value: id, in: "path", style: "simple", explode: false, dataType: "number", dataFormat: "int64"})}/deactivate`;
+        const { basePath, withCredentials } = this.configuration;
+        return this.httpClient.request<any>('patch', `${basePath}${localVarPath}`,
+            {
+                context: localVarHttpContext,
+                responseType: <any>responseType_,
+                ...(withCredentials ? { withCredentials } : {}),
+                headers: localVarHeaders,
+                observe: observe,
+                ...(localVarTransferCache !== undefined ? { transferCache: localVarTransferCache } : {}),
+                reportProgress: reportProgress
+            }
+        );
+    }
+
+    /**
+     * Get an assignment by id
+     * @endpoint get /api/worker-assignments/{id}
+     * @param id Identifier of the assignment
+     * @param observe set whether or not to return the data Observable as the body, response or events. defaults to returning the body.
+     * @param reportProgress flag to report request and response progress.
+     * @param options additional options
+     */
+    public getById4(id: number, observe?: 'body', reportProgress?: boolean, options?: {httpHeaderAccept?: 'application/json', context?: HttpContext, transferCache?: boolean}): Observable<WorkerProjectAssignmentResponse>;
+    public getById4(id: number, observe?: 'response', reportProgress?: boolean, options?: {httpHeaderAccept?: 'application/json', context?: HttpContext, transferCache?: boolean}): Observable<HttpResponse<WorkerProjectAssignmentResponse>>;
+    public getById4(id: number, observe?: 'events', reportProgress?: boolean, options?: {httpHeaderAccept?: 'application/json', context?: HttpContext, transferCache?: boolean}): Observable<HttpEvent<WorkerProjectAssignmentResponse>>;
+    public getById4(id: number, observe: any = 'body', reportProgress: boolean = false, options?: {httpHeaderAccept?: 'application/json', context?: HttpContext, transferCache?: boolean}): Observable<any> {
+        if (id === null || id === undefined) {
+            throw new Error('Required parameter id was null or undefined when calling getById4.');
+        }
+
+        let localVarHeaders = this.defaultHeaders;
+
+        // authentication (bearerAuth) required
+        localVarHeaders = this.configuration.addCredentialToHeaders('bearerAuth', 'Authorization', localVarHeaders, 'Bearer ');
+
+        const localVarHttpHeaderAcceptSelected: string | undefined = options?.httpHeaderAccept ?? this.configuration.selectHeaderAccept([
+            'application/json'
+        ]);
+        if (localVarHttpHeaderAcceptSelected !== undefined) {
+            localVarHeaders = localVarHeaders.set('Accept', localVarHttpHeaderAcceptSelected);
+        }
+
+        const localVarHttpContext: HttpContext = options?.context ?? new HttpContext();
+
+        const localVarTransferCache: boolean = options?.transferCache ?? true;
+
+
+        let responseType_: 'text' | 'json' | 'blob' = 'json';
+        if (localVarHttpHeaderAcceptSelected) {
+            if (localVarHttpHeaderAcceptSelected.startsWith('text')) {
+                responseType_ = 'text';
+            } else if (this.configuration.isJsonMime(localVarHttpHeaderAcceptSelected)) {
+                responseType_ = 'json';
+            } else {
+                responseType_ = 'blob';
+            }
+        }
+
+        let localVarPath = `/api/worker-assignments/${this.configuration.encodeParam({name: "id", value: id, in: "path", style: "simple", explode: false, dataType: "number", dataFormat: "int64"})}`;
+        const { basePath, withCredentials } = this.configuration;
+        return this.httpClient.request<WorkerProjectAssignmentResponse>('get', `${basePath}${localVarPath}`,
+            {
+                context: localVarHttpContext,
+                responseType: <any>responseType_,
+                ...(withCredentials ? { withCredentials } : {}),
+                headers: localVarHeaders,
+                observe: observe,
+                ...(localVarTransferCache !== undefined ? { transferCache: localVarTransferCache } : {}),
+                reportProgress: reportProgress
+            }
+        );
+    }
+
+    /**
+     * List worker-project assignments
+     * Returns a paged list of assignments, optionally filtered by project and/or active flag. GET ?projectId&#x3D;X&amp;active&#x3D;true is how the attendance batch form fetches a project\&#39;s crew.
+     * @endpoint get /api/worker-assignments
+     * @param projectId Filter by project
+     * @param active Filter by active flag
+     * @param page Zero-based page index (0..N)
+     * @param size The size of the page to be returned
+     * @param sort Sorting criteria in the format: property,(asc|desc). Default sort order is ascending. Multiple sort criteria are supported.
+     * @param observe set whether or not to return the data Observable as the body, response or events. defaults to returning the body.
+     * @param reportProgress flag to report request and response progress.
+     * @param options additional options
+     */
+    public search1(projectId?: number, active?: boolean, page?: number, size?: number, sort?: Array<string>, observe?: 'body', reportProgress?: boolean, options?: {httpHeaderAccept?: 'application/json', context?: HttpContext, transferCache?: boolean}): Observable<PageResponse>;
+    public search1(projectId?: number, active?: boolean, page?: number, size?: number, sort?: Array<string>, observe?: 'response', reportProgress?: boolean, options?: {httpHeaderAccept?: 'application/json', context?: HttpContext, transferCache?: boolean}): Observable<HttpResponse<PageResponse>>;
+    public search1(projectId?: number, active?: boolean, page?: number, size?: number, sort?: Array<string>, observe?: 'events', reportProgress?: boolean, options?: {httpHeaderAccept?: 'application/json', context?: HttpContext, transferCache?: boolean}): Observable<HttpEvent<PageResponse>>;
+    public search1(projectId?: number, active?: boolean, page?: number, size?: number, sort?: Array<string>, observe: any = 'body', reportProgress: boolean = false, options?: {httpHeaderAccept?: 'application/json', context?: HttpContext, transferCache?: boolean}): Observable<any> {
 
         let localVarQueryParameters = new OpenApiHttpParams(this.encoder);
 
         localVarQueryParameters = this.addToHttpParams(
             localVarQueryParameters,
-            'status',
-            <any>status,
+            'projectId',
+            <any>projectId,
+            QueryParamStyle.Form,
+            true,
+        );
+
+
+        localVarQueryParameters = this.addToHttpParams(
+            localVarQueryParameters,
+            'active',
+            <any>active,
+            QueryParamStyle.Form,
+            true,
+        );
+
+
+        localVarQueryParameters = this.addToHttpParams(
+            localVarQueryParameters,
+            'page',
+            <any>page,
+            QueryParamStyle.Form,
+            true,
+        );
+
+
+        localVarQueryParameters = this.addToHttpParams(
+            localVarQueryParameters,
+            'size',
+            <any>size,
+            QueryParamStyle.Form,
+            true,
+        );
+
+
+        localVarQueryParameters = this.addToHttpParams(
+            localVarQueryParameters,
+            'sort',
+            <any>sort,
             QueryParamStyle.Form,
             true,
         );
@@ -139,7 +303,7 @@ export class EquipmentAssignmentBatchesService extends BaseService {
         localVarHeaders = this.configuration.addCredentialToHeaders('bearerAuth', 'Authorization', localVarHeaders, 'Bearer ');
 
         const localVarHttpHeaderAcceptSelected: string | undefined = options?.httpHeaderAccept ?? this.configuration.selectHeaderAccept([
-            '*/*'
+            'application/json'
         ]);
         if (localVarHttpHeaderAcceptSelected !== undefined) {
             localVarHeaders = localVarHeaders.set('Accept', localVarHttpHeaderAcceptSelected);
@@ -161,131 +325,12 @@ export class EquipmentAssignmentBatchesService extends BaseService {
             }
         }
 
-        let localVarPath = `/api/equipment/assignment-batches`;
+        let localVarPath = `/api/worker-assignments`;
         const { basePath, withCredentials } = this.configuration;
-        return this.httpClient.request<Array<EquipmentAssignmentBatchResponse>>('get', `${basePath}${localVarPath}`,
+        return this.httpClient.request<PageResponse>('get', `${basePath}${localVarPath}`,
             {
                 context: localVarHttpContext,
                 params: localVarQueryParameters.toHttpParams(),
-                responseType: <any>responseType_,
-                ...(withCredentials ? { withCredentials } : {}),
-                headers: localVarHeaders,
-                observe: observe,
-                ...(localVarTransferCache !== undefined ? { transferCache: localVarTransferCache } : {}),
-                reportProgress: reportProgress
-            }
-        );
-    }
-
-    /**
-     * Get an equipment assignment batch by id
-     * @endpoint get /api/equipment/assignment-batches/{id}
-     * @param id Identifier of the batch to retrieve
-     * @param observe set whether or not to return the data Observable as the body, response or events. defaults to returning the body.
-     * @param reportProgress flag to report request and response progress.
-     * @param options additional options
-     */
-    public getById6(id: number, observe?: 'body', reportProgress?: boolean, options?: {httpHeaderAccept?: '*/*', context?: HttpContext, transferCache?: boolean}): Observable<EquipmentAssignmentBatchResponse>;
-    public getById6(id: number, observe?: 'response', reportProgress?: boolean, options?: {httpHeaderAccept?: '*/*', context?: HttpContext, transferCache?: boolean}): Observable<HttpResponse<EquipmentAssignmentBatchResponse>>;
-    public getById6(id: number, observe?: 'events', reportProgress?: boolean, options?: {httpHeaderAccept?: '*/*', context?: HttpContext, transferCache?: boolean}): Observable<HttpEvent<EquipmentAssignmentBatchResponse>>;
-    public getById6(id: number, observe: any = 'body', reportProgress: boolean = false, options?: {httpHeaderAccept?: '*/*', context?: HttpContext, transferCache?: boolean}): Observable<any> {
-        if (id === null || id === undefined) {
-            throw new Error('Required parameter id was null or undefined when calling getById6.');
-        }
-
-        let localVarHeaders = this.defaultHeaders;
-
-        // authentication (bearerAuth) required
-        localVarHeaders = this.configuration.addCredentialToHeaders('bearerAuth', 'Authorization', localVarHeaders, 'Bearer ');
-
-        const localVarHttpHeaderAcceptSelected: string | undefined = options?.httpHeaderAccept ?? this.configuration.selectHeaderAccept([
-            '*/*'
-        ]);
-        if (localVarHttpHeaderAcceptSelected !== undefined) {
-            localVarHeaders = localVarHeaders.set('Accept', localVarHttpHeaderAcceptSelected);
-        }
-
-        const localVarHttpContext: HttpContext = options?.context ?? new HttpContext();
-
-        const localVarTransferCache: boolean = options?.transferCache ?? true;
-
-
-        let responseType_: 'text' | 'json' | 'blob' = 'json';
-        if (localVarHttpHeaderAcceptSelected) {
-            if (localVarHttpHeaderAcceptSelected.startsWith('text')) {
-                responseType_ = 'text';
-            } else if (this.configuration.isJsonMime(localVarHttpHeaderAcceptSelected)) {
-                responseType_ = 'json';
-            } else {
-                responseType_ = 'blob';
-            }
-        }
-
-        let localVarPath = `/api/equipment/assignment-batches/${this.configuration.encodeParam({name: "id", value: id, in: "path", style: "simple", explode: false, dataType: "number", dataFormat: "int64"})}`;
-        const { basePath, withCredentials } = this.configuration;
-        return this.httpClient.request<EquipmentAssignmentBatchResponse>('get', `${basePath}${localVarPath}`,
-            {
-                context: localVarHttpContext,
-                responseType: <any>responseType_,
-                ...(withCredentials ? { withCredentials } : {}),
-                headers: localVarHeaders,
-                observe: observe,
-                ...(localVarTransferCache !== undefined ? { transferCache: localVarTransferCache } : {}),
-                reportProgress: reportProgress
-            }
-        );
-    }
-
-    /**
-     * Submit a draft equipment assignment batch
-     * Applies a draft batch: for each line, delegates to the same single-item checkout/check-in logic used by /api/equipment/{id}/checkout|checkin (checkOut is used whenever this batch has a holderId — it resolves assign-out vs. transfer per line itself, from that equipment\&#39;s current status; checkIn is used otherwise, for a return). The whole operation is one transaction — if any line fails, nothing is applied and the batch stays in its prior state. Per line, the equipment\&#39;s current status must be valid: AVAILABLE for an assign-out line, CHECKED_OUT or IN_USE for a transfer or return line — violating this is rejected with 409, matching this module\&#39;s existing checkOut() convention for \&#39;equipment not in the right status for this operation\&#39; (InvalidEquipmentStatusException), rather than the 422 used for the analogous case in the inventory module. A transfer line whose destination is the warehouse that equipment is already at is rejected with 400 (EquipmentAlreadyAtWarehouseException).
-     * @endpoint post /api/equipment/assignment-batches/{id}/submit
-     * @param id Identifier of the batch to submit
-     * @param observe set whether or not to return the data Observable as the body, response or events. defaults to returning the body.
-     * @param reportProgress flag to report request and response progress.
-     * @param options additional options
-     */
-    public submit2(id: number, observe?: 'body', reportProgress?: boolean, options?: {httpHeaderAccept?: '*/*', context?: HttpContext, transferCache?: boolean}): Observable<EquipmentAssignmentBatchResponse>;
-    public submit2(id: number, observe?: 'response', reportProgress?: boolean, options?: {httpHeaderAccept?: '*/*', context?: HttpContext, transferCache?: boolean}): Observable<HttpResponse<EquipmentAssignmentBatchResponse>>;
-    public submit2(id: number, observe?: 'events', reportProgress?: boolean, options?: {httpHeaderAccept?: '*/*', context?: HttpContext, transferCache?: boolean}): Observable<HttpEvent<EquipmentAssignmentBatchResponse>>;
-    public submit2(id: number, observe: any = 'body', reportProgress: boolean = false, options?: {httpHeaderAccept?: '*/*', context?: HttpContext, transferCache?: boolean}): Observable<any> {
-        if (id === null || id === undefined) {
-            throw new Error('Required parameter id was null or undefined when calling submit2.');
-        }
-
-        let localVarHeaders = this.defaultHeaders;
-
-        // authentication (bearerAuth) required
-        localVarHeaders = this.configuration.addCredentialToHeaders('bearerAuth', 'Authorization', localVarHeaders, 'Bearer ');
-
-        const localVarHttpHeaderAcceptSelected: string | undefined = options?.httpHeaderAccept ?? this.configuration.selectHeaderAccept([
-            '*/*'
-        ]);
-        if (localVarHttpHeaderAcceptSelected !== undefined) {
-            localVarHeaders = localVarHeaders.set('Accept', localVarHttpHeaderAcceptSelected);
-        }
-
-        const localVarHttpContext: HttpContext = options?.context ?? new HttpContext();
-
-        const localVarTransferCache: boolean = options?.transferCache ?? true;
-
-
-        let responseType_: 'text' | 'json' | 'blob' = 'json';
-        if (localVarHttpHeaderAcceptSelected) {
-            if (localVarHttpHeaderAcceptSelected.startsWith('text')) {
-                responseType_ = 'text';
-            } else if (this.configuration.isJsonMime(localVarHttpHeaderAcceptSelected)) {
-                responseType_ = 'json';
-            } else {
-                responseType_ = 'blob';
-            }
-        }
-
-        let localVarPath = `/api/equipment/assignment-batches/${this.configuration.encodeParam({name: "id", value: id, in: "path", style: "simple", explode: false, dataType: "number", dataFormat: "int64"})}/submit`;
-        const { basePath, withCredentials } = this.configuration;
-        return this.httpClient.request<EquipmentAssignmentBatchResponse>('post', `${basePath}${localVarPath}`,
-            {
-                context: localVarHttpContext,
                 responseType: <any>responseType_,
                 ...(withCredentials ? { withCredentials } : {}),
                 headers: localVarHeaders,

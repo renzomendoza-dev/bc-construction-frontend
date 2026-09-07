@@ -101,7 +101,7 @@ export class ProjectsListComponent implements OnInit {
     this.loading.set(true);
     this.errorMessage.set(null);
 
-    this.projectsService.search2(undefined, 0, FETCH_SIZE, undefined).subscribe({
+    this.projectsService.search3(undefined, 0, FETCH_SIZE, undefined).subscribe({
       next: (result) => {
         this.allProjects.set((result.content ?? []) as ProjectResponse[]);
         this.loading.set(false);

@@ -20,12 +20,18 @@ api/suppliers.service.ts
 api/transferBatches.service.ts
 api/user.service.ts
 api/warehouses.service.ts
+api/workerAssignments.service.ts
 api/workers.service.ts
 configuration.ts
 encoder.ts
 git_push.sh
 index.ts
 model/adminUserResponse.ts
+model/attendanceBatchCreateRequest.ts
+model/attendanceBatchLineRequest.ts
+model/attendanceBatchResponse.ts
+model/attendanceBatchSkippedEntry.ts
+model/attendanceCalendarEntry.ts
 model/attendanceCreateRequest.ts
 model/attendanceResponse.ts
 model/equipmentAssignmentBatchCreateRequest.ts
@@ -94,6 +100,8 @@ model/warehouseCreateRequest.ts
 model/warehouseResponse.ts
 model/warehouseUpdateRequest.ts
 model/workerCreateRequest.ts
+model/workerProjectAssignmentCreateRequest.ts
+model/workerProjectAssignmentResponse.ts
 model/workerResponse.ts
 model/workerUpdateRequest.ts
 param.ts

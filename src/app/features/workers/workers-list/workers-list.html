@@ -2,9 +2,12 @@
 
   <div class="workers-page__header">
     <div class="workers-page__title">Workers</div>
-    @if (canCreate) {
-      <button type="button" class="btn-primary" (click)="createNew()">+ New Worker</button>
-    }
+    <div class="workers-page__header-actions">
+      <button type="button" class="btn-secondary" (click)="openCalendar()">Attendance Calendar</button>
+      @if (canCreate) {
+        <button type="button" class="btn-primary" (click)="createNew()">+ New Worker</button>
+      }
+    </div>
   </div>
 
   <div class="workers-page__filters">

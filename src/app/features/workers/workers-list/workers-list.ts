@@ -85,6 +85,10 @@ export class WorkersListComponent implements OnInit {
     this.router.navigate(['/workers/new']);
   }
 
+  openCalendar(): void {
+    this.router.navigate(['/workers/calendar']);
+  }
+
   private fetchWorkers(): void {
     this.loading.set(true);
     this.errorMessage.set(null);

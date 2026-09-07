@@ -118,6 +118,34 @@
       }
     </div>
 
+    <!-- ===== Crew ===== -->
+    <div class="card">
+      <div class="expenses-header">
+        <div class="card__title">Crew</div>
+        @if (canAddToCrew) {
+          <button type="button" class="btn-secondary" (click)="openAddCrewDialog()">+ Add to Crew</button>
+        }
+      </div>
+
+      @if (crewLoading()) {
+        <div class="table-state">Loading…</div>
+      } @else if (crewError()) {
+        <div class="table-state table-state--error">{{ crewError() }}</div>
+      } @else if (crew().length > 0) {
+        @for (c of crew(); track c.id) {
+          <div class="crew-row">
+            <div class="crew-row__name">{{ c.workerName }}</div>
+            <div class="crew-row__since">Since {{ c.createdAt | date: 'mediumDate' }}</div>
+            @if (canRemoveFromCrew) {
+              <button type="button" class="btn-link-danger" (click)="openRemoveCrewDialog(c)">Remove</button>
+            }
+          </div>
+        }
+      } @else {
+        <div class="table-state">No workers currently assigned to this project.</div>
+      }
+    </div>
+
     <!-- ===== Expenses list ===== -->
     <div class="card">
       <div class="expenses-header">
@@ -210,6 +238,52 @@
         <button type="button" class="btn-secondary" [disabled]="expenseSaving()" (click)="closeExpenseDialog()">Cancel</button>
         <button type="button" class="btn-primary" [disabled]="expenseSaving()" (click)="submitExpense()">
           {{ expenseSaving() ? 'Saving…' : 'Add Expense' }}
+        </button>
+      </div>
+    </div>
+  }
+
+  @if (addCrewDialogOpen()) {
+    <div class="scrim" (click)="closeAddCrewDialog()"></div>
+    <div class="dialog">
+      <div class="dialog__title">Add to Crew</div>
+
+      @if (addCrewError()) {
+        <div class="form-error">{{ addCrewError() }}</div>
+      }
+
+      <div class="dialog-form">
+        <div class="form-field">
+          <label>Worker</label>
+          <select [value]="addCrewWorkerId() ?? ''" (change)="onAddCrewWorkerChange($any($event.target).value)">
+            <option value="" disabled>Select a worker…</option>
+            @for (w of addableWorkers(); track w.id) {
+              <option [value]="w.id">{{ w.name }}</option>
+            }
+          </select>
+        </div>
+      </div>
+
+      <div class="dialog__actions">
+        <button type="button" class="btn-secondary" [disabled]="addingToCrew()" (click)="closeAddCrewDialog()">Cancel</button>
+        <button type="button" class="btn-primary" [disabled]="addingToCrew()" (click)="submitAddToCrew()">
+          {{ addingToCrew() ? 'Adding…' : 'Add to Crew' }}
+        </button>
+      </div>
+    </div>
+  }
+
+  @if (removeCrewTarget(); as target) {
+    <div class="scrim" (click)="closeRemoveCrewDialog()"></div>
+    <div class="dialog">
+      <div class="dialog__title">Remove "{{ target.workerName }}" from this crew?</div>
+      <div class="dialog__body">
+        This only ends their assignment to this project's crew — their attendance history is untouched.
+      </div>
+      <div class="dialog__actions">
+        <button type="button" class="btn-secondary" [disabled]="removingFromCrew()" (click)="closeRemoveCrewDialog()">Cancel</button>
+        <button type="button" class="btn-danger-outline" [disabled]="removingFromCrew()" (click)="removeFromCrew()">
+          {{ removingFromCrew() ? 'Removing…' : 'Yes, Remove' }}
         </button>
       </div>
     </div>

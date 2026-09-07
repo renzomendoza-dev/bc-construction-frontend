@@ -17,6 +17,12 @@ import { Observable }                                        from 'rxjs';
 import { OpenApiHttpParams, QueryParamStyle } from '../query.params';
 
 // @ts-ignore
+import { AttendanceBatchCreateRequest } from '../model/attendanceBatchCreateRequest';
+// @ts-ignore
+import { AttendanceBatchResponse } from '../model/attendanceBatchResponse';
+// @ts-ignore
+import { AttendanceCalendarEntry } from '../model/attendanceCalendarEntry';
+// @ts-ignore
 import { AttendanceCreateRequest } from '../model/attendanceCreateRequest';
 // @ts-ignore
 import { AttendanceResponse } from '../model/attendanceResponse';
@@ -44,6 +50,95 @@ export class AttendanceService extends BaseService {
     }
 
     /**
+     * Get a calendar summary of recorded attendance
+     * One entry per (date, project) with any recorded attendance in range, plus a distinct-worker count — shaped for calendar rendering. Reflects only what\&#39;s actually been recorded, not assigned-but-not-yet-recorded crew size.
+     * @endpoint get /api/attendance/calendar
+     * @param projectId Filter by project
+     * @param dateFrom Filter to date &gt;&#x3D; this date
+     * @param dateTo Filter to date &lt;&#x3D; this date
+     * @param observe set whether or not to return the data Observable as the body, response or events. defaults to returning the body.
+     * @param reportProgress flag to report request and response progress.
+     * @param options additional options
+     */
+    public calendar(projectId?: number, dateFrom?: string, dateTo?: string, observe?: 'body', reportProgress?: boolean, options?: {httpHeaderAccept?: 'application/json', context?: HttpContext, transferCache?: boolean}): Observable<AttendanceCalendarEntry>;
+    public calendar(projectId?: number, dateFrom?: string, dateTo?: string, observe?: 'response', reportProgress?: boolean, options?: {httpHeaderAccept?: 'application/json', context?: HttpContext, transferCache?: boolean}): Observable<HttpResponse<AttendanceCalendarEntry>>;
+    public calendar(projectId?: number, dateFrom?: string, dateTo?: string, observe?: 'events', reportProgress?: boolean, options?: {httpHeaderAccept?: 'application/json', context?: HttpContext, transferCache?: boolean}): Observable<HttpEvent<AttendanceCalendarEntry>>;
+    public calendar(projectId?: number, dateFrom?: string, dateTo?: string, observe: any = 'body', reportProgress: boolean = false, options?: {httpHeaderAccept?: 'application/json', context?: HttpContext, transferCache?: boolean}): Observable<any> {
+
+        let localVarQueryParameters = new OpenApiHttpParams(this.encoder);
+
+        localVarQueryParameters = this.addToHttpParams(
+            localVarQueryParameters,
+            'projectId',
+            <any>projectId,
+            QueryParamStyle.Form,
+            true,
+        );
+
+
+        localVarQueryParameters = this.addToHttpParams(
+            localVarQueryParameters,
+            'dateFrom',
+            <any>dateFrom,
+            QueryParamStyle.Form,
+            true,
+        );
+
+
+        localVarQueryParameters = this.addToHttpParams(
+            localVarQueryParameters,
+            'dateTo',
+            <any>dateTo,
+            QueryParamStyle.Form,
+            true,
+        );
+
+
+        let localVarHeaders = this.defaultHeaders;
+
+        // authentication (bearerAuth) required
+        localVarHeaders = this.configuration.addCredentialToHeaders('bearerAuth', 'Authorization', localVarHeaders, 'Bearer ');
+
+        const localVarHttpHeaderAcceptSelected: string | undefined = options?.httpHeaderAccept ?? this.configuration.selectHeaderAccept([
+            'application/json'
+        ]);
+        if (localVarHttpHeaderAcceptSelected !== undefined) {
+            localVarHeaders = localVarHeaders.set('Accept', localVarHttpHeaderAcceptSelected);
+        }
+
+        const localVarHttpContext: HttpContext = options?.context ?? new HttpContext();
+
+        const localVarTransferCache: boolean = options?.transferCache ?? true;
+
+
+        let responseType_: 'text' | 'json' | 'blob' = 'json';
+        if (localVarHttpHeaderAcceptSelected) {
+            if (localVarHttpHeaderAcceptSelected.startsWith('text')) {
+                responseType_ = 'text';
+            } else if (this.configuration.isJsonMime(localVarHttpHeaderAcceptSelected)) {
+                responseType_ = 'json';
+            } else {
+                responseType_ = 'blob';
+            }
+        }
+
+        let localVarPath = `/api/attendance/calendar`;
+        const { basePath, withCredentials } = this.configuration;
+        return this.httpClient.request<AttendanceCalendarEntry>('get', `${basePath}${localVarPath}`,
+            {
+                context: localVarHttpContext,
+                params: localVarQueryParameters.toHttpParams(),
+                responseType: <any>responseType_,
+                ...(withCredentials ? { withCredentials } : {}),
+                headers: localVarHeaders,
+                observe: observe,
+                ...(localVarTransferCache !== undefined ? { transferCache: localVarTransferCache } : {}),
+                reportProgress: reportProgress
+            }
+        );
+    }
+
+    /**
      * Record one worker\&#39;s attendance for one day
      * At most one record per worker per day (409 on a duplicate). Automatically creates a LABOR ProjectExpense on the referenced project (amount &#x3D; the worker\&#39;s current dailyRate * daysPresent) — 422 if that project is COMPLETED/CANCELLED, same lock rule as recording an expense manually. 400 if the worker is inactive.
      * @endpoint post /api/attendance
@@ -52,12 +147,12 @@ export class AttendanceService extends BaseService {
      * @param reportProgress flag to report request and response progress.
      * @param options additional options
      */
-    public create5(attendanceCreateRequest: AttendanceCreateRequest, observe?: 'body', reportProgress?: boolean, options?: {httpHeaderAccept?: 'application/json', context?: HttpContext, transferCache?: boolean}): Observable<AttendanceResponse>;
-    public create5(attendanceCreateRequest: AttendanceCreateRequest, observe?: 'response', reportProgress?: boolean, options?: {httpHeaderAccept?: 'application/json', context?: HttpContext, transferCache?: boolean}): Observable<HttpResponse<AttendanceResponse>>;
-    public create5(attendanceCreateRequest: AttendanceCreateRequest, observe?: 'events', reportProgress?: boolean, options?: {httpHeaderAccept?: 'application/json', context?: HttpContext, transferCache?: boolean}): Observable<HttpEvent<AttendanceResponse>>;
-    public create5(attendanceCreateRequest: AttendanceCreateRequest, observe: any = 'body', reportProgress: boolean = false, options?: {httpHeaderAccept?: 'application/json', context?: HttpContext, transferCache?: boolean}): Observable<any> {
+    public create6(attendanceCreateRequest: AttendanceCreateRequest, observe?: 'body', reportProgress?: boolean, options?: {httpHeaderAccept?: 'application/json', context?: HttpContext, transferCache?: boolean}): Observable<AttendanceResponse>;
+    public create6(attendanceCreateRequest: AttendanceCreateRequest, observe?: 'response', reportProgress?: boolean, options?: {httpHeaderAccept?: 'application/json', context?: HttpContext, transferCache?: boolean}): Observable<HttpResponse<AttendanceResponse>>;
+    public create6(attendanceCreateRequest: AttendanceCreateRequest, observe?: 'events', reportProgress?: boolean, options?: {httpHeaderAccept?: 'application/json', context?: HttpContext, transferCache?: boolean}): Observable<HttpEvent<AttendanceResponse>>;
+    public create6(attendanceCreateRequest: AttendanceCreateRequest, observe: any = 'body', reportProgress: boolean = false, options?: {httpHeaderAccept?: 'application/json', context?: HttpContext, transferCache?: boolean}): Observable<any> {
         if (attendanceCreateRequest === null || attendanceCreateRequest === undefined) {
-            throw new Error('Required parameter attendanceCreateRequest was null or undefined when calling create5.');
+            throw new Error('Required parameter attendanceCreateRequest was null or undefined when calling create6.');
         }
 
         let localVarHeaders = this.defaultHeaders;
@@ -103,6 +198,76 @@ export class AttendanceService extends BaseService {
             {
                 context: localVarHttpContext,
                 body: attendanceCreateRequest,
+                responseType: <any>responseType_,
+                ...(withCredentials ? { withCredentials } : {}),
+                headers: localVarHeaders,
+                observe: observe,
+                ...(localVarTransferCache !== undefined ? { transferCache: localVarTransferCache } : {}),
+                reportProgress: reportProgress
+            }
+        );
+    }
+
+    /**
+     * Record attendance for multiple workers on one project/day in a single batch
+     * Derives daysPresent per entry from timeIn/timeOut (capped at one standard 8-hour day) using the same dailyRate * daysPresent expense formula as the single-record endpoint. A worker who already has a record for this date is skipped (not an error) and reported in the response — revisiting an already-recorded day is a normal, expected use of the calendar. Any other failure (inactive worker, worker/project not found, timeOut not after timeIn, a duplicate workerId within the same request, or the project being COMPLETED/CANCELLED) aborts the whole batch — same all-or-nothing transaction as POST /api/inventory/transfer-batches/{id}/submit.
+     * @endpoint post /api/attendance/batch
+     * @param attendanceBatchCreateRequest 
+     * @param observe set whether or not to return the data Observable as the body, response or events. defaults to returning the body.
+     * @param reportProgress flag to report request and response progress.
+     * @param options additional options
+     */
+    public createBatch(attendanceBatchCreateRequest: AttendanceBatchCreateRequest, observe?: 'body', reportProgress?: boolean, options?: {httpHeaderAccept?: 'application/json', context?: HttpContext, transferCache?: boolean}): Observable<AttendanceBatchResponse>;
+    public createBatch(attendanceBatchCreateRequest: AttendanceBatchCreateRequest, observe?: 'response', reportProgress?: boolean, options?: {httpHeaderAccept?: 'application/json', context?: HttpContext, transferCache?: boolean}): Observable<HttpResponse<AttendanceBatchResponse>>;
+    public createBatch(attendanceBatchCreateRequest: AttendanceBatchCreateRequest, observe?: 'events', reportProgress?: boolean, options?: {httpHeaderAccept?: 'application/json', context?: HttpContext, transferCache?: boolean}): Observable<HttpEvent<AttendanceBatchResponse>>;
+    public createBatch(attendanceBatchCreateRequest: AttendanceBatchCreateRequest, observe: any = 'body', reportProgress: boolean = false, options?: {httpHeaderAccept?: 'application/json', context?: HttpContext, transferCache?: boolean}): Observable<any> {
+        if (attendanceBatchCreateRequest === null || attendanceBatchCreateRequest === undefined) {
+            throw new Error('Required parameter attendanceBatchCreateRequest was null or undefined when calling createBatch.');
+        }
+
+        let localVarHeaders = this.defaultHeaders;
+
+        // authentication (bearerAuth) required
+        localVarHeaders = this.configuration.addCredentialToHeaders('bearerAuth', 'Authorization', localVarHeaders, 'Bearer ');
+
+        const localVarHttpHeaderAcceptSelected: string | undefined = options?.httpHeaderAccept ?? this.configuration.selectHeaderAccept([
+            'application/json'
+        ]);
+        if (localVarHttpHeaderAcceptSelected !== undefined) {
+            localVarHeaders = localVarHeaders.set('Accept', localVarHttpHeaderAcceptSelected);
+        }
+
+        const localVarHttpContext: HttpContext = options?.context ?? new HttpContext();
+
+        const localVarTransferCache: boolean = options?.transferCache ?? true;
+
+
+        // to determine the Content-Type header
+        const consumes: string[] = [
+            'application/json'
+        ];
+        const httpContentTypeSelected: string | undefined = this.configuration.selectHeaderContentType(consumes);
+        if (httpContentTypeSelected !== undefined) {
+            localVarHeaders = localVarHeaders.set('Content-Type', httpContentTypeSelected);
+        }
+
+        let responseType_: 'text' | 'json' | 'blob' = 'json';
+        if (localVarHttpHeaderAcceptSelected) {
+            if (localVarHttpHeaderAcceptSelected.startsWith('text')) {
+                responseType_ = 'text';
+            } else if (this.configuration.isJsonMime(localVarHttpHeaderAcceptSelected)) {
+                responseType_ = 'json';
+            } else {
+                responseType_ = 'blob';
+            }
+        }
+
+        let localVarPath = `/api/attendance/batch`;
+        const { basePath, withCredentials } = this.configuration;
+        return this.httpClient.request<AttendanceBatchResponse>('post', `${basePath}${localVarPath}`,
+            {
+                context: localVarHttpContext,
+                body: attendanceBatchCreateRequest,
                 responseType: <any>responseType_,
                 ...(withCredentials ? { withCredentials } : {}),
                 headers: localVarHeaders,
@@ -181,12 +346,12 @@ export class AttendanceService extends BaseService {
      * @param reportProgress flag to report request and response progress.
      * @param options additional options
      */
-    public getById6(id: number, observe?: 'body', reportProgress?: boolean, options?: {httpHeaderAccept?: 'application/json', context?: HttpContext, transferCache?: boolean}): Observable<AttendanceResponse>;
-    public getById6(id: number, observe?: 'response', reportProgress?: boolean, options?: {httpHeaderAccept?: 'application/json', context?: HttpContext, transferCache?: boolean}): Observable<HttpResponse<AttendanceResponse>>;
-    public getById6(id: number, observe?: 'events', reportProgress?: boolean, options?: {httpHeaderAccept?: 'application/json', context?: HttpContext, transferCache?: boolean}): Observable<HttpEvent<AttendanceResponse>>;
-    public getById6(id: number, observe: any = 'body', reportProgress: boolean = false, options?: {httpHeaderAccept?: 'application/json', context?: HttpContext, transferCache?: boolean}): Observable<any> {
+    public getById7(id: number, observe?: 'body', reportProgress?: boolean, options?: {httpHeaderAccept?: 'application/json', context?: HttpContext, transferCache?: boolean}): Observable<AttendanceResponse>;
+    public getById7(id: number, observe?: 'response', reportProgress?: boolean, options?: {httpHeaderAccept?: 'application/json', context?: HttpContext, transferCache?: boolean}): Observable<HttpResponse<AttendanceResponse>>;
+    public getById7(id: number, observe?: 'events', reportProgress?: boolean, options?: {httpHeaderAccept?: 'application/json', context?: HttpContext, transferCache?: boolean}): Observable<HttpEvent<AttendanceResponse>>;
+    public getById7(id: number, observe: any = 'body', reportProgress: boolean = false, options?: {httpHeaderAccept?: 'application/json', context?: HttpContext, transferCache?: boolean}): Observable<any> {
         if (id === null || id === undefined) {
-            throw new Error('Required parameter id was null or undefined when calling getById6.');
+            throw new Error('Required parameter id was null or undefined when calling getById7.');
         }
 
         let localVarHeaders = this.defaultHeaders;
@@ -247,10 +412,10 @@ export class AttendanceService extends BaseService {
      * @param reportProgress flag to report request and response progress.
      * @param options additional options
      */
-    public search6(workerId?: number, projectId?: number, dateFrom?: string, dateTo?: string, page?: number, size?: number, sort?: Array<string>, observe?: 'body', reportProgress?: boolean, options?: {httpHeaderAccept?: 'application/json', context?: HttpContext, transferCache?: boolean}): Observable<PageResponse>;
-    public search6(workerId?: number, projectId?: number, dateFrom?: string, dateTo?: string, page?: number, size?: number, sort?: Array<string>, observe?: 'response', reportProgress?: boolean, options?: {httpHeaderAccept?: 'application/json', context?: HttpContext, transferCache?: boolean}): Observable<HttpResponse<PageResponse>>;
-    public search6(workerId?: number, projectId?: number, dateFrom?: string, dateTo?: string, page?: number, size?: number, sort?: Array<string>, observe?: 'events', reportProgress?: boolean, options?: {httpHeaderAccept?: 'application/json', context?: HttpContext, transferCache?: boolean}): Observable<HttpEvent<PageResponse>>;
-    public search6(workerId?: number, projectId?: number, dateFrom?: string, dateTo?: string, page?: number, size?: number, sort?: Array<string>, observe: any = 'body', reportProgress: boolean = false, options?: {httpHeaderAccept?: 'application/json', context?: HttpContext, transferCache?: boolean}): Observable<any> {
+    public search7(workerId?: number, projectId?: number, dateFrom?: string, dateTo?: string, page?: number, size?: number, sort?: Array<string>, observe?: 'body', reportProgress?: boolean, options?: {httpHeaderAccept?: 'application/json', context?: HttpContext, transferCache?: boolean}): Observable<PageResponse>;
+    public search7(workerId?: number, projectId?: number, dateFrom?: string, dateTo?: string, page?: number, size?: number, sort?: Array<string>, observe?: 'response', reportProgress?: boolean, options?: {httpHeaderAccept?: 'application/json', context?: HttpContext, transferCache?: boolean}): Observable<HttpResponse<PageResponse>>;
+    public search7(workerId?: number, projectId?: number, dateFrom?: string, dateTo?: string, page?: number, size?: number, sort?: Array<string>, observe?: 'events', reportProgress?: boolean, options?: {httpHeaderAccept?: 'application/json', context?: HttpContext, transferCache?: boolean}): Observable<HttpEvent<PageResponse>>;
+    public search7(workerId?: number, projectId?: number, dateFrom?: string, dateTo?: string, page?: number, size?: number, sort?: Array<string>, observe: any = 'body', reportProgress: boolean = false, options?: {httpHeaderAccept?: 'application/json', context?: HttpContext, transferCache?: boolean}): Observable<any> {
 
         let localVarQueryParameters = new OpenApiHttpParams(this.encoder);
 

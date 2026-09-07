@@ -9,7 +9,17 @@ import {
   ProjectsService,
   ProjectSummaryResponse,
   ProjectUpdateRequest,
+  WorkerAssignmentsService,
+  WorkerProjectAssignmentCreateRequest,
+  WorkerProjectAssignmentResponse,
+  WorkerResponse,
+  WorkersService,
 } from '../../../generated';
+
+// Same tradeoff as every other "fetch a batch, filter client-side" list in
+// this app — search()'s active filter already narrows the roster, so this
+// is just a generous page size, not full pagination.
+const ACTIVE_WORKERS_FETCH_SIZE = 300;
 import { formatPeso } from '../../../core/model.currency';
 import { CurrentUserService } from '../../../core/services/current-user';
 import { Permission } from '../../../core/constants/permissions';
@@ -30,6 +40,8 @@ export class ProjectDetailComponent implements OnInit {
   private readonly router = inject(Router);
   private readonly projectsService = inject(ProjectsService);
   private readonly expensesService = inject(ProjectExpensesService);
+  private readonly workerAssignmentsService = inject(WorkerAssignmentsService);
+  private readonly workersService = inject(WorkersService);
   private readonly currentUser = inject(CurrentUserService);
 
   readonly formatPeso = formatPeso;
@@ -37,6 +49,8 @@ export class ProjectDetailComponent implements OnInit {
   readonly canEdit = this.currentUser.hasPermission(Permission.ProjectEdit);
   readonly canComplete = this.currentUser.hasPermission(Permission.ProjectComplete);
   readonly canAddExpense = this.currentUser.hasPermission(Permission.ProjectExpenseCreate);
+  readonly canAddToCrew = this.currentUser.hasPermission(Permission.WorkerAssignmentCreate);
+  readonly canRemoveFromCrew = this.currentUser.hasPermission(Permission.WorkerAssignmentDeactivate);
 
   readonly project = signal<ProjectResponse | null>(null);
   readonly loading = signal(true);
@@ -78,6 +92,29 @@ export class ProjectDetailComponent implements OnInit {
   readonly expenseSaving = signal(false);
   readonly expenseError = signal<string | null>(null);
 
+  // ---- Crew ----
+  readonly crew = signal<WorkerProjectAssignmentResponse[]>([]);
+  readonly crewLoading = signal(false);
+  readonly crewError = signal<string | null>(null);
+
+  readonly addCrewDialogOpen = signal(false);
+  private readonly activeWorkers = signal<WorkerResponse[]>([]);
+  readonly addCrewWorkerId = signal<number | null>(null);
+  readonly addingToCrew = signal(false);
+  readonly addCrewError = signal<string | null>(null);
+
+  readonly removeCrewTarget = signal<WorkerProjectAssignmentResponse | null>(null);
+  readonly removingFromCrew = signal(false);
+
+  // Excludes workers already on this project's crew, so the picker only
+  // offers someone actually assignable — the backend still enforces this
+  // with a 409 (a worker can only have one active assignment anywhere), but
+  // filtering client-side avoids an avoidable round-trip for the common case.
+  readonly addableWorkers = computed(() => {
+    const onCrew = new Set(this.crew().map((c) => c.workerId));
+    return this.activeWorkers().filter((w) => w.id === undefined || !onCrew.has(w.id));
+  });
+
   ngOnInit(): void {
     const id = Number(this.route.snapshot.paramMap.get('id'));
     if (!id) {
@@ -88,6 +125,7 @@ export class ProjectDetailComponent implements OnInit {
     this.loadProject(id);
     this.loadSummary(id);
     this.loadExpenses(id);
+    this.loadCrew(id);
   }
 
   backToList(): void {
@@ -331,7 +369,7 @@ export class ProjectDetailComponent implements OnInit {
     this.expenseSaving.set(true);
     this.expenseError.set(null);
 
-    this.expensesService.create2(projectId, body).subscribe({
+    this.expensesService.create3(projectId, body).subscribe({
       next: () => {
         this.expenseSaving.set(false);
         this.expenseDialogOpen.set(false);
@@ -379,7 +417,7 @@ export class ProjectDetailComponent implements OnInit {
   private loadExpenses(projectId: number): void {
     this.expensesLoading.set(true);
     this.expensesError.set(null);
-    this.expensesService.search3(projectId, undefined, 0, EXPENSES_FETCH_SIZE, undefined).subscribe({
+    this.expensesService.search4(projectId, undefined, 0, EXPENSES_FETCH_SIZE, undefined).subscribe({
       next: (result) => {
         this.allExpenses.set((result.content ?? []) as ProjectExpenseResponse[]);
         this.expensesLoading.set(false);
@@ -387,6 +425,102 @@ export class ProjectDetailComponent implements OnInit {
       error: () => {
         this.expensesError.set('Could not load expenses. Please try again.');
         this.expensesLoading.set(false);
+      },
+    });
+  }
+
+  // ---- Crew ----
+  openAddCrewDialog(): void {
+    const current = this.project();
+    if (!current || current.id === undefined) return;
+
+    this.addCrewWorkerId.set(null);
+    this.addCrewError.set(null);
+    this.addCrewDialogOpen.set(true);
+    this.workersService.search(true, 0, ACTIVE_WORKERS_FETCH_SIZE, undefined).subscribe({
+      next: (result) => this.activeWorkers.set((result.content ?? []) as WorkerResponse[]),
+      error: () => this.activeWorkers.set([]),
+    });
+  }
+
+  closeAddCrewDialog(): void {
+    this.addCrewDialogOpen.set(false);
+  }
+
+  onAddCrewWorkerChange(value: string): void {
+    this.addCrewWorkerId.set(value ? Number(value) : null);
+  }
+
+  submitAddToCrew(): void {
+    const current = this.project();
+    const workerId = this.addCrewWorkerId();
+    if (!current || current.id === undefined || !workerId) {
+      this.addCrewError.set('Select a worker.');
+      return;
+    }
+    const projectId = current.id;
+
+    this.addingToCrew.set(true);
+    this.addCrewError.set(null);
+
+    const body: WorkerProjectAssignmentCreateRequest = { workerId, projectId };
+    this.workerAssignmentsService.create1(body).subscribe({
+      next: () => {
+        this.addingToCrew.set(false);
+        this.addCrewDialogOpen.set(false);
+        this.loadCrew(projectId);
+      },
+      error: (err) => {
+        this.addingToCrew.set(false);
+        this.addCrewError.set(
+          err?.status === 409
+            ? 'This worker already has an active assignment elsewhere — remove them from that crew first.'
+            : 'Could not add this worker to the crew. Please try again.',
+        );
+      },
+    });
+  }
+
+  openRemoveCrewDialog(assignment: WorkerProjectAssignmentResponse): void {
+    this.removeCrewTarget.set(assignment);
+  }
+
+  closeRemoveCrewDialog(): void {
+    this.removeCrewTarget.set(null);
+  }
+
+  removeFromCrew(): void {
+    const target = this.removeCrewTarget();
+    const current = this.project();
+    if (!target || target.id === undefined || !current || current.id === undefined) return;
+    const projectId = current.id;
+
+    this.removingFromCrew.set(true);
+    this.workerAssignmentsService.deactivate1(target.id).subscribe({
+      next: () => {
+        this.removingFromCrew.set(false);
+        this.removeCrewTarget.set(null);
+        this.loadCrew(projectId);
+      },
+      error: () => {
+        this.removingFromCrew.set(false);
+        this.removeCrewTarget.set(null);
+        this.crewError.set('Could not remove this worker from the crew. Please try again.');
+      },
+    });
+  }
+
+  private loadCrew(projectId: number): void {
+    this.crewLoading.set(true);
+    this.crewError.set(null);
+    this.workerAssignmentsService.search1(projectId, true, 0, ACTIVE_WORKERS_FETCH_SIZE, undefined).subscribe({
+      next: (result) => {
+        this.crew.set((result.content ?? []) as WorkerProjectAssignmentResponse[]);
+        this.crewLoading.set(false);
+      },
+      error: () => {
+        this.crewError.set('Could not load the crew. Please try again.');
+        this.crewLoading.set(false);
       },
     });
   }

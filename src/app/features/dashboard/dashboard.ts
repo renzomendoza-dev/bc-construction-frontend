@@ -136,7 +136,7 @@ export class Dashboard implements OnInit {
       // supports server-side status filtering, so no need to fetch and
       // count every AWAITING_PURCHASE batch just for this number.
       awaitingPurchase: this.transferBatchesService
-        .search4(undefined, undefined, 'AWAITING_PURCHASE', 0, 1, undefined)
+        .search5(undefined, undefined, 'AWAITING_PURCHASE', 0, 1, undefined)
         .pipe(catchError(() => of(null))),
       // Equipment's list/overdue endpoints return a flat array with no
       // page/size params, so counting means fetching the whole thing —
@@ -147,7 +147,7 @@ export class Dashboard implements OnInit {
       overdueEquipment: this.equipmentService.findOverdue(OVERDUE_DAYS, 'body', undefined, this.jsonAccept).pipe(
         catchError(() => of([] as EquipmentResponse[])),
       ),
-      projects: this.projectsService.search2(undefined, 0, PROJECTS_FETCH_SIZE, undefined).pipe(
+      projects: this.projectsService.search3(undefined, 0, PROJECTS_FETCH_SIZE, undefined).pipe(
         catchError(() => of(null)),
       ),
     }).subscribe(({ items, lowStock, receipts, awaitingPurchase, equipment, overdueEquipment, projects }) => {

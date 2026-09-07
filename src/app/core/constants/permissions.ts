@@ -89,6 +89,13 @@ export const Permission = {
   WorkerDeactivate: 'WORKER_DEACTIVATE',
   AttendanceCreate: 'ATTENDANCE_CREATE',
   AttendanceDelete: 'ATTENDANCE_DELETE',
+
+  // Also verified (see comment above) — the calendar/batch-attendance phase 2
+  // backend prompt's ask for exact role names, including for the new
+  // WorkerProjectAssignment feature, was answered the same way.
+  WorkerAssignmentCreate: 'WORKER_ASSIGNMENT_CREATE',
+  WorkerAssignmentDeactivate: 'WORKER_ASSIGNMENT_DEACTIVATE',
+  AttendanceBatchCreate: 'ATTENDANCE_BATCH_CREATE',
 } as const;
 
 export type PermissionValue = (typeof Permission)[keyof typeof Permission];

@@ -1,0 +1,131 @@
+<div class="calendar-page">
+
+  <button type="button" class="back-btn" (click)="backToWorkers()">
+    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+      <path d="M19 12H5"></path>
+      <path d="m12 19-7-7 7-7"></path>
+    </svg>
+    Back to Workers
+  </button>
+
+  <div class="calendar-page__title">Attendance Calendar</div>
+
+  <div class="card">
+    <div class="form-field">
+      <label>Project</label>
+      <select [value]="selectedProjectId() ?? ''" (change)="onProjectChange($any($event.target).value)">
+        <option value="">Select a project…</option>
+        @for (p of projects(); track p.id) {
+          <option [value]="p.id">{{ p.name }}</option>
+        }
+      </select>
+    </div>
+  </div>
+
+  @if (!selectedProjectId()) {
+    <div class="state-message">Select a project to see its attendance calendar.</div>
+  } @else {
+
+    <div class="calendar-nav">
+      <button type="button" class="nav-btn" (click)="prevMonth()">‹ Prev</button>
+      <div class="calendar-nav__label">{{ monthLabel() }}</div>
+      <button type="button" class="nav-btn" (click)="nextMonth()">Next ›</button>
+    </div>
+
+    @if (errorMessage()) {
+      <div class="form-error">{{ errorMessage() }}</div>
+    }
+
+    <div class="calendar-grid">
+      @for (label of weekdayLabels; track label) {
+        <div class="calendar-grid__weekday">{{ label }}</div>
+      }
+      @for (cell of calendarCells(); track $index) {
+        @if (cell.date) {
+          <button
+            type="button"
+            class="calendar-cell"
+            [class.calendar-cell--today]="cell.date === todayDateStr"
+            [class.calendar-cell--has-data]="cell.workerCount !== null"
+            (click)="openDayDialog(cell.date)"
+          >
+            <span class="calendar-cell__day">{{ cell.day }}</span>
+            @if (cell.workerCount !== null) {
+              <span class="calendar-cell__count">{{ cell.workerCount }} worker{{ cell.workerCount === 1 ? '' : 's' }}</span>
+            }
+          </button>
+        } @else {
+          <div class="calendar-cell calendar-cell--empty"></div>
+        }
+      }
+    </div>
+
+    @if (loading()) {
+      <div class="state-message">Loading…</div>
+    }
+
+  }
+
+  @if (dayDialogOpen()) {
+    <div class="scrim" (click)="closeDayDialog()"></div>
+    <div class="dialog">
+      <div class="dialog__title">Attendance — {{ dayDialogDate() | date: 'mediumDate' }}</div>
+
+      @if (dayError()) {
+        <div class="form-error">{{ dayError() }}</div>
+      }
+      @if (dayResultMessage()) {
+        <div class="form-success">{{ dayResultMessage() }}</div>
+      }
+
+      @if (dayLoading()) {
+        <div class="table-state">Loading…</div>
+      } @else if (dayLines().length === 0) {
+        <div class="table-state">No workers are currently assigned to this project's crew.</div>
+      } @else {
+        <div class="day-lines">
+          @for (line of dayLines(); track line.workerId) {
+            <div class="day-line" [class.day-line--locked]="line.existing">
+              <div class="day-line__header">
+                @if (!line.existing && canRecordBatch) {
+                  <input
+                    type="checkbox"
+                    [checked]="line.include"
+                    (change)="toggleLineInclude(line.workerId, $any($event.target).checked)"
+                  />
+                }
+                <span class="day-line__name">{{ line.workerName }}</span>
+                @if (line.existing) {
+                  <span class="day-line__badge">Recorded</span>
+                }
+              </div>
+
+              @if (line.existing; as e) {
+                <div class="day-line__existing">
+                  {{ e.timeIn || '—' }}–{{ e.timeOut || '—' }} · {{ e.daysPresent }}d · {{ e.notes || 'No notes' }}
+                </div>
+              } @else if (canRecordBatch) {
+                <div class="day-line__inputs">
+                  <input type="time" [value]="line.timeIn" [disabled]="!line.include" (change)="onLineTimeInChange(line.workerId, $any($event.target).value)" />
+                  <span class="day-line__dash">–</span>
+                  <input type="time" [value]="line.timeOut" [disabled]="!line.include" (change)="onLineTimeOutChange(line.workerId, $any($event.target).value)" />
+                  <input type="text" placeholder="Notes (optional)" [value]="line.notes" [disabled]="!line.include" (change)="onLineNotesChange(line.workerId, $any($event.target).value)" />
+                </div>
+              }
+            </div>
+          }
+        </div>
+      }
+
+      <div class="dialog__actions">
+        <button type="button" class="btn-secondary" [disabled]="daySaving()" (click)="closeDayDialog()">Close</button>
+        @if (canRecordBatch) {
+          <button type="button" class="btn-primary" [disabled]="daySaving() || dayLoading()" (click)="submitDayBatch()">
+            {{ daySaving() ? 'Recording…' : 'Record Attendance' }}
+          </button>
+        }
+      </div>
+    </div>
+  }
+
+</div>

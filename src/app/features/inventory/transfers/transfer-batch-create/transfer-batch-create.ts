@@ -372,7 +372,7 @@ export class TransferBatchCreateComponent implements OnInit {
       // Non-critical: a failed fetch just means the optional project picker
       // has no options, not a form-blocking error like warehouses/items.
       projects: this.projectsService
-        .search2(undefined, 0, PROJECTS_FETCH_SIZE, undefined)
+        .search3(undefined, 0, PROJECTS_FETCH_SIZE, undefined)
         .pipe(catchError(() => of({ content: [] as ProjectResponse[] }))),
     }).subscribe({
       next: ({ warehouses, items, projects }) => {

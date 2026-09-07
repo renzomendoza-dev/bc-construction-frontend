@@ -122,7 +122,7 @@ export class EquipmentAssignmentBatchDetailComponent implements OnInit {
 
   private loadBatch(id: number): void {
     this.loading.set(true);
-    this.batchesService.getById5(id, 'body', undefined, this.jsonAccept).subscribe({
+    this.batchesService.getById6(id, 'body', undefined, this.jsonAccept).subscribe({
       next: (batch) => {
         this.batch.set(batch);
         this.loading.set(false);

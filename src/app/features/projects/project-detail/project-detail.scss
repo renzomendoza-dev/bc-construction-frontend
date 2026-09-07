@@ -288,6 +288,46 @@
   font-family: 'IBM Plex Sans', sans-serif;
 }
 
+// ---- Crew ----
+
+.crew-row {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 10px 0;
+  border-bottom: 1px solid var(--border);
+
+  &:last-child {
+    border-bottom: none;
+  }
+}
+
+.crew-row__name {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--heading-text);
+  flex: 1;
+}
+
+.crew-row__since {
+  font-size: 12.5px;
+  color: var(--sub-text);
+}
+
+.btn-link-danger {
+  background: none;
+  border: none;
+  color: #b5493f;
+  font-size: 12.5px;
+  font-weight: 600;
+  cursor: pointer;
+  padding: 0;
+
+  &:hover {
+    text-decoration: underline;
+  }
+}
+
 .expenses-head {
   display: grid;
   grid-template-columns: 0.9fr 1.8fr 1fr 1fr 1.1fr;

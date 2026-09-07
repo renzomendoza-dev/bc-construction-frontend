@@ -114,12 +114,12 @@ export class ProjectsService extends BaseService {
      * @param reportProgress flag to report request and response progress.
      * @param options additional options
      */
-    public create1(projectCreateRequest: ProjectCreateRequest, observe?: 'body', reportProgress?: boolean, options?: {httpHeaderAccept?: 'application/json', context?: HttpContext, transferCache?: boolean}): Observable<ProjectResponse>;
-    public create1(projectCreateRequest: ProjectCreateRequest, observe?: 'response', reportProgress?: boolean, options?: {httpHeaderAccept?: 'application/json', context?: HttpContext, transferCache?: boolean}): Observable<HttpResponse<ProjectResponse>>;
-    public create1(projectCreateRequest: ProjectCreateRequest, observe?: 'events', reportProgress?: boolean, options?: {httpHeaderAccept?: 'application/json', context?: HttpContext, transferCache?: boolean}): Observable<HttpEvent<ProjectResponse>>;
-    public create1(projectCreateRequest: ProjectCreateRequest, observe: any = 'body', reportProgress: boolean = false, options?: {httpHeaderAccept?: 'application/json', context?: HttpContext, transferCache?: boolean}): Observable<any> {
+    public create2(projectCreateRequest: ProjectCreateRequest, observe?: 'body', reportProgress?: boolean, options?: {httpHeaderAccept?: 'application/json', context?: HttpContext, transferCache?: boolean}): Observable<ProjectResponse>;
+    public create2(projectCreateRequest: ProjectCreateRequest, observe?: 'response', reportProgress?: boolean, options?: {httpHeaderAccept?: 'application/json', context?: HttpContext, transferCache?: boolean}): Observable<HttpResponse<ProjectResponse>>;
+    public create2(projectCreateRequest: ProjectCreateRequest, observe?: 'events', reportProgress?: boolean, options?: {httpHeaderAccept?: 'application/json', context?: HttpContext, transferCache?: boolean}): Observable<HttpEvent<ProjectResponse>>;
+    public create2(projectCreateRequest: ProjectCreateRequest, observe: any = 'body', reportProgress: boolean = false, options?: {httpHeaderAccept?: 'application/json', context?: HttpContext, transferCache?: boolean}): Observable<any> {
         if (projectCreateRequest === null || projectCreateRequest === undefined) {
-            throw new Error('Required parameter projectCreateRequest was null or undefined when calling create1.');
+            throw new Error('Required parameter projectCreateRequest was null or undefined when calling create2.');
         }
 
         let localVarHeaders = this.defaultHeaders;
@@ -246,10 +246,10 @@ export class ProjectsService extends BaseService {
      * @param reportProgress flag to report request and response progress.
      * @param options additional options
      */
-    public search2(status?: 'ACTIVE' | 'ON_HOLD' | 'COMPLETED' | 'CANCELLED', page?: number, size?: number, sort?: Array<string>, observe?: 'body', reportProgress?: boolean, options?: {httpHeaderAccept?: 'application/json', context?: HttpContext, transferCache?: boolean}): Observable<PageResponse>;
-    public search2(status?: 'ACTIVE' | 'ON_HOLD' | 'COMPLETED' | 'CANCELLED', page?: number, size?: number, sort?: Array<string>, observe?: 'response', reportProgress?: boolean, options?: {httpHeaderAccept?: 'application/json', context?: HttpContext, transferCache?: boolean}): Observable<HttpResponse<PageResponse>>;
-    public search2(status?: 'ACTIVE' | 'ON_HOLD' | 'COMPLETED' | 'CANCELLED', page?: number, size?: number, sort?: Array<string>, observe?: 'events', reportProgress?: boolean, options?: {httpHeaderAccept?: 'application/json', context?: HttpContext, transferCache?: boolean}): Observable<HttpEvent<PageResponse>>;
-    public search2(status?: 'ACTIVE' | 'ON_HOLD' | 'COMPLETED' | 'CANCELLED', page?: number, size?: number, sort?: Array<string>, observe: any = 'body', reportProgress: boolean = false, options?: {httpHeaderAccept?: 'application/json', context?: HttpContext, transferCache?: boolean}): Observable<any> {
+    public search3(status?: 'ACTIVE' | 'ON_HOLD' | 'COMPLETED' | 'CANCELLED', page?: number, size?: number, sort?: Array<string>, observe?: 'body', reportProgress?: boolean, options?: {httpHeaderAccept?: 'application/json', context?: HttpContext, transferCache?: boolean}): Observable<PageResponse>;
+    public search3(status?: 'ACTIVE' | 'ON_HOLD' | 'COMPLETED' | 'CANCELLED', page?: number, size?: number, sort?: Array<string>, observe?: 'response', reportProgress?: boolean, options?: {httpHeaderAccept?: 'application/json', context?: HttpContext, transferCache?: boolean}): Observable<HttpResponse<PageResponse>>;
+    public search3(status?: 'ACTIVE' | 'ON_HOLD' | 'COMPLETED' | 'CANCELLED', page?: number, size?: number, sort?: Array<string>, observe?: 'events', reportProgress?: boolean, options?: {httpHeaderAccept?: 'application/json', context?: HttpContext, transferCache?: boolean}): Observable<HttpEvent<PageResponse>>;
+    public search3(status?: 'ACTIVE' | 'ON_HOLD' | 'COMPLETED' | 'CANCELLED', page?: number, size?: number, sort?: Array<string>, observe: any = 'body', reportProgress: boolean = false, options?: {httpHeaderAccept?: 'application/json', context?: HttpContext, transferCache?: boolean}): Observable<any> {
 
         let localVarQueryParameters = new OpenApiHttpParams(this.encoder);
 

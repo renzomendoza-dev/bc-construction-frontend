@@ -2,6 +2,10 @@
 
 All notable changes to this project are documented here, newest first. Dates are when the change was committed.
 
+## 2026-09-07
+- Add an Attendance Calendar for Workers: pick a project, see a month view of which days already have recorded attendance and how many workers, and click any day to batch-record attendance (time in/out per worker) for that project's assigned crew in one submission.
+- Add a Crew section to Project detail for assigning/removing workers to a project, feeding the Attendance Calendar's per-day worker list.
+
 ## 2026-09-06
 - Add Projects: track a project's code/name/budget/dates through an Active → On Hold → Completed lifecycle, with manual expense entry (Labor/Material/Other), a running expense summary against budget, and a filterable expense history.
 - Add a Projects card to the Dashboard (Active Projects, Total Budget, and an Over Budget count across open projects).
