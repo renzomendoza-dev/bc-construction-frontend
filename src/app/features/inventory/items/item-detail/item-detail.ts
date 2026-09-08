@@ -2,11 +2,13 @@ import { ChangeDetectionStrategy, Component, OnInit, inject, signal } from '@ang
 import { DatePipe } from '@angular/common';
 import { ActivatedRoute, Router } from '@angular/router';
 import { ItemResponse, ItemsService, ItemSupplierResponse, SuppliersService } from '../../../../generated';
-import { FIRE_PROTECTION_CATEGORIES } from '../../../../core/constants/categories';
 import { CurrentUserService } from '../../../../core/services/current-user';
 import { Permission } from '../../../../core/constants/permissions';
 
-const CATEGORIES = FIRE_PROTECTION_CATEGORIES;
+// Category is free text on Item (no backend enum/endpoint for it) — the
+// datalist offered in edit mode is autocomplete convenience sourced from
+// what's actually in use today, not a constrained set of choices.
+const CATEGORY_SCAN_SIZE = 500;
 
 type Mode = 'view' | 'edit';
 
@@ -33,7 +35,7 @@ export class ItemDetailComponent implements OnInit {
   private readonly suppliersService = inject(SuppliersService);
   private readonly currentUser = inject(CurrentUserService);
 
-  readonly categories = CATEGORIES;
+  readonly categoryOptions = signal<string[]>([]);
   readonly canEdit = this.currentUser.hasPermission(Permission.ItemEdit);
   readonly canDeactivate = this.currentUser.hasPermission(Permission.ItemDeactivate);
 
@@ -59,6 +61,16 @@ export class ItemDetailComponent implements OnInit {
       return;
     }
     this.loadItem(itemId);
+
+    this.itemsService.listItems(undefined, undefined, undefined, 0, CATEGORY_SCAN_SIZE).subscribe({
+      next: (result) => {
+        const distinct = new Set(
+          (result.content ?? []).map((i) => i.category).filter((c): c is string => !!c),
+        );
+        this.categoryOptions.set(Array.from(distinct).sort());
+      },
+      error: () => this.categoryOptions.set([]),
+    });
   }
 
   backToList(): void {

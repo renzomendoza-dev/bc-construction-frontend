@@ -53,29 +53,27 @@ export const Permission = {
   // missing) but no @PreAuthorize role name in the spec.
   TransferBatchDelete: 'TRANSFER_BATCH_DELETE',
 
-  // Also unverified (see comment above) — the Purchase Order feature's
-  // backend prompt explicitly asked for these role names and never got an
-  // answer; every other detail (entity/field/status names, response codes)
-  // was confirmed directly.
+  // Verified directly against PurchaseOrderController source
+  // (@PreAuthorize("hasRole('...')")) — the original guess turned out
+  // correct, and confirmed PURCHASE_ORDER_SUBMIT is a distinct role from
+  // PURCHASE_ORDER_EDIT (previously missing here; the Submit action had
+  // been incorrectly gated on Edit instead).
   PurchaseOrderCreate: 'PURCHASE_ORDER_CREATE',
   PurchaseOrderEdit: 'PURCHASE_ORDER_EDIT',
+  PurchaseOrderSubmit: 'PURCHASE_ORDER_SUBMIT',
   PurchaseOrderClose: 'PURCHASE_ORDER_CLOSE',
 
-  // Also unverified (see comment above) — DELETE /api/inventory/material-requests/{id}
-  // shipped with its status codes and lock rule documented (422 once
-  // PARTIALLY_FULFILLED/FULFILLED, matching the existing edit-lock; 404 if
-  // missing) but no @PreAuthorize role name in the spec.
+  // Verified directly against MaterialRequestController source.
   MaterialRequestDelete: 'MATERIAL_REQUEST_DELETE',
 
-  // Also unverified (see comment above) — DELETE /api/purchase-orders/{id}
-  // shipped with its status codes documented (422 if not DRAFT, 409 if a
-  // PurchaseReceipt already references it, 404 if missing) but no
-  // @PreAuthorize role name, the third unanswered ask for a PO permission.
+  // Verified directly against PurchaseOrderController source (see also
+  // PurchaseOrderSubmit above).
   PurchaseOrderDelete: 'PURCHASE_ORDER_DELETE',
 
-  // Also unverified (see comment above) — the new Project + Project Expense
-  // feature's endpoints never state @PreAuthorize role names either, same
-  // as everything else in this project.
+  // Verified directly against ProjectController/ProjectExpenseController
+  // source. Backend also has a distinct PROJECT_EXPENSE_DELETE role for
+  // DELETE .../expenses/{id} — not added here since the frontend has no
+  // delete-expense action yet (a feature gap, not a permissions gap).
   ProjectCreate: 'PROJECT_CREATE',
   ProjectEdit: 'PROJECT_EDIT',
   ProjectComplete: 'PROJECT_COMPLETE',

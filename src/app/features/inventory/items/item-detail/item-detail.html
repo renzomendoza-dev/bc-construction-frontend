@@ -104,11 +104,18 @@
             </div>
             <div class="form-field">
               <label>Category</label>
-              <select [value]="form().category" [disabled]="mode() === 'view'" (change)="onFormCategoryChange($any($event.target).value)">
-                @for (cat of categories; track cat) {
-                  <option [value]="cat">{{ cat }}</option>
+              <input
+                type="text"
+                list="category-options"
+                [value]="form().category"
+                [disabled]="mode() === 'view'"
+                (change)="onFormCategoryChange($any($event.target).value)"
+              />
+              <datalist id="category-options">
+                @for (cat of categoryOptions(); track cat) {
+                  <option [value]="cat"></option>
                 }
-              </select>
+              </datalist>
             </div>
             <div class="form-field">
               <label>Unit of Measure</label>

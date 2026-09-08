@@ -54,11 +54,18 @@
 
         <div class="form-field">
           <label>Category</label>
-          <select [value]="form().category" (change)="onCategoryChange($any($event.target).value)">
-            @for (cat of categories; track cat) {
-              <option [value]="cat">{{ cat }}</option>
+          <input
+            type="text"
+            list="category-options"
+            placeholder="e.g. Cement, Steel, Lumber…"
+            [value]="form().category"
+            (change)="onCategoryChange($any($event.target).value)"
+          />
+          <datalist id="category-options">
+            @for (cat of categoryOptions(); track cat) {
+              <option [value]="cat"></option>
             }
-          </select>
+          </datalist>
         </div>
 
         <div class="form-field">

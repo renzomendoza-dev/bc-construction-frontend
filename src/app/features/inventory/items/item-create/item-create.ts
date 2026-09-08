@@ -1,10 +1,12 @@
-import { ChangeDetectionStrategy, Component, inject, signal } from '@angular/core';
+import { ChangeDetectionStrategy, Component, OnInit, inject, signal } from '@angular/core';
 import { Router } from '@angular/router';
 import { ItemCreateRequest, ItemsService } from '../../../../generated';
-import { FIRE_PROTECTION_CATEGORIES } from '../../../../core/constants/categories';
- 
-const CATEGORIES = FIRE_PROTECTION_CATEGORIES;
- 
+
+// Category is free text on Item (no backend enum/endpoint for it) — the
+// datalist below is just autocomplete convenience sourced from what's
+// actually in use today, not a constrained set of choices.
+const CATEGORY_SCAN_SIZE = 500;
+
 interface CreateForm {
   sku: string;
   name: string;
@@ -13,11 +15,11 @@ interface CreateForm {
   sellingPrice: number | null;
   defaultCostPrice: number | null;
 }
- 
+
 const EMPTY_FORM: CreateForm = {
   sku: '',
   name: '',
-  category: CATEGORIES[0],
+  category: '',
   unitOfMeasure: '',
   sellingPrice: null,
   defaultCostPrice: null,
@@ -30,17 +32,29 @@ const EMPTY_FORM: CreateForm = {
   styleUrl: './item-create.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class ItemCreateComponent {
+export class ItemCreateComponent implements OnInit {
   private readonly itemsService = inject(ItemsService);
   private readonly router = inject(Router);
- 
-  readonly categories = CATEGORIES;
+
+  readonly categoryOptions = signal<string[]>([]);
   readonly form = signal<CreateForm>({ ...EMPTY_FORM });
- 
+
   readonly saving = signal(false);
   readonly errorMessage = signal<string | null>(null);
   readonly fieldErrors = signal<Record<string, string>>({});
- 
+
+  ngOnInit(): void {
+    this.itemsService.listItems(undefined, undefined, undefined, 0, CATEGORY_SCAN_SIZE).subscribe({
+      next: (result) => {
+        const distinct = new Set(
+          (result.content ?? []).map((i) => i.category).filter((c): c is string => !!c),
+        );
+        this.categoryOptions.set(Array.from(distinct).sort());
+      },
+      error: () => this.categoryOptions.set([]),
+    });
+  }
+
   backToList(): void {
     this.router.navigate(['/inventory/items']);
   }

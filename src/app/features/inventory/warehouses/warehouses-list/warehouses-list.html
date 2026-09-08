@@ -63,7 +63,7 @@
               <span class="status-badge" [class.status-badge--inactive]="!wh.active">
                 {{ wh.active ? 'Active' : 'Inactive' }}
               </span>
-              <div class="warehouse-card__loc-count">{{ locationCount(warehouseId) }} locations</div>
+              <div class="warehouse-card__loc-count">{{ locationCount(warehouseId) }} location{{ locationCount(warehouseId) === 1 ? '' : 's' }}</div>
               <button type="button" class="view-stock-btn" (click)="viewStock(warehouseId, $event)">View Stock</button>
               @if (canToggleActive(wh)) {
                 <button

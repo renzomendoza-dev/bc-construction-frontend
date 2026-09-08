@@ -2,6 +2,11 @@
 
 All notable changes to this project are documented here, newest first. Dates are when the change was committed.
 
+## 2026-09-08
+- Fix Item Category showing/defaulting to the wrong value everywhere (Item Detail, Create, and the Items list filter) — the dropdown was pulling from a leftover, unrelated category list, so a new item could silently save with the wrong category unless someone manually corrected it. Category is now a free-text field with autocomplete suggestions drawn from your actual items.
+- Fix Purchase Order's "Submit to Supplier" button being gated by the Edit permission instead of its own Submit permission.
+- Fix "1 locations" grammar on the Warehouses & Sites page.
+
 ## 2026-09-07
 - Add an Attendance Calendar for Workers: pick a project, see a month view of which days already have recorded attendance and how many workers, and click any day to batch-record attendance (time in/out per worker) for that project's assigned crew in one submission.
 - Add a Crew section to Project detail for assigning/removing workers to a project, feeding the Attendance Calendar's per-day worker list.

@@ -4,8 +4,13 @@ import { ItemResponse, ItemsService } from '../../../../generated';
 import { CurrentUserService } from '../../../../core/services/current-user';
 import { Permission } from '../../../../core/constants/permissions';
 
-const CATEGORIES = ['Framing', 'Concrete', 'Reinforcement', 'Insulation', 'Sheathing', 'Fasteners'];
 const PAGE_SIZE = 20;
+// Category is free text on Item (no backend enum/endpoint for it), so the
+// filter's option list is derived from whatever categories actually exist
+// today rather than a hand-maintained list that inevitably drifts from real
+// data — same "fetch a large batch, derive distinct values" tradeoff used
+// elsewhere in this app.
+const CATEGORY_SCAN_SIZE = 500;
 
 @Component({
   selector: 'app-items-list',
@@ -19,7 +24,7 @@ export class ItemsListComponent implements OnInit {
   private readonly router = inject(Router);
   private readonly currentUser = inject(CurrentUserService);
 
-  readonly categories = CATEGORIES;
+  readonly categories = signal<string[]>([]);
   readonly canCreate = this.currentUser.hasPermission(Permission.ItemCreate);
  
   readonly search = signal('');
@@ -35,6 +40,7 @@ export class ItemsListComponent implements OnInit {
  
   ngOnInit(): void {
     this.fetchItems();
+    this.loadCategoryOptions();
   }
   onSearchChange(value: string): void {
     this.search.set(value);
@@ -105,5 +111,22 @@ export class ItemsListComponent implements OnInit {
     });
 }
 
+  // Scans active + inactive items (undefined active filter) so a category
+  // used only by a deactivated item still shows up as a filter option.
+  private loadCategoryOptions(): void {
+    this.itemsService.listItems(undefined, undefined, undefined, 0, CATEGORY_SCAN_SIZE).subscribe({
+      next: (result) => {
+        const distinct = new Set(
+          (result.content ?? [])
+            .map((i) => i.category)
+            .filter((c): c is string => !!c),
+        );
+        this.categories.set(Array.from(distinct).sort());
+      },
+      error: () => {
+        this.categories.set([]);
+      },
+    });
+  }
 }
  

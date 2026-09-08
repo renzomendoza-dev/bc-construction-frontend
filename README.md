@@ -6,7 +6,7 @@ Angular frontend for BC Construction Services' inventory, equipment, and admin o
 
 - **Dashboard** — module overview cards with live inventory, equipment, and project stats.
 - **Inventory**
-  - Items — list, detail (view/edit toggle), create, images, linked suppliers, categories.
+  - Items — list, detail (view/edit toggle), create, images, linked suppliers, free-text category with autocomplete drawn from existing items.
   - Suppliers — list with create/edit drawer.
   - Warehouses & Sites — list/create, `MAIN`/`SITE` type, storage locations, a "View Stock" shortcut into Stock Levels pre-filtered to that warehouse.
   - Purchase Receipts — draft → confirm workflow that applies stock on confirmation, optionally linked to a fulfilling Transfer Batch or Purchase Order.

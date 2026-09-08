@@ -51,6 +51,7 @@ export class PurchaseOrderDetailComponent implements OnInit {
   private readonly currentUser = inject(CurrentUserService);
 
   readonly canEdit = this.currentUser.hasPermission(Permission.PurchaseOrderEdit);
+  readonly canSubmit = this.currentUser.hasPermission(Permission.PurchaseOrderSubmit);
   readonly canClose = this.currentUser.hasPermission(Permission.PurchaseOrderClose);
   readonly canDelete = this.currentUser.hasPermission(Permission.PurchaseOrderDelete);
 
@@ -129,7 +130,7 @@ export class PurchaseOrderDetailComponent implements OnInit {
   }
 
   canShowSubmit(order: PurchaseOrderResponse): boolean {
-    return this.canEdit && order.status === PurchaseOrderResponse.StatusEnum.Draft;
+    return this.canSubmit && order.status === PurchaseOrderResponse.StatusEnum.Draft;
   }
 
   // Delete is DRAFT-only (422 otherwise) — same status as Submit/Edit.
