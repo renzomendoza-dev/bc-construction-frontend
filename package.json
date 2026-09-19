@@ -7,7 +7,8 @@
     "build": "ng build",
     "watch": "ng build --watch --configuration development",
     "test": "ng test",
-    "generate:api": "openapi-generator-cli generate -i http://localhost:8080/api-docs -g typescript-angular -o src/app/generated --additional-properties=ngVersion=22.0.0,providedInRoot=true,serviceSuffix=Service"
+    "generate:api": "openapi-generator-cli generate -i http://localhost:8080/api-docs -g typescript-angular -o src/app/generated --additional-properties=ngVersion=22.0.0,providedInRoot=true,serviceSuffix=Service",
+    "lint": "ng lint"
   },
   "private": true,
   "packageManager": "npm@11.17.0",
@@ -27,9 +28,13 @@
     "@angular/build": "^22.0.8",
     "@angular/cli": "^22.0.8",
     "@angular/compiler-cli": "^22.0.0",
+    "@eslint/js": "^10.0.1",
+    "angular-eslint": "22.5.0",
+    "eslint": "^10.9.1",
     "jsdom": "^28.0.0",
     "prettier": "^3.8.1",
     "typescript": "~6.0.2",
+    "typescript-eslint": "8.69.0",
     "vitest": "^4.0.8"
   }
 }

@@ -66,6 +66,14 @@ To execute unit tests with the [Vitest](https://vitest.dev/) test runner, use th
 ng test
 ```
 
+## Linting
+
+```bash
+ng lint
+```
+
+The generated API client (`src/app/generated`) is excluded, since it's rewritten by `npm run generate:api`.
+
 ## Running end-to-end tests
 
 For end-to-end (e2e) testing, run:

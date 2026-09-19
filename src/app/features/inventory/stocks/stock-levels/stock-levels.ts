@@ -288,7 +288,8 @@ export class StockLevelsComponent implements OnInit {
   toggleExpand(itemId: number): void {
     this.expandedItemIds.update((set) => {
       const next = new Set(set);
-      next.has(itemId) ? next.delete(itemId) : next.add(itemId);
+      if (next.has(itemId)) next.delete(itemId);
+      else next.add(itemId);
       return next;
     });
   }

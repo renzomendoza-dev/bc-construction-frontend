@@ -72,7 +72,8 @@ export class WarehousesListComponent implements OnInit {
   toggleExpand(warehouseId: number): void {
     this.expandedIds.update((set) => {
       const next = new Set(set);
-      next.has(warehouseId) ? next.delete(warehouseId) : next.add(warehouseId);
+      if (next.has(warehouseId)) next.delete(warehouseId);
+      else next.add(warehouseId);
       return next;
     });
   }

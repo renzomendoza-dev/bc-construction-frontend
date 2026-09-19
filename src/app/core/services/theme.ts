@@ -1,4 +1,4 @@
-import { effect, Injectable, Service, signal } from '@angular/core';
+import { effect, Injectable, signal } from '@angular/core';
 
 const STORAGE_KEY = 'bc-theme';
 

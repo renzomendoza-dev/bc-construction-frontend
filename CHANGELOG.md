@@ -2,6 +2,11 @@
 
 All notable changes to this project are documented here, newest first. Dates are when the change was committed.
 
+## 2026-09-19
+- Add ESLint (`angular-eslint`) with an `ng lint` target; the generated API client is excluded. Template accessibility rules are temporarily warnings until the shared form/dialog cleanup lands.
+- Replace the unmaintained, non-compiling CLI scaffold specs with real unit tests covering permission gating (including the PO Submit regression), Purchase Order action visibility, the Attendance Calendar month grid, and peso formatting.
+- Fix four small lint findings (unused import, constructor injection, two ternaries used as statements).
+
 ## 2026-09-08
 - Fix Item Category showing/defaulting to the wrong value everywhere (Item Detail, Create, and the Items list filter) — the dropdown was pulling from a leftover, unrelated category list, so a new item could silently save with the wrong category unless someone manually corrected it. Category is now a free-text field with autocomplete suggestions drawn from your actual items.
 - Fix Purchase Order's "Submit to Supplier" button being gated by the Edit permission instead of its own Submit permission.

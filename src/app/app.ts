@@ -15,9 +15,10 @@ import { UserService } from './generated';
 export class App {
   protected readonly title = signal('bc-construction-frontend');
 
+  private readonly http = inject(HttpClient);
   private readonly userService = inject(UserService);
 
-  constructor(private http: HttpClient) {
+  constructor() {
     this.http.get(`${environment.apiBaseUrl}/actuator/health`).subscribe();
 
     // GET /api/users/me syncs this user's local profile (fullName, active,
