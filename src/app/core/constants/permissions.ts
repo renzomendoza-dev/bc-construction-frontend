@@ -71,13 +71,12 @@ export const Permission = {
   PurchaseOrderDelete: 'PURCHASE_ORDER_DELETE',
 
   // Verified directly against ProjectController/ProjectExpenseController
-  // source. Backend also has a distinct PROJECT_EXPENSE_DELETE role for
-  // DELETE .../expenses/{id} — not added here since the frontend has no
-  // delete-expense action yet (a feature gap, not a permissions gap).
+  // source.
   ProjectCreate: 'PROJECT_CREATE',
   ProjectEdit: 'PROJECT_EDIT',
   ProjectComplete: 'PROJECT_COMPLETE',
   ProjectExpenseCreate: 'PROJECT_EXPENSE_CREATE',
+  ProjectExpenseDelete: 'PROJECT_EXPENSE_DELETE',
 
   // Verified directly against WorkerController/AttendanceController source
   // (@PreAuthorize("hasRole('...')")), unlike every unverified block above —

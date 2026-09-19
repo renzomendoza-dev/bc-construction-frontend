@@ -355,6 +355,11 @@
   }
 }
 
+.expenses-head--with-actions,
+.expenses-row--with-actions {
+  grid-template-columns: 0.9fr 1.8fr 1fr 1fr 1.1fr 56px;
+}
+
 .expenses-row__desc {
   font-size: 13px;
   color: var(--heading-text);
@@ -507,6 +512,11 @@
   .expenses-head,
   .expenses-row {
     min-width: 520px;
+  }
+
+  .expenses-head--with-actions,
+  .expenses-row--with-actions {
+    min-width: 580px;
   }
 
   .action-row {

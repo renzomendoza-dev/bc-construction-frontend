@@ -158,25 +158,42 @@
         </select>
       </div>
 
+      @if (deleteExpenseError()) {
+        <div class="form-error">{{ deleteExpenseError() }}</div>
+      }
+
       @if (expensesLoading()) {
         <div class="table-state">Loading…</div>
       } @else if (expensesError()) {
         <div class="table-state table-state--error">{{ expensesError() }}</div>
       } @else if (filteredExpenses().length > 0) {
-        <div class="expenses-head">
+        <div class="expenses-head" [class.expenses-head--with-actions]="canShowDeleteExpense(p)">
           <div>Category</div>
           <div>Description</div>
           <div class="align-right">Amount</div>
           <div>Date</div>
           <div>Recorded By</div>
+          @if (canShowDeleteExpense(p)) {
+            <div></div>
+          }
         </div>
         @for (e of filteredExpenses(); track e.id) {
-          <div class="expenses-row">
+          <div class="expenses-row" [class.expenses-row--with-actions]="canShowDeleteExpense(p)">
             <div><span class="category-badge" [attr.data-category]="e.category">{{ categoryLabel(e.category) }}</span></div>
             <div class="expenses-row__desc">{{ e.description }}</div>
             <div class="align-right expenses-row__amount">{{ formatPeso(e.amount) }}</div>
             <div class="expenses-row__date">{{ e.expenseDate | date: 'mediumDate' }}</div>
             <div class="expenses-row__by">{{ e.recordedByName || '—' }}</div>
+            @if (canShowDeleteExpense(p)) {
+              <div class="align-right">
+                <button
+                  type="button"
+                  class="btn-link-danger"
+                  [attr.aria-label]="'Delete expense: ' + e.description"
+                  (click)="openDeleteExpenseDialog(e)"
+                >Delete</button>
+              </div>
+            }
           </div>
         }
       } @else {
@@ -260,6 +277,21 @@
         <button type="button" class="btn-secondary" [disabled]="addingToCrew()" (click)="closeAddCrewDialog()">Cancel</button>
         <button type="button" class="btn-primary" [disabled]="addingToCrew()" (click)="submitAddToCrew()">
           {{ addingToCrew() ? 'Adding…' : 'Add to Crew' }}
+        </button>
+      </div>
+    </app-modal>
+  }
+
+  @if (deleteExpenseTarget(); as target) {
+    <app-modal title="Delete this expense?" (closed)="closeDeleteExpenseDialog()">
+      <div class="app-modal__body">
+        {{ categoryLabel(target.category) }} · {{ target.description }} · {{ formatPeso(target.amount) }}
+        ({{ target.expenseDate | date: 'mediumDate' }}). It will be removed from this project's totals. This cannot be undone.
+      </div>
+      <div class="app-modal__actions">
+        <button type="button" class="btn-secondary" [disabled]="deletingExpense()" (click)="closeDeleteExpenseDialog()">Cancel</button>
+        <button type="button" class="btn-danger-outline" [disabled]="deletingExpense()" (click)="deleteExpense()">
+          {{ deletingExpense() ? 'Deleting…' : 'Yes, Delete' }}
         </button>
       </div>
     </app-modal>
