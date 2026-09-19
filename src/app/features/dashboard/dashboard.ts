@@ -6,6 +6,7 @@ import { ThemeService } from '../../core/services/theme';
 import { CurrentUserService } from '../../core/services/current-user';
 import { formatPeso } from '../../core/model.currency';
 import {
+  AttendanceService,
   EquipmentResponse,
   EquipmentService,
   InventoryService,
@@ -15,6 +16,8 @@ import {
   ProjectsService,
   PurchaseReceiptsService,
   TransferBatchesService,
+  WorkerAssignmentsService,
+  WorkersService,
 } from '../../generated';
 
 interface InventoryStats {
@@ -36,9 +39,16 @@ interface ProjectStats {
   overBudget: number;
 }
 
+interface WorkerStats {
+  active: number;
+  onCrew: number;
+  attendanceToday: number;
+}
+
 const EMPTY_STATS: InventoryStats = { items: 0, lowStock: 0, pendingReceipts: 0, awaitingPurchase: 0 };
 const EMPTY_EQUIPMENT_STATS: EquipmentStats = { total: 0, checkedOut: 0, overdue: 0 };
 const EMPTY_PROJECT_STATS: ProjectStats = { active: 0, totalBudget: 0, overBudget: 0 };
+const EMPTY_WORKER_STATS: WorkerStats = { active: 0, onCrew: 0, attendanceToday: 0 };
 
 // GET /api/purchase-receipts has no "confirmed" filter, so counting
 // drafts means fetching a batch and filtering client-side — same gap
@@ -73,6 +83,9 @@ export class Dashboard implements OnInit {
   private readonly equipmentService = inject(EquipmentService);
   private readonly projectsService = inject(ProjectsService);
   private readonly projectExpensesService = inject(ProjectExpensesService);
+  private readonly workersService = inject(WorkersService);
+  private readonly workerAssignmentsService = inject(WorkerAssignmentsService);
+  private readonly attendanceService = inject(AttendanceService);
 
   // The Equipment module's endpoints declare their response content-type as
   // `*/*` in the OpenAPI spec, so the generated client falls back to
@@ -103,6 +116,7 @@ export class Dashboard implements OnInit {
   protected readonly inventoryStats = signal<InventoryStats>(EMPTY_STATS);
   protected readonly equipmentStats = signal<EquipmentStats>(EMPTY_EQUIPMENT_STATS);
   protected readonly projectStats = signal<ProjectStats>(EMPTY_PROJECT_STATS);
+  protected readonly workerStats = signal<WorkerStats>(EMPTY_WORKER_STATS);
   protected readonly statsLoading = signal(true);
   // Over-budget is a second wave of per-project summary calls, kept
   // separate from statsLoading so it doesn't hold up the rest of the
@@ -119,6 +133,7 @@ export class Dashboard implements OnInit {
 
   private loadStats(): void {
     this.statsLoading.set(true);
+    const today = localDateString(new Date());
 
     forkJoin({
       // totalElements from a 1-row page avoids pulling the full item list
@@ -150,7 +165,18 @@ export class Dashboard implements OnInit {
       projects: this.projectsService.search3(undefined, 0, PROJECTS_FETCH_SIZE, undefined).pipe(
         catchError(() => of(null)),
       ),
-    }).subscribe(({ items, lowStock, receipts, awaitingPurchase, equipment, overdueEquipment, projects }) => {
+      // All three Workers numbers use the totalElements-from-a-1-row-page
+      // trick with server-side filters, so none of them can be truncated.
+      activeWorkers: this.workersService.search(true, 0, 1, undefined).pipe(catchError(() => of(null))),
+      // A worker can only hold one active assignment (backend enforces it
+      // with a 409), so active assignments = workers currently on a crew.
+      onCrew: this.workerAssignmentsService
+        .search1(undefined, true, 0, 1, undefined)
+        .pipe(catchError(() => of(null))),
+      attendanceToday: this.attendanceService
+        .search7(undefined, undefined, today, today, 0, 1, undefined)
+        .pipe(catchError(() => of(null))),
+    }).subscribe(({ items, lowStock, receipts, awaitingPurchase, equipment, overdueEquipment, projects, activeWorkers, onCrew, attendanceToday }) => {
       const pendingReceipts = (receipts?.content ?? []).filter((r) => !r.confirmed).length;
       const equipmentList = equipment ?? [];
 
@@ -166,6 +192,11 @@ export class Dashboard implements OnInit {
           (e) => e.status === EquipmentResponse.StatusEnum.CheckedOut || e.status === EquipmentResponse.StatusEnum.InUse,
         ).length,
         overdue: (overdueEquipment ?? []).length,
+      });
+      this.workerStats.set({
+        active: activeWorkers?.totalElements ?? 0,
+        onCrew: onCrew?.totalElements ?? 0,
+        attendanceToday: attendanceToday?.totalElements ?? 0,
       });
       this.statsLoading.set(false);
 
@@ -206,4 +237,11 @@ export class Dashboard implements OnInit {
       this.overBudgetLoading.set(false);
     });
   }
+}
+
+// Local calendar date as YYYY-MM-DD. toISOString() would give the UTC date,
+// which in the Philippines (UTC+8) is still yesterday until 8 a.m.
+function localDateString(d: Date): string {
+  const pad = (n: number) => String(n).padStart(2, '0');
+  return `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}`;
 }

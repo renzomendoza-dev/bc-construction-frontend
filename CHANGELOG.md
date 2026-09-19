@@ -3,6 +3,7 @@
 All notable changes to this project are documented here, newest first. Dates are when the change was committed.
 
 ## 2026-09-19
+- Add a Workers card to the Dashboard: Active Workers, workers currently On a Crew, and Attendance Today (all counted server-side, so they stay accurate as data grows).
 - Add Delete for project expenses on Project detail (with confirmation), for users with the Project Expense Delete permission while the project is Active or On Hold; totals refresh afterward. Expenses recorded automatically from worker attendance or transfers can't be deleted here — the page explains where to handle them instead.
 - Fix Admin → Users showing "Could not load this user" for users without a matching Keycloak account (the dev seed's placeholder users, or someone deleted in Keycloak). The drawer now still shows the user's status and Activate/Deactivate, and explains that roles can't be managed instead of failing outright.
 - Replace the 22 hand-rolled dialogs, the Suppliers and Admin Users side drawers, and the receipt image viewer with one shared modal component: Escape closes, Tab stays inside the dialog, focus returns to what opened it, and screen readers announce it as a titled dialog. Removes the duplicated dialog/drawer styles from 12 pages.

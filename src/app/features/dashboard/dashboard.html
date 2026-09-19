@@ -95,6 +95,35 @@
         </div>
       </a>
 
+      <!-- Workers: active module -->
+      <a routerLink="/workers" class="card card--active">
+        <div class="card__header">
+          <div class="card__icon card__icon--teal">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#1B6E76" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M2 18a1 1 0 0 0 1 1h18a1 1 0 0 0 1-1v-2a1 1 0 0 0-1-1H3a1 1 0 0 0-1 1v2z"></path>
+              <path d="M10 10V5a1 1 0 0 1 1-1h2a1 1 0 0 1 1 1v5"></path>
+              <path d="M4 15v-3a6 6 0 0 1 6-6"></path>
+              <path d="M14 6a6 6 0 0 1 6 6v3"></path>
+            </svg>
+          </div>
+          <div class="card__title">Workers</div>
+        </div>
+        <div class="card__stats">
+          <div class="stat-row">
+            <span class="stat-label">Active Workers</span>
+            <span class="stat-value">{{ statsLoading() ? '—' : workerStats().active }}</span>
+          </div>
+          <div class="stat-row">
+            <span class="stat-label">On a Crew</span>
+            <span class="stat-value">{{ statsLoading() ? '—' : workerStats().onCrew }}</span>
+          </div>
+          <div class="stat-row">
+            <span class="stat-label">Attendance Today</span>
+            <span class="stat-value">{{ statsLoading() ? '—' : workerStats().attendanceToday }}</span>
+          </div>
+        </div>
+      </a>
+
       <!-- Sales: not built yet -->
       <div class="card card--disabled">
         <div class="card__badge">Coming Soon</div>

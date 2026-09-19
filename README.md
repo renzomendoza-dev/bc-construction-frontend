@@ -4,7 +4,7 @@ Angular frontend for BC Construction Services' inventory, equipment, and admin o
 
 ## Features
 
-- **Dashboard** — module overview cards with live inventory, equipment, and project stats.
+- **Dashboard** — module overview cards with live inventory, equipment, project, and workers stats.
 - **Inventory**
   - Items — list, detail (view/edit toggle), create, images, linked suppliers, free-text category with autocomplete drawn from existing items.
   - Suppliers — list with create/edit drawer.
