@@ -19,6 +19,7 @@ import {
 } from '../../../../generated';
 import { CurrentUserService } from '../../../../core/services/current-user';
 import { Permission } from '../../../../core/constants/permissions';
+import { ModalComponent } from '../../../../shared/modal/modal';
 
 type Tab = 'levels' | 'lowstock' | 'history';
 type MovementType = 'IN' | 'OUT' | 'TRANSFER' | 'ADJUSTMENT';
@@ -55,7 +56,7 @@ const FETCH_SIZE = 500;
 
 @Component({
   selector: 'app-stock-levels',
-  imports: [DatePipe, RouterLink],
+  imports: [DatePipe, RouterLink, ModalComponent],
   templateUrl: './stock-levels.html',
   styleUrl: './stock-levels.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,

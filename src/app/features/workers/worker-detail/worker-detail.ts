@@ -14,6 +14,7 @@ import {
 import { formatPeso } from '../../../core/model.currency';
 import { CurrentUserService } from '../../../core/services/current-user';
 import { Permission } from '../../../core/constants/permissions';
+import { ModalComponent } from '../../../shared/modal/modal';
 
 type Mode = 'view' | 'edit';
 
@@ -26,7 +27,7 @@ const ATTENDANCE_FETCH_SIZE = 300;
 
 @Component({
   selector: 'app-worker-detail',
-  imports: [DatePipe],
+  imports: [DatePipe, ModalComponent],
   templateUrl: './worker-detail.html',
   styleUrl: './worker-detail.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,

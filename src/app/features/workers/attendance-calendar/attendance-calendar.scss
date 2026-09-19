@@ -195,41 +195,9 @@
 
 // ---- Day dialog ----
 
-.scrim {
-  position: fixed;
-  inset: 0;
-  background: rgba(20, 26, 28, 0.45);
-  z-index: 40;
-}
-
-.dialog {
-  position: fixed;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
-  background: var(--panel-bg);
-  border-radius: 14px;
-  padding: 26px;
-  width: 480px;
-  max-height: 80vh;
-  overflow-y: auto;
-  box-sizing: border-box;
-  box-shadow: 0 24px 60px rgba(20, 40, 35, 0.25);
-  z-index: 41;
-}
-
-.dialog__title {
-  font-family: 'Archivo', sans-serif;
-  font-weight: 700;
-  font-size: 17px;
-  color: var(--heading-text);
-  margin-bottom: 14px;
-}
-
-.dialog__actions {
-  display: flex;
-  justify-content: flex-end;
-  gap: 10px;
+// Actions follow the .day-lines list rather than an .app-modal__form, so
+// they need their own gap.
+.app-modal__actions {
   margin-top: 18px;
 }
 
@@ -376,11 +344,6 @@
 @media (max-width: 640px) {
   .calendar-page {
     padding: 20px 16px 40px;
-  }
-
-  .dialog {
-    width: calc(100vw - 32px);
-    padding: 20px;
   }
 
   .calendar-cell__count {

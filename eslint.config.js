@@ -40,12 +40,5 @@ module.exports = defineConfig([
   {
     files: ['**/*.html'],
     extends: [angular.configs.templateRecommended, angular.configs.templateAccessibility],
-    // Warn, not error, until the shared form-field/dialog refactor fixes these
-    // across the board — promote back to 'error' once the count hits zero.
-    rules: {
-      '@angular-eslint/template/label-has-associated-control': 'warn',
-      '@angular-eslint/template/click-events-have-key-events': 'warn',
-      '@angular-eslint/template/interactive-supports-focus': 'warn',
-    },
   },
 ]);

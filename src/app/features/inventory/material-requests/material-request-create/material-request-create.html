@@ -17,8 +17,8 @@
   <div class="card">
     <div class="form-grid">
       <div class="form-field">
-        <label>Site *</label>
-        <select [value]="siteWarehouseId()" (change)="onSiteChange($any($event.target).value)">
+        <label for="mr-site">Site *</label>
+        <select id="mr-site" [value]="siteWarehouseId()" (change)="onSiteChange($any($event.target).value)">
           <option value="">Select a site…</option>
           @for (s of sites(); track s.id) {
             <option [value]="s.id">{{ s.name }}</option>
@@ -26,8 +26,8 @@
         </select>
       </div>
       <div class="form-field">
-        <label>Date Needed</label>
-        <input type="date" [value]="dateNeeded()" (change)="onDateNeededChange($any($event.target).value)" />
+        <label for="mr-date-needed">Date Needed</label>
+        <input id="mr-date-needed" type="date" [value]="dateNeeded()" (change)="onDateNeededChange($any($event.target).value)" />
       </div>
     </div>
   </div>

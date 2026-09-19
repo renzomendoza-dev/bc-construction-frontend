@@ -12,8 +12,8 @@
 
   <div class="card">
     <div class="form-field">
-      <label>Project</label>
-      <select [value]="selectedProjectId() ?? ''" (change)="onProjectChange($any($event.target).value)">
+      <label for="calendar-project">Project</label>
+      <select id="calendar-project" [value]="selectedProjectId() ?? ''" (change)="onProjectChange($any($event.target).value)">
         <option value="">Select a project…</option>
         @for (p of projects(); track p.id) {
           <option [value]="p.id">{{ p.name }}</option>
@@ -67,10 +67,7 @@
   }
 
   @if (dayDialogOpen()) {
-    <div class="scrim" (click)="closeDayDialog()"></div>
-    <div class="dialog">
-      <div class="dialog__title">Attendance — {{ dayDialogDate() | date: 'mediumDate' }}</div>
-
+    <app-modal title="Attendance — {{ dayDialogDate() | date: 'mediumDate' }}" (closed)="closeDayDialog()" [wide]="true">
       @if (dayError()) {
         <div class="form-error">{{ dayError() }}</div>
       }
@@ -117,7 +114,7 @@
         </div>
       }
 
-      <div class="dialog__actions">
+      <div class="app-modal__actions">
         <button type="button" class="btn-secondary" [disabled]="daySaving()" (click)="closeDayDialog()">Close</button>
         @if (canRecordBatch) {
           <button type="button" class="btn-primary" [disabled]="daySaving() || dayLoading()" (click)="submitDayBatch()">
@@ -125,7 +122,7 @@
           </button>
         }
       </div>
-    </div>
+    </app-modal>
   }
 
 </div>

@@ -14,16 +14,16 @@
       }
       <div class="new-warehouse-form__row">
         <div class="form-field form-field--code">
-          <label>Code</label>
-          <input type="text" placeholder="e.g. WH-03" [value]="newForm().code" (change)="onNewCodeChange($any($event.target).value)" />
+          <label for="warehouse-code">Code</label>
+          <input id="warehouse-code" type="text" placeholder="e.g. WH-03" [value]="newForm().code" (change)="onNewCodeChange($any($event.target).value)" />
         </div>
         <div class="form-field form-field--name">
-          <label>Name</label>
-          <input type="text" placeholder="e.g. South Yard" [value]="newForm().name" (change)="onNewNameChange($any($event.target).value)" />
+          <label for="warehouse-name">Name</label>
+          <input id="warehouse-name" type="text" placeholder="e.g. South Yard" [value]="newForm().name" (change)="onNewNameChange($any($event.target).value)" />
         </div>
         <div class="form-field form-field--type">
-          <label>Type</label>
-          <select [value]="newForm().type" (change)="onNewTypeChange($any($event.target).value)">
+          <label for="warehouse-type">Type</label>
+          <select id="warehouse-type" [value]="newForm().type" (change)="onNewTypeChange($any($event.target).value)">
             @for (t of warehouseTypes; track t) {
               <option [value]="t">{{ t === 'SITE' ? 'Site' : 'Warehouse' }}</option>
             }
@@ -47,7 +47,7 @@
         @if (wh.id; as warehouseId) {
           <div class="warehouse-card">
 
-            <div class="warehouse-card__row" (click)="toggleExpand(warehouseId)">
+            <div class="warehouse-card__row" (click)="toggleExpand(warehouseId)" role="button" tabindex="0" [attr.aria-expanded]="isExpanded(warehouseId)" (keydown.enter)="toggleExpand(warehouseId)" (keydown.space)="$event.preventDefault(); toggleExpand(warehouseId)">
               <svg
                 class="warehouse-card__chevron"
                 [class.warehouse-card__chevron--open]="isExpanded(warehouseId)"
@@ -82,7 +82,7 @@
                 <div class="locations-header">
                   <div class="locations-header__title">Storage Locations</div>
                   @if (canManageLocations) {
-                    <div class="locations-header__add" (click)="$event.stopPropagation()">
+                    <div class="locations-header__add">
                       <input
                         type="text"
                         placeholder="e.g. A1"

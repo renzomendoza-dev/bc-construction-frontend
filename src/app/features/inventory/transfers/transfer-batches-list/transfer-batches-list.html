@@ -39,7 +39,7 @@
       </div>
 
       @for (b of pageItems(); track b.id) {
-        <div class="transfers-table__row" (click)="openBatch(b.id)">
+        <div class="transfers-table__row" (click)="openBatch(b.id)" role="link" tabindex="0" (keydown.enter)="openBatch(b.id)">
           <div class="transfers-table__warehouse">{{ b.originWarehouseName }}</div>
           <div class="transfers-table__warehouse">{{ b.destinationWarehouseName }}</div>
           <div>

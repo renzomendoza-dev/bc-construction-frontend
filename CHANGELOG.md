@@ -3,6 +3,10 @@
 All notable changes to this project are documented here, newest first. Dates are when the change was committed.
 
 ## 2026-09-19
+- Replace the 22 hand-rolled dialogs, the Suppliers and Admin Users side drawers, and the receipt image viewer with one shared modal component: Escape closes, Tab stays inside the dialog, focus returns to what opened it, and screen readers announce it as a titled dialog. Removes the duplicated dialog/drawer styles from 12 pages.
+- Make clickable list rows keyboard-accessible (Tab to focus, Enter to open; Space too for rows that open a drawer or expand), with a visible focus ring; Escape now also closes the mobile sidebar.
+- Link every form label to its field, so clicking a label focuses the field and screen readers read the right name.
+- Promote the template accessibility lint rules from warnings to errors now that the count is zero.
 - Add ESLint (`angular-eslint`) with an `ng lint` target; the generated API client is excluded. Template accessibility rules are temporarily warnings until the shared form/dialog cleanup lands.
 - Replace the unmaintained, non-compiling CLI scaffold specs with real unit tests covering permission gating (including the PO Submit regression), Purchase Order action visibility, the Attendance Calendar month grid, and peso formatting.
 - Fix four small lint findings (unused import, constructor injection, two ternaries used as statements).

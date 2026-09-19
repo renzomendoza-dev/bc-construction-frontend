@@ -40,7 +40,7 @@
       </div>
 
       @for (o of pageItems(); track o.id) {
-        <div class="orders-table__row" (click)="openOrder(o.id)">
+        <div class="orders-table__row" (click)="openOrder(o.id)" role="link" tabindex="0" (keydown.enter)="openOrder(o.id)">
           <div class="orders-table__supplier">{{ o.supplierName }}</div>
           <div>
             <span class="status-badge" [attr.data-status]="o.status">{{ statusLabel(o) }}</span>

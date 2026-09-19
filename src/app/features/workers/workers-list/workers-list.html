@@ -33,7 +33,7 @@
       </div>
 
       @for (w of pageItems(); track w.id) {
-        <div class="workers-table__row" (click)="openWorker(w.id)">
+        <div class="workers-table__row" (click)="openWorker(w.id)" role="link" tabindex="0" (keydown.enter)="openWorker(w.id)">
           <div class="workers-table__name">{{ w.name }}</div>
           <div class="workers-table__position">{{ w.position || '—' }}</div>
           <div class="align-right workers-table__rate">{{ w.dailyRate !== undefined ? formatPeso(w.dailyRate) : '—' }}</div>

@@ -21,6 +21,7 @@ Angular frontend for BC Construction Services' inventory, equipment, and admin o
 - **Admin** — user list with activate/deactivate and Keycloak realm-role assignment.
 - **Access control** — mutating UI actions are gated behind fine-grained permissions read from the authenticated user's Keycloak JWT.
 - Responsive layout (collapsible/overlay sidebar, scrollable tables, stacked forms on narrow screens).
+- Keyboard and screen-reader accessible: every dialog, side drawer, and image viewer shares one modal component (`src/app/shared/modal`) with Escape to close, focus trapping, and focus restore; clickable list rows are reachable with Tab and open with Enter; every form label is linked to its field.
 
 This project was generated using [Angular CLI](https://github.com/angular/angular-cli) version 22.0.8.
 
@@ -72,7 +73,7 @@ ng test
 ng lint
 ```
 
-The generated API client (`src/app/generated`) is excluded, since it's rewritten by `npm run generate:api`.
+The generated API client (`src/app/generated`) is excluded, since it's rewritten by `npm run generate:api`. Template accessibility rules are enforced as errors.
 
 ## Running end-to-end tests
 

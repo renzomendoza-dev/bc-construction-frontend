@@ -17,6 +17,8 @@ interface InventorySubRoute {
   host: {
     '[class.is-expanded]': 'expanded()',
     '[class.is-collapsed]': '!expanded()',
+    // Keyboard counterpart to tapping the mobile scrim.
+    '(document:keydown.escape)': 'closeOnMobileNav()',
   },
 })
 export class Sidebar {

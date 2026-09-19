@@ -27,8 +27,8 @@
 
       <div class="form-grid">
         <div class="form-field">
-          <label>SKU *</label>
-          <input
+          <label for="item-sku">SKU *</label>
+          <input id="item-sku"
             type="text"
             [value]="form().sku"
             (change)="onSkuChange($any($event.target).value)"
@@ -40,8 +40,8 @@
         </div>
 
         <div class="form-field">
-          <label>Name *</label>
-          <input
+          <label for="item-name">Name *</label>
+          <input id="item-name"
             type="text"
             [value]="form().name"
             (change)="onNameChange($any($event.target).value)"
@@ -53,8 +53,8 @@
         </div>
 
         <div class="form-field">
-          <label>Category</label>
-          <input
+          <label for="item-category">Category</label>
+          <input id="item-category"
             type="text"
             list="category-options"
             placeholder="e.g. Cement, Steel, Lumber…"
@@ -69,18 +69,18 @@
         </div>
 
         <div class="form-field">
-          <label>Unit of Measure</label>
-          <input type="text" placeholder="e.g. pcs, box, sheet" [value]="form().unitOfMeasure" (change)="onUnitChange($any($event.target).value)" />
+          <label for="item-unit-of-measure">Unit of Measure</label>
+          <input id="item-unit-of-measure" type="text" placeholder="e.g. pcs, box, sheet" [value]="form().unitOfMeasure" (change)="onUnitChange($any($event.target).value)" />
         </div>
 
         <div class="form-field">
-          <label>Selling Price</label>
-          <input type="number" step="0.01" min="0" [value]="form().sellingPrice" (change)="onPriceChange($any($event.target).value)" />
+          <label for="item-selling-price">Selling Price</label>
+          <input id="item-selling-price" type="number" step="0.01" min="0" [value]="form().sellingPrice" (change)="onPriceChange($any($event.target).value)" />
         </div>
 
         <div class="form-field">
-          <label>Default Cost Price</label>
-          <input type="number" step="0.01" min="0" [value]="form().defaultCostPrice" (change)="onCostChange($any($event.target).value)" />
+          <label for="item-default-cost-price">Default Cost Price</label>
+          <input id="item-default-cost-price" type="number" step="0.01" min="0" [value]="form().defaultCostPrice" (change)="onCostChange($any($event.target).value)" />
         </div>
       </div>
 

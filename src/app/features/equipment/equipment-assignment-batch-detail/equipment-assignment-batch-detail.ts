@@ -4,10 +4,11 @@ import { ActivatedRoute, Router } from '@angular/router';
 import { EquipmentAssignmentBatchResponse, EquipmentAssignmentBatchesService } from '../../../generated';
 import { CurrentUserService } from '../../../core/services/current-user';
 import { Permission } from '../../../core/constants/permissions';
+import { ModalComponent } from '../../../shared/modal/modal';
 
 @Component({
   selector: 'app-equipment-assignment-batch-detail',
-  imports: [DatePipe],
+  imports: [DatePipe, ModalComponent],
   templateUrl: './equipment-assignment-batch-detail.html',
   styleUrl: './equipment-assignment-batch-detail.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,

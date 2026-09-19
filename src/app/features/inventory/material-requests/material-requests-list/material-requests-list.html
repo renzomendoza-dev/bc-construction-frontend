@@ -38,7 +38,7 @@
       </div>
 
       @for (r of pageItems(); track r.id) {
-        <div class="requests-table__row" (click)="openRequest(r.id)">
+        <div class="requests-table__row" (click)="openRequest(r.id)" role="link" tabindex="0" (keydown.enter)="openRequest(r.id)">
           <div class="requests-table__site">{{ r.siteWarehouseName }}</div>
           <div class="requests-table__by">{{ r.requestedByName || '—' }}</div>
           <div class="requests-table__date">{{ r.dateNeeded || '—' }}</div>

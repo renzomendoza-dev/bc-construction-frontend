@@ -14,7 +14,8 @@ import {
   WarehousesService,
 } from '../../../generated';
 import { CurrentUserService } from '../../../core/services/current-user';
-import { Permission } from '../../../core/constants/permissions';
+import { Permission } from '../../../core/constants/permissions';
+import { ModalComponent } from '../../../shared/modal/modal';
 
 type Tab = 'all' | 'overdue';
 
@@ -75,7 +76,7 @@ const EMPTY_EDIT_FORM: EditEquipmentForm = {
 
 @Component({
   selector: 'app-equipment-list',
-  imports: [DatePipe, NgClass, RouterLink],
+  imports: [DatePipe, NgClass, RouterLink, ModalComponent],
   templateUrl: './equipment-list.html',
   styleUrl: './equipment-list.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,

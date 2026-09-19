@@ -8,6 +8,7 @@ import {
 } from '../../../../generated';
 import { CurrentUserService } from '../../../../core/services/current-user';
 import { Permission } from '../../../../core/constants/permissions';
+import { ModalComponent } from '../../../../shared/modal/modal';
 
 const PAGE_SIZE = 6;
 // Large enough to cover the realistic supplier count in one request.
@@ -26,7 +27,7 @@ const EMPTY_FORM: SupplierForm = { name: '', contactInfo: '' };
  
 @Component({
   selector: 'app-suppliers-list',
-  imports: [DatePipe],
+  imports: [DatePipe, ModalComponent],
   templateUrl: './suppliers-list.html',
   styleUrl: './suppliers-list.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,

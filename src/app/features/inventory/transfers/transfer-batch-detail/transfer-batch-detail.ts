@@ -11,10 +11,11 @@ import {
 } from '../../../../generated';
 import { CurrentUserService } from '../../../../core/services/current-user';
 import { Permission } from '../../../../core/constants/permissions';
+import { ModalComponent } from '../../../../shared/modal/modal';
 
 @Component({
   selector: 'app-transfer-batch-detail',
-  imports: [DatePipe, RouterLink],
+  imports: [DatePipe, RouterLink, ModalComponent],
   templateUrl: './transfer-batch-detail.html',
   styleUrl: './transfer-batch-detail.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,

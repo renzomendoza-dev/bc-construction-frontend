@@ -52,7 +52,7 @@
       <div class="items-table__state items-table__state--error">{{ errorMessage() }}</div>
     } @else if (items().length > 0) {
       @for (item of items(); track item.id) {
-        <div class="items-table__row" (click)="openItem(item.id)">
+        <div class="items-table__row" (click)="openItem(item.id)" role="link" tabindex="0" (keydown.enter)="openItem(item.id)">
           <div class="items-table__icon">
             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
               <path d="M21 8 12 3 3 8l9 5 9-5Z"></path>

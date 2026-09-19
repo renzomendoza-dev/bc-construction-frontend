@@ -125,51 +125,45 @@
   }
 
   @if (submitDialogOpen() && order(); as o) {
-    <div class="scrim" (click)="closeSubmitDialog()"></div>
-    <div class="dialog">
-      <div class="dialog__title">Submit this order to {{ o.supplierName }}?</div>
-      <div class="dialog__body">
+    <app-modal title="Submit this order to {{ o.supplierName }}?" (closed)="closeSubmitDialog()">
+      <div class="app-modal__body">
         This locks the line items — you won't be able to edit quantities after this. This action cannot be undone.
       </div>
-      <div class="dialog__actions">
+      <div class="app-modal__actions">
         <button type="button" class="btn-secondary" [disabled]="submitting()" (click)="closeSubmitDialog()">Cancel</button>
         <button type="button" class="btn-confirm" [disabled]="submitting()" (click)="submitOrder()">
           {{ submitting() ? 'Submitting…' : 'Yes, Submit Order' }}
         </button>
       </div>
-    </div>
+    </app-modal>
   }
 
   @if (closeDialogOpen() && order(); as o) {
-    <div class="scrim" (click)="closeCloseDialog()"></div>
-    <div class="dialog">
-      <div class="dialog__title">Close this order?</div>
-      <div class="dialog__body">
+    <app-modal title="Close this order?" (closed)="closeCloseDialog()">
+      <div class="app-modal__body">
         Use this when the remaining shortfall isn't coming — this ends the order regardless of how much has been received so far. This action cannot be undone.
       </div>
-      <div class="dialog__actions">
+      <div class="app-modal__actions">
         <button type="button" class="btn-secondary" [disabled]="closing()" (click)="closeCloseDialog()">Cancel</button>
         <button type="button" class="btn-danger-outline" [disabled]="closing()" (click)="closeOrder()">
           {{ closing() ? 'Closing…' : 'Yes, Close Order' }}
         </button>
       </div>
-    </div>
+    </app-modal>
   }
 
   @if (deleteDialogOpen() && order(); as o) {
-    <div class="scrim" (click)="closeDeleteDialog()"></div>
-    <div class="dialog">
-      <div class="dialog__title">Delete this draft order?</div>
-      <div class="dialog__body">
+    <app-modal title="Delete this draft order?" (closed)="closeDeleteDialog()">
+      <div class="app-modal__body">
         This will permanently remove this draft purchase order for {{ o.supplierName }}. This action cannot be undone.
       </div>
-      <div class="dialog__actions">
+      <div class="app-modal__actions">
         <button type="button" class="btn-secondary" [disabled]="deleting()" (click)="closeDeleteDialog()">Cancel</button>
         <button type="button" class="btn-danger-outline" [disabled]="deleting()" (click)="deleteOrder()">
           {{ deleting() ? 'Deleting…' : 'Yes, Delete Draft' }}
         </button>
       </div>
-    </div>
+    </app-modal>
   }
 
 </div>

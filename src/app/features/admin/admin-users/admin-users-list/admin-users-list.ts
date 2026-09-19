@@ -6,6 +6,7 @@ import {
   AdminRolesService,
   RoleResponse,
 } from '../../../../generated';
+import { ModalComponent } from '../../../../shared/modal/modal';
 
 const PAGE_SIZE = 8;
 // GET /api/admin/users is paged server-side, but there's no search param —
@@ -15,7 +16,7 @@ const FETCH_SIZE = 500;
 
 @Component({
   selector: 'app-admin-users-list',
-  imports: [DatePipe],
+  imports: [DatePipe, ModalComponent],
   templateUrl: './admin-users-list.html',
   styleUrl: './admin-users-list.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,

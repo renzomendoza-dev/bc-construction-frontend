@@ -50,12 +50,12 @@
           <div><span class="request-header__meta-label">Created:</span> {{ r.createdAt | date: 'medium' }}</div>
         </div>
         <div class="edit-field">
-          <label>Date Needed</label>
-          <input type="date" [value]="editDateNeeded()" (change)="onEditDateNeededChange($any($event.target).value)" />
+          <label for="mr-date-needed">Date Needed</label>
+          <input id="mr-date-needed" type="date" [value]="editDateNeeded()" (change)="onEditDateNeededChange($any($event.target).value)" />
         </div>
         <div class="edit-field">
-          <label>Notes</label>
-          <textarea placeholder="Optional notes about this request…" [value]="editNotes()" (change)="onEditNotesChange($any($event.target).value)"></textarea>
+          <label for="mr-notes">Notes</label>
+          <textarea id="mr-notes" placeholder="Optional notes about this request…" [value]="editNotes()" (change)="onEditNotesChange($any($event.target).value)"></textarea>
         </div>
       }
     </div>
@@ -132,19 +132,17 @@
   }
 
   @if (deleteDialogOpen() && request(); as r) {
-    <div class="scrim" (click)="closeDeleteDialog()"></div>
-    <div class="dialog">
-      <div class="dialog__title">Delete this request?</div>
-      <div class="dialog__body">
+    <app-modal title="Delete this request?" (closed)="closeDeleteDialog()">
+      <div class="app-modal__body">
         This will permanently remove the material request for {{ r.siteWarehouseName }}. This action cannot be undone.
       </div>
-      <div class="dialog__actions">
+      <div class="app-modal__actions">
         <button type="button" class="btn-secondary" [disabled]="deleting()" (click)="closeDeleteDialog()">Cancel</button>
         <button type="button" class="btn-danger-outline" [disabled]="deleting()" (click)="deleteRequest()">
           {{ deleting() ? 'Deleting…' : 'Yes, Delete Request' }}
         </button>
       </div>
-    </div>
+    </app-modal>
   }
 
 </div>

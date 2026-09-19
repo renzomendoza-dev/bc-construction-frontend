@@ -29,9 +29,9 @@
   <div class="card">
     <div class="form-grid">
       <div class="form-field">
-        <label>Supplier *</label>
+        <label for="receipt-supplier">Supplier *</label>
         @if (fulfillingOrder(); as order) {
-          <div class="frozen-field">{{ order.supplierName }}</div>
+          <output id="receipt-supplier" class="frozen-field">{{ order.supplierName }}</output>
         } @else {
           <select [value]="supplierId()" (change)="onSupplierChange($any($event.target).value)">
             <option value="">Select a supplier…</option>
@@ -42,9 +42,9 @@
         }
       </div>
       <div class="form-field">
-        <label>Warehouse *</label>
+        <label for="receipt-warehouse">Warehouse *</label>
         @if (fulfillingBatch(); as batch) {
-          <div class="frozen-field">{{ batch.originWarehouseName }}</div>
+          <output id="receipt-warehouse" class="frozen-field">{{ batch.originWarehouseName }}</output>
         } @else {
           <select [value]="warehouseId()" (change)="onWarehouseChange($any($event.target).value)">
             <option value="">Select a warehouse…</option>
@@ -55,12 +55,12 @@
         }
       </div>
       <div class="form-field">
-        <label>Receipt Number</label>
-        <input type="text" placeholder="e.g. INV-2026-00842" [value]="receiptNumber()" (change)="onReceiptNumberChange($any($event.target).value)" />
+        <label for="receipt-number">Receipt Number</label>
+        <input id="receipt-number" type="text" placeholder="e.g. INV-2026-00842" [value]="receiptNumber()" (change)="onReceiptNumberChange($any($event.target).value)" />
       </div>
       <div class="form-field">
-        <label>Purchase Date *</label>
-        <input type="date" [value]="purchaseDate()" (change)="onPurchaseDateChange($any($event.target).value)" />
+        <label for="receipt-purchase-date">Purchase Date *</label>
+        <input id="receipt-purchase-date" type="date" [value]="purchaseDate()" (change)="onPurchaseDateChange($any($event.target).value)" />
       </div>
     </div>
   </div>

@@ -1,0 +1,165 @@
+// Unencapsulated (see modal.ts) so projected content can use the
+// app-modal__* helper classes. Everything is namespaced to avoid leaks.
+
+.app-modal {
+  position: fixed;
+  inset: 0;
+  z-index: 40;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 16px;
+  box-sizing: border-box;
+  background: rgba(20, 26, 28, 0.45);
+}
+
+.app-modal__panel {
+  width: 420px;
+  max-width: 100%;
+  max-height: 85vh;
+  overflow-y: auto;
+  box-sizing: border-box;
+  padding: 26px;
+  border-radius: 14px;
+  background: var(--panel-bg);
+  box-shadow: 0 24px 60px rgba(20, 40, 35, 0.25);
+
+  &:focus {
+    outline: none;
+  }
+}
+
+.app-modal--wide .app-modal__panel {
+  width: 480px;
+}
+
+.app-modal__title {
+  margin: 0 0 10px;
+  font-family: 'Archivo', sans-serif;
+  font-weight: 700;
+  font-size: 17px;
+  color: var(--heading-text);
+}
+
+.app-modal__subtitle {
+  margin: -4px 0 18px;
+  font-size: 13px;
+  color: var(--sub-text);
+}
+
+.app-modal__body {
+  margin-bottom: 22px;
+  font-size: 13.5px;
+  line-height: 1.6;
+  color: var(--sub-text);
+}
+
+.app-modal__form {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  margin-bottom: 20px;
+}
+
+.app-modal__form--grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+}
+
+.app-modal__actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+}
+
+// ---- Drawer variant ----
+
+.app-modal--drawer {
+  justify-content: flex-end;
+  align-items: stretch;
+  padding: 0;
+  background: rgba(20, 26, 28, 0.4);
+
+  .app-modal__panel {
+    display: flex;
+    flex-direction: column;
+    width: 440px;
+    height: 100vh;
+    max-height: none;
+    padding: 0;
+    border-radius: 0;
+    border-left: 1px solid var(--border);
+    box-shadow: -12px 0 32px rgba(20, 40, 35, 0.14);
+    overflow: hidden;
+  }
+
+  .app-modal__title {
+    margin: 0;
+    font-size: 16.5px;
+  }
+}
+
+// ---- Lightbox variant ----
+
+.app-modal--lightbox {
+  background: rgba(20, 26, 28, 0.8);
+  cursor: zoom-out;
+
+  .app-modal__panel {
+    width: auto;
+    max-width: 90vw;
+    max-height: 90vh;
+    padding: 0;
+    overflow: visible;
+    background: transparent;
+    box-shadow: none;
+    cursor: default;
+  }
+
+  .app-modal__title {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+    clip: rect(0 0 0 0);
+    white-space: nowrap;
+  }
+}
+
+.app-modal__header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 20px 24px;
+  border-bottom: 1px solid var(--border);
+}
+
+.app-modal__close {
+  width: 30px;
+  height: 30px;
+  border: none;
+  border-radius: 8px;
+  background: transparent;
+  color: var(--sub-text);
+  font-size: 16px;
+  cursor: pointer;
+
+  &:hover {
+    background: var(--hover-bg);
+  }
+}
+
+@media (max-width: 640px) {
+  .app-modal__panel {
+    padding: 20px;
+  }
+
+  .app-modal__form--grid {
+    grid-template-columns: 1fr;
+  }
+
+  .app-modal--drawer .app-modal__panel {
+    width: 100%;
+    padding: 0;
+  }
+}

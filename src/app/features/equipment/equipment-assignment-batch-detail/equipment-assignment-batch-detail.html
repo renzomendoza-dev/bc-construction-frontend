@@ -72,19 +72,17 @@
   }
 
   @if (confirmDialogOpen() && batch(); as b) {
-    <div class="scrim" (click)="closeConfirmDialog()"></div>
-    <div class="dialog">
-      <div class="dialog__title">Submit this batch?</div>
-      <div class="dialog__body">
+    <app-modal title="Submit this batch?" (closed)="closeConfirmDialog()">
+      <div class="app-modal__body">
         This will {{ usesCheckOut(b) ? 'check out' : 'check in' }} {{ (b.lines ?? []).length }} piece(s) of equipment. This action cannot be undone.
       </div>
-      <div class="dialog__actions">
+      <div class="app-modal__actions">
         <button type="button" class="btn-secondary" [disabled]="submitting()" (click)="closeConfirmDialog()">Cancel</button>
         <button type="button" class="btn-confirm" [disabled]="submitting()" (click)="submitBatch()">
           {{ submitting() ? 'Submitting…' : 'Yes, Submit Batch' }}
         </button>
       </div>
-    </div>
+    </app-modal>
   }
 
 </div>

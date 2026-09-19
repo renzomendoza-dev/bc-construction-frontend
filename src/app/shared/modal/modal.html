@@ -1,0 +1,19 @@
+<div
+  #panel
+  class="app-modal__panel"
+  role="dialog"
+  aria-modal="true"
+  tabindex="-1"
+  [attr.aria-labelledby]="titleId"
+  (keydown)="onPanelKeydown($event)"
+>
+  @if (variant() === 'drawer') {
+    <div class="app-modal__header">
+      <h2 class="app-modal__title" [id]="titleId">{{ title() }}</h2>
+      <button type="button" class="app-modal__close" aria-label="Close" (click)="closed.emit()">✕</button>
+    </div>
+  } @else {
+    <h2 class="app-modal__title" [id]="titleId">{{ title() }}</h2>
+  }
+  <ng-content />
+</div>

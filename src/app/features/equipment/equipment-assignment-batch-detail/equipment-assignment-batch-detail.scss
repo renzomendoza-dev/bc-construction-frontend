@@ -235,48 +235,6 @@
 
 // ---- Submit confirm dialog ----
 
-.scrim {
-  position: fixed;
-  inset: 0;
-  background: rgba(20, 26, 28, 0.45);
-  z-index: 40;
-}
-
-.dialog {
-  position: fixed;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
-  background: var(--panel-bg);
-  border-radius: 14px;
-  padding: 28px;
-  width: 420px;
-  box-sizing: border-box;
-  box-shadow: 0 24px 60px rgba(20, 40, 35, 0.25);
-  z-index: 41;
-}
-
-.dialog__title {
-  font-family: 'Archivo', sans-serif;
-  font-weight: 700;
-  font-size: 17px;
-  color: var(--heading-text);
-  margin-bottom: 10px;
-}
-
-.dialog__body {
-  font-size: 13.5px;
-  color: var(--sub-text);
-  line-height: 1.6;
-  margin-bottom: 22px;
-}
-
-.dialog__actions {
-  display: flex;
-  justify-content: flex-end;
-  gap: 10px;
-}
-
 .btn-secondary {
   height: 38px;
   padding: 0 16px;
@@ -310,11 +268,6 @@
   .lines-head,
   .lines-row {
     min-width: 480px;
-  }
-
-  .dialog {
-    width: calc(100vw - 32px);
-    padding: 20px;
   }
 
   .btn-confirm {

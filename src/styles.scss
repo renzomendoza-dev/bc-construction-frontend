@@ -35,4 +35,12 @@ body {
   background: var(--page-bg);
   transition: background 0.2s;
 }
+
+// Clickable list rows are divs with a role + tabindex; show a focus ring for
+// keyboard users only (inset so table overflow doesn't clip it).
+[role='link'][tabindex]:focus-visible,
+[role='button'][tabindex]:focus-visible {
+  outline: 2px solid var(--teal);
+  outline-offset: -2px;
+}
  

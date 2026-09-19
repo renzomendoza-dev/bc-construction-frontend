@@ -17,8 +17,8 @@
   <div class="card">
     <div class="form-grid">
       <div class="form-field">
-        <label>Supplier *</label>
-        <select [value]="supplierId()" (change)="onSupplierChange($any($event.target).value)">
+        <label for="po-supplier">Supplier *</label>
+        <select id="po-supplier" [value]="supplierId()" (change)="onSupplierChange($any($event.target).value)">
           <option value="">Select a supplier…</option>
           @for (s of suppliers(); track s.id) {
             <option [value]="s.id">{{ s.name }}</option>

@@ -70,6 +70,11 @@
                 class="table__row table__row--items"
                 [class.table__row--low]="group.isLow"
                 (click)="toggleExpand(group.itemId)"
+                role="button"
+                [attr.aria-expanded]="isExpanded(group.itemId)"
+                tabindex="0"
+                (keydown.enter)="toggleExpand(group.itemId)"
+                (keydown.space)="$event.preventDefault(); toggleExpand(group.itemId)"
               >
                 <svg
                   class="expand-chevron"
@@ -157,7 +162,7 @@
                           }
                         </div>
                         @if (canAdjust || canTransfer) {
-                          <div class="align-right row-actions" (click)="$event.stopPropagation()">
+                          <div class="align-right row-actions">
                             @if (canAdjust) {
                               <button type="button" class="btn-row-action" (click)="openAdjust(row)">Adjust</button>
                             }
@@ -291,65 +296,59 @@
 
   <!-- ===== Adjust Stock modal ===== -->
   @if (adjustOpen()) {
-    <div class="scrim" (click)="closeAdjust()"></div>
-    <div class="dialog">
-      <div class="dialog__title">Adjust Stock</div>
-
+    <app-modal title="Adjust Stock" (closed)="closeAdjust()">
       @if (adjustError()) {
         <div class="form-error">{{ adjustError() }}</div>
       }
 
-      <div class="dialog-form">
+      <div class="app-modal__form">
         <div class="form-field">
-          <label>Item</label>
-          <div class="frozen-field">{{ adjustItemName() }}</div>
+          <label for="stock-adjust-item">Item</label>
+          <output id="stock-adjust-item" class="frozen-field">{{ adjustItemName() }}</output>
         </div>
         <div class="form-field">
-          <label>Warehouse / Location</label>
-          <div class="frozen-field">{{ adjustLocationLabel() }}</div>
+          <label for="stock-adjust-location">Warehouse / Location</label>
+          <output id="stock-adjust-location" class="frozen-field">{{ adjustLocationLabel() }}</output>
         </div>
         <div class="form-field">
-          <label>Quantity Change (+/-)</label>
-          <input type="text" placeholder="e.g. -5 or 20" [value]="adjustQty()" (change)="onAdjustQtyChange($any($event.target).value)" />
+          <label for="stock-adjust-quantity">Quantity Change (+/-)</label>
+          <input id="stock-adjust-quantity" type="text" placeholder="e.g. -5 or 20" [value]="adjustQty()" (change)="onAdjustQtyChange($any($event.target).value)" />
         </div>
         <div class="form-field">
-          <label>Reason</label>
-          <textarea placeholder="e.g. Cycle count correction" [value]="adjustReason()" (change)="onAdjustReasonChange($any($event.target).value)"></textarea>
+          <label for="stock-adjust-reason">Reason</label>
+          <textarea id="stock-adjust-reason" placeholder="e.g. Cycle count correction" [value]="adjustReason()" (change)="onAdjustReasonChange($any($event.target).value)"></textarea>
         </div>
       </div>
 
-      <div class="dialog__actions">
+      <div class="app-modal__actions">
         <button type="button" class="btn-secondary" [disabled]="adjustSaving()" (click)="closeAdjust()">Cancel</button>
         <button type="button" class="btn-primary" [disabled]="adjustSaving()" (click)="submitAdjust()">
           {{ adjustSaving() ? 'Submitting…' : 'Submit Adjustment' }}
         </button>
       </div>
-    </div>
+    </app-modal>
   }
 
   <!-- ===== Transfer Stock modal ===== -->
   @if (transferOpen()) {
-    <div class="scrim" (click)="closeTransfer()"></div>
-    <div class="dialog">
-      <div class="dialog__title">Transfer Stock</div>
-
+    <app-modal title="Transfer Stock" (closed)="closeTransfer()">
       @if (transferError()) {
         <div class="form-error">{{ transferError() }}</div>
       }
 
-      <div class="dialog-form">
+      <div class="app-modal__form">
         <div class="form-field">
-          <label>Item</label>
-          <div class="frozen-field">{{ transferItemName() }}</div>
+          <label for="stock-transfer-item">Item</label>
+          <output id="stock-transfer-item" class="frozen-field">{{ transferItemName() }}</output>
         </div>
         <div class="form-field-row">
           <div class="form-field">
-            <label>From Location</label>
-            <div class="frozen-field">{{ transferFromLabel() }}</div>
+            <label for="stock-transfer-from">From Location</label>
+            <output id="stock-transfer-from" class="frozen-field">{{ transferFromLabel() }}</output>
           </div>
           <div class="form-field">
-            <label>To Location</label>
-            <select [value]="transferToKey()" (change)="onTransferToChange($any($event.target).value)">
+            <label for="stock-transfer-to">To Location</label>
+            <select id="stock-transfer-to" [value]="transferToKey()" (change)="onTransferToChange($any($event.target).value)">
               @for (l of locations(); track l.key) {
                 <option [value]="l.key">{{ l.label }}</option>
               }
@@ -357,18 +356,18 @@
           </div>
         </div>
         <div class="form-field">
-          <label>Quantity</label>
-          <input type="text" placeholder="e.g. 25" [value]="transferQty()" (change)="onTransferQtyChange($any($event.target).value)" />
+          <label for="stock-transfer-quantity">Quantity</label>
+          <input id="stock-transfer-quantity" type="text" placeholder="e.g. 25" [value]="transferQty()" (change)="onTransferQtyChange($any($event.target).value)" />
         </div>
       </div>
 
-      <div class="dialog__actions">
+      <div class="app-modal__actions">
         <button type="button" class="btn-secondary" [disabled]="transferSaving()" (click)="closeTransfer()">Cancel</button>
         <button type="button" class="btn-primary" [disabled]="transferSaving()" (click)="submitTransfer()">
           {{ transferSaving() ? 'Submitting…' : 'Submit Transfer' }}
         </button>
       </div>
-    </div>
+    </app-modal>
   }
 
 </div>

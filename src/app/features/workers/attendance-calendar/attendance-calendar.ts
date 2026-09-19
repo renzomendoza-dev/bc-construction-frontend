@@ -15,6 +15,7 @@ import {
 } from '../../../generated';
 import { CurrentUserService } from '../../../core/services/current-user';
 import { Permission } from '../../../core/constants/permissions';
+import { ModalComponent } from '../../../shared/modal/modal';
 
 const PROJECTS_FETCH_SIZE = 300;
 const CREW_FETCH_SIZE = 300;
@@ -43,7 +44,7 @@ function pad2(n: number): string {
 
 @Component({
   selector: 'app-attendance-calendar',
-  imports: [DatePipe],
+  imports: [DatePipe, ModalComponent],
   templateUrl: './attendance-calendar.html',
   styleUrl: './attendance-calendar.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,

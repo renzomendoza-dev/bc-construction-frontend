@@ -136,10 +136,8 @@
 
   <!-- ===== Check Out / Transfer modal ===== -->
   @if (checkOutOpen()) {
-    <div class="scrim" (click)="closeCheckOut()"></div>
-    <div class="dialog">
-      <div class="dialog__title">{{ checkOutMode() === 'TRANSFER' ? 'Transfer Equipment' : 'Check Out Equipment' }}</div>
-      <div class="dialog__subtitle">
+    <app-modal title="{{ checkOutMode() === 'TRANSFER' ? 'Transfer Equipment' : 'Check Out Equipment' }}" (closed)="closeCheckOut()">
+      <div class="app-modal__subtitle">
         {{ checkOutTarget()?.name }} · {{ checkOutTarget()?.assetTag }}
         @if (checkOutMode() === 'TRANSFER') {
           · currently at {{ checkOutTarget()?.currentWarehouseName }}
@@ -150,11 +148,11 @@
         <div class="form-error">{{ checkOutError() }}</div>
       }
 
-      <div class="dialog-form">
+      <div class="app-modal__form">
         <div class="form-field">
-          <label>User</label>
+          <label for="equipment-user">User</label>
           @if (usersLoading()) {
-            <select disabled>
+            <select id="equipment-user" disabled>
               <option>Loading users…</option>
             </select>
           } @else if (usersError()) {
@@ -172,8 +170,8 @@
           }
         </div>
         <div class="form-field">
-          <label>{{ checkOutMode() === 'TRANSFER' ? 'Destination Site' : 'Site' }}</label>
-          <select
+          <label for="equipment-checkout-site">{{ checkOutMode() === 'TRANSFER' ? 'Destination Site' : 'Site' }}</label>
+          <select id="equipment-checkout-site"
             [value]="checkOutSiteWarehouseId()"
             (change)="onCheckOutSiteWarehouseIdChange($any($event.target).value)"
           >
@@ -184,8 +182,8 @@
           </select>
         </div>
         <div class="form-field">
-          <label>Condition {{ checkOutMode() === 'TRANSFER' ? '(optional)' : 'Out (optional)' }}</label>
-          <textarea
+          <label for="equipment-condition-out">Condition {{ checkOutMode() === 'TRANSFER' ? '(optional)' : 'Out (optional)' }}</label>
+          <textarea id="equipment-condition-out"
             placeholder="e.g. Minor scuff on housing, fully functional"
             [value]="checkOutCondition()"
             (change)="onCheckOutConditionChange($any($event.target).value)"
@@ -193,7 +191,7 @@
         </div>
       </div>
 
-      <div class="dialog__actions">
+      <div class="app-modal__actions">
         <button type="button" class="btn-secondary" [disabled]="checkOutSaving()" (click)="closeCheckOut()">Cancel</button>
         <button type="button" class="btn-primary" [disabled]="checkOutSaving()" (click)="submitCheckOut()">
           @if (checkOutSaving()) {
@@ -203,24 +201,22 @@
           }
         </button>
       </div>
-    </div>
+    </app-modal>
   }
 
   <!-- ===== Check In modal ===== -->
   @if (checkInOpen()) {
-    <div class="scrim" (click)="closeCheckIn()"></div>
-    <div class="dialog">
-      <div class="dialog__title">Check In Equipment</div>
-      <div class="dialog__subtitle">{{ checkInTarget()?.name }} · currently with {{ holderLabel(checkInTarget()!) }}</div>
+    <app-modal title="Check In Equipment" (closed)="closeCheckIn()">
+      <div class="app-modal__subtitle">{{ checkInTarget()?.name }} · currently with {{ holderLabel(checkInTarget()!) }}</div>
 
       @if (checkInError()) {
         <div class="form-error">{{ checkInError() }}</div>
       }
 
-      <div class="dialog-form">
+      <div class="app-modal__form">
         <div class="form-field">
-          <label>Return to Warehouse</label>
-          <select
+          <label for="equipment-return-to-warehouse">Return to Warehouse</label>
+          <select id="equipment-return-to-warehouse"
             [value]="checkInDestinationWarehouseId()"
             (change)="onCheckInDestinationWarehouseIdChange($any($event.target).value)"
           >
@@ -231,8 +227,8 @@
           </select>
         </div>
         <div class="form-field">
-          <label>Condition In (optional)</label>
-          <textarea
+          <label for="equipment-condition-in">Condition In (optional)</label>
+          <textarea id="equipment-condition-in"
             placeholder="e.g. Returned in working order, blade needs sharpening"
             [value]="checkInCondition()"
             (change)="onCheckInConditionChange($any($event.target).value)"
@@ -240,29 +236,26 @@
         </div>
       </div>
 
-      <div class="dialog__actions">
+      <div class="app-modal__actions">
         <button type="button" class="btn-secondary" [disabled]="checkInSaving()" (click)="closeCheckIn()">Cancel</button>
         <button type="button" class="btn-primary" [disabled]="checkInSaving()" (click)="submitCheckIn()">
           {{ checkInSaving() ? 'Checking In…' : 'Confirm Check In' }}
         </button>
       </div>
-    </div>
+    </app-modal>
   }
 
   <!-- ===== New Equipment modal ===== -->
   @if (newOpen()) {
-    <div class="scrim" (click)="closeNew()"></div>
-    <div class="dialog dialog--wide">
-      <div class="dialog__title">New Equipment</div>
-
+    <app-modal title="New Equipment" (closed)="closeNew()" [wide]="true">
       @if (newError()) {
         <div class="form-error">{{ newError() }}</div>
       }
 
-      <div class="dialog-form dialog-form--grid">
+      <div class="app-modal__form app-modal__form--grid">
         <div class="form-field form-field--full">
-          <label>Name</label>
-          <input
+          <label for="equipment-name">Name</label>
+          <input id="equipment-name"
             type="text"
             placeholder="e.g. DeWalt 20V Cordless Drill"
             [value]="newForm().name"
@@ -270,8 +263,8 @@
           />
         </div>
         <div class="form-field">
-          <label>Asset Tag</label>
-          <input
+          <label for="equipment-asset-tag">Asset Tag</label>
+          <input id="equipment-asset-tag"
             type="text"
             placeholder="e.g. EQ-2026-0042"
             [value]="newForm().assetTag"
@@ -279,8 +272,8 @@
           />
         </div>
         <div class="form-field">
-          <label>Category</label>
-          <input
+          <label for="equipment-category">Category</label>
+          <input id="equipment-category"
             type="text"
             placeholder="e.g. Power Tools"
             [value]="newForm().category"
@@ -288,8 +281,8 @@
           />
         </div>
         <div class="form-field">
-          <label>Serial Number</label>
-          <input
+          <label for="equipment-serial-number">Serial Number</label>
+          <input id="equipment-serial-number"
             type="text"
             placeholder="e.g. SN-88213A"
             [value]="newForm().serialNumber"
@@ -297,8 +290,8 @@
           />
         </div>
         <div class="form-field">
-          <label>Purchase Price</label>
-          <input
+          <label for="equipment-purchase-price">Purchase Price</label>
+          <input id="equipment-purchase-price"
             type="text"
             placeholder="e.g. 249.99"
             [value]="newForm().purchasePrice"
@@ -306,8 +299,8 @@
           />
         </div>
         <div class="form-field">
-          <label>Warehouse</label>
-          <select
+          <label for="equipment-warehouse">Warehouse</label>
+          <select id="equipment-warehouse"
             [value]="newForm().warehouseId"
             (change)="onNewFieldChange('warehouseId', $any($event.target).value)"
           >
@@ -319,30 +312,28 @@
         </div>
       </div>
 
-      <div class="dialog__actions">
+      <div class="app-modal__actions">
         <button type="button" class="btn-secondary" [disabled]="newSaving()" (click)="closeNew()">Cancel</button>
         <button type="button" class="btn-primary" [disabled]="newSaving()" (click)="submitNew()">
           {{ newSaving() ? 'Creating…' : 'Create Equipment' }}
         </button>
       </div>
-    </div>
+    </app-modal>
   }
 
   <!-- ===== Edit Equipment modal ===== -->
   @if (editOpen()) {
-    <div class="scrim" (click)="closeEdit()"></div>
-    <div class="dialog dialog--wide">
-      <div class="dialog__title">Edit Equipment</div>
-      <div class="dialog__subtitle">{{ editTarget()?.assetTag }}</div>
+    <app-modal title="Edit Equipment" (closed)="closeEdit()" [wide]="true">
+      <div class="app-modal__subtitle">{{ editTarget()?.assetTag }}</div>
 
       @if (editError()) {
         <div class="form-error">{{ editError() }}</div>
       }
 
-      <div class="dialog-form dialog-form--grid">
+      <div class="app-modal__form app-modal__form--grid">
         <div class="form-field form-field--full">
-          <label>Name</label>
-          <input
+          <label for="equipment-edit-name">Name</label>
+          <input id="equipment-edit-name"
             type="text"
             placeholder="e.g. DeWalt 20V Cordless Drill"
             [value]="editForm().name"
@@ -350,8 +341,8 @@
           />
         </div>
         <div class="form-field">
-          <label>Category</label>
-          <input
+          <label for="equipment-edit-category">Category</label>
+          <input id="equipment-edit-category"
             type="text"
             placeholder="e.g. Power Tools"
             [value]="editForm().category"
@@ -359,8 +350,8 @@
           />
         </div>
         <div class="form-field">
-          <label>Serial Number</label>
-          <input
+          <label for="equipment-edit-serial-number">Serial Number</label>
+          <input id="equipment-edit-serial-number"
             type="text"
             placeholder="e.g. SN-88213A"
             [value]="editForm().serialNumber"
@@ -368,8 +359,8 @@
           />
         </div>
         <div class="form-field">
-          <label>Purchase Price</label>
-          <input
+          <label for="equipment-edit-purchase-price">Purchase Price</label>
+          <input id="equipment-edit-purchase-price"
             type="text"
             placeholder="e.g. 249.99"
             [value]="editForm().purchasePrice"
@@ -377,16 +368,16 @@
           />
         </div>
         <div class="form-field">
-          <label>Purchase Date</label>
-          <input
+          <label for="equipment-purchase-date">Purchase Date</label>
+          <input id="equipment-purchase-date"
             type="date"
             [value]="editForm().purchaseDate"
             (change)="onEditFieldChange('purchaseDate', $any($event.target).value)"
           />
         </div>
         <div class="form-field form-field--full">
-          <label>Purchase Vendor</label>
-          <input
+          <label for="equipment-purchase-vendor">Purchase Vendor</label>
+          <input id="equipment-purchase-vendor"
             type="text"
             placeholder="e.g. Home Depot Pro"
             [value]="editForm().purchaseVendor"
@@ -395,13 +386,13 @@
         </div>
       </div>
 
-      <div class="dialog__actions">
+      <div class="app-modal__actions">
         <button type="button" class="btn-secondary" [disabled]="editSaving()" (click)="closeEdit()">Cancel</button>
         <button type="button" class="btn-primary" [disabled]="editSaving()" (click)="submitEdit()">
           {{ editSaving() ? 'Saving…' : 'Save Changes' }}
         </button>
       </div>
-    </div>
+    </app-modal>
   }
 
 </div>

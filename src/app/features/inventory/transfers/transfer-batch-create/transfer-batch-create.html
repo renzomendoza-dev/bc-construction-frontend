@@ -32,8 +32,8 @@
   <div class="card">
     <div class="form-grid">
       <div class="form-field">
-        <label>{{ direction() === 'PULL_OUT' ? 'Origin Site *' : 'Origin Warehouse *' }}</label>
-        <select [value]="originWarehouseId()" (change)="onOriginChange($any($event.target).value)">
+        <label for="transfer-origin">{{ direction() === 'PULL_OUT' ? 'Origin Site *' : 'Origin Warehouse *' }}</label>
+        <select id="transfer-origin" [value]="originWarehouseId()" (change)="onOriginChange($any($event.target).value)">
           <option value="">Select…</option>
           @for (w of originOptions(); track w.id) {
             <option [value]="w.id">{{ w.name }}</option>
@@ -41,9 +41,9 @@
         </select>
       </div>
       <div class="form-field">
-        <label>{{ direction() === 'PULL_OUT' ? 'Destination Warehouse *' : 'Destination Site *' }}</label>
+        <label for="transfer-destination">{{ direction() === 'PULL_OUT' ? 'Destination Warehouse *' : 'Destination Site *' }}</label>
         @if (fulfillingRequest(); as req) {
-          <div class="frozen-field">{{ req.siteWarehouseName }}</div>
+          <output id="transfer-destination" class="frozen-field">{{ req.siteWarehouseName }}</output>
         } @else {
           <select [value]="destinationWarehouseId()" (change)="onDestinationChange($any($event.target).value)">
             <option value="">Select…</option>
@@ -55,8 +55,8 @@
       </div>
       @if (showProjectField()) {
         <div class="form-field">
-          <label>Project (optional)</label>
-          <select [value]="projectId() ?? ''" (change)="onProjectChange($any($event.target).value)">
+          <label for="transfer-project">Project (optional)</label>
+          <select id="transfer-project" [value]="projectId() ?? ''" (change)="onProjectChange($any($event.target).value)">
             <option value="">No project</option>
             @for (p of projectOptions(); track p.id) {
               <option [value]="p.id">{{ p.name }}</option>

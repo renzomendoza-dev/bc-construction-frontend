@@ -48,6 +48,9 @@
           class="receipts-table__row"
           [class.receipts-table__row--confirmed]="r.confirmed"
           (click)="openReceipt(r.id)"
+          role="link"
+          tabindex="0"
+          (keydown.enter)="openReceipt(r.id)"
         >
           <div class="receipts-table__number">{{ r.receiptNumber || ('#' + r.id) }}</div>
           <div class="receipts-table__supplier">{{ r.supplierName }}</div>

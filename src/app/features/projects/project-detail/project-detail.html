@@ -56,24 +56,24 @@
         <div class="card__title">Edit Project</div>
         <div class="form-grid">
           <div class="form-field form-field--full">
-            <label>Name *</label>
-            <input type="text" [value]="editName()" (change)="onEditNameChange($any($event.target).value)" />
+            <label for="project-name">Name *</label>
+            <input id="project-name" type="text" [value]="editName()" (change)="onEditNameChange($any($event.target).value)" />
           </div>
           <div class="form-field">
-            <label>Budget</label>
-            <input type="text" placeholder="e.g. 2500000" [value]="editBudget()" (change)="onEditBudgetChange($any($event.target).value)" />
+            <label for="project-budget">Budget</label>
+            <input id="project-budget" type="text" placeholder="e.g. 2500000" [value]="editBudget()" (change)="onEditBudgetChange($any($event.target).value)" />
           </div>
           <div class="form-field">
-            <label>Start Date *</label>
-            <input type="date" [value]="editStartDate()" (change)="onEditStartDateChange($any($event.target).value)" />
+            <label for="project-start-date">Start Date *</label>
+            <input id="project-start-date" type="date" [value]="editStartDate()" (change)="onEditStartDateChange($any($event.target).value)" />
           </div>
           <div class="form-field">
-            <label>End Date</label>
-            <input type="date" [value]="editEndDate()" (change)="onEditEndDateChange($any($event.target).value)" />
+            <label for="project-end-date">End Date</label>
+            <input id="project-end-date" type="date" [value]="editEndDate()" (change)="onEditEndDateChange($any($event.target).value)" />
           </div>
           <div class="form-field form-field--full">
-            <label>Description</label>
-            <textarea placeholder="Optional description…" [value]="editDescription()" (change)="onEditDescriptionChange($any($event.target).value)"></textarea>
+            <label for="project-description">Description</label>
+            <textarea id="project-description" placeholder="Optional description…" [value]="editDescription()" (change)="onEditDescriptionChange($any($event.target).value)"></textarea>
           </div>
         </div>
         <div class="form-actions">
@@ -187,75 +187,67 @@
   }
 
   @if (completeDialogOpen() && project(); as p) {
-    <div class="scrim" (click)="closeCompleteDialog()"></div>
-    <div class="dialog">
-      <div class="dialog__title">Mark "{{ p.name }}" as Completed?</div>
-      <div class="dialog__body">
+    <app-modal title='Mark "{{ p.name }}" as Completed?' (closed)="closeCompleteDialog()">
+      <div class="app-modal__body">
         This is terminal — no further edits or expenses can be recorded against this project afterward. This action cannot be undone.
       </div>
-      <div class="dialog__actions">
+      <div class="app-modal__actions">
         <button type="button" class="btn-secondary" [disabled]="completing()" (click)="closeCompleteDialog()">Cancel</button>
         <button type="button" class="btn-danger-outline" [disabled]="completing()" (click)="completeProject()">
           {{ completing() ? 'Completing…' : 'Yes, Mark Completed' }}
         </button>
       </div>
-    </div>
+    </app-modal>
   }
 
   @if (expenseDialogOpen()) {
-    <div class="scrim" (click)="closeExpenseDialog()"></div>
-    <div class="dialog">
-      <div class="dialog__title">Add Expense</div>
-
+    <app-modal title="Add Expense" (closed)="closeExpenseDialog()">
       @if (expenseError()) {
         <div class="form-error">{{ expenseError() }}</div>
       }
 
-      <div class="dialog-form">
+      <div class="app-modal__form">
         <div class="form-field">
-          <label>Category</label>
-          <select [value]="expenseCategory()" (change)="onExpenseCategoryChange($any($event.target).value)">
+          <label for="expense-category">Category</label>
+          <select id="expense-category" [value]="expenseCategory()" (change)="onExpenseCategoryChange($any($event.target).value)">
             <option value="LABOR">Labor</option>
             <option value="MATERIAL">Material</option>
             <option value="OTHER">Other</option>
           </select>
         </div>
         <div class="form-field">
-          <label>Description</label>
-          <input type="text" placeholder="e.g. 50 bags of Portland cement" [value]="expenseDescription()" (change)="onExpenseDescriptionChange($any($event.target).value)" />
+          <label for="expense-description">Description</label>
+          <input id="expense-description" type="text" placeholder="e.g. 50 bags of Portland cement" [value]="expenseDescription()" (change)="onExpenseDescriptionChange($any($event.target).value)" />
         </div>
         <div class="form-field">
-          <label>Amount</label>
-          <input type="number" min="0" step="0.01" placeholder="e.g. 14500" [value]="expenseAmount()" (change)="onExpenseAmountChange($any($event.target).value)" />
+          <label for="expense-amount">Amount</label>
+          <input id="expense-amount" type="number" min="0" step="0.01" placeholder="e.g. 14500" [value]="expenseAmount()" (change)="onExpenseAmountChange($any($event.target).value)" />
         </div>
         <div class="form-field">
-          <label>Expense Date</label>
-          <input type="date" [value]="expenseDate()" (change)="onExpenseDateChange($any($event.target).value)" />
+          <label for="expense-date">Expense Date</label>
+          <input id="expense-date" type="date" [value]="expenseDate()" (change)="onExpenseDateChange($any($event.target).value)" />
         </div>
       </div>
 
-      <div class="dialog__actions">
+      <div class="app-modal__actions">
         <button type="button" class="btn-secondary" [disabled]="expenseSaving()" (click)="closeExpenseDialog()">Cancel</button>
         <button type="button" class="btn-primary" [disabled]="expenseSaving()" (click)="submitExpense()">
           {{ expenseSaving() ? 'Saving…' : 'Add Expense' }}
         </button>
       </div>
-    </div>
+    </app-modal>
   }
 
   @if (addCrewDialogOpen()) {
-    <div class="scrim" (click)="closeAddCrewDialog()"></div>
-    <div class="dialog">
-      <div class="dialog__title">Add to Crew</div>
-
+    <app-modal title="Add to Crew" (closed)="closeAddCrewDialog()">
       @if (addCrewError()) {
         <div class="form-error">{{ addCrewError() }}</div>
       }
 
-      <div class="dialog-form">
+      <div class="app-modal__form">
         <div class="form-field">
-          <label>Worker</label>
-          <select [value]="addCrewWorkerId() ?? ''" (change)="onAddCrewWorkerChange($any($event.target).value)">
+          <label for="crew-worker">Worker</label>
+          <select id="crew-worker" [value]="addCrewWorkerId() ?? ''" (change)="onAddCrewWorkerChange($any($event.target).value)">
             <option value="" disabled>Select a worker…</option>
             @for (w of addableWorkers(); track w.id) {
               <option [value]="w.id">{{ w.name }}</option>
@@ -264,29 +256,27 @@
         </div>
       </div>
 
-      <div class="dialog__actions">
+      <div class="app-modal__actions">
         <button type="button" class="btn-secondary" [disabled]="addingToCrew()" (click)="closeAddCrewDialog()">Cancel</button>
         <button type="button" class="btn-primary" [disabled]="addingToCrew()" (click)="submitAddToCrew()">
           {{ addingToCrew() ? 'Adding…' : 'Add to Crew' }}
         </button>
       </div>
-    </div>
+    </app-modal>
   }
 
   @if (removeCrewTarget(); as target) {
-    <div class="scrim" (click)="closeRemoveCrewDialog()"></div>
-    <div class="dialog">
-      <div class="dialog__title">Remove "{{ target.workerName }}" from this crew?</div>
-      <div class="dialog__body">
+    <app-modal title='Remove "{{ target.workerName }}" from this crew?' (closed)="closeRemoveCrewDialog()">
+      <div class="app-modal__body">
         This only ends their assignment to this project's crew — their attendance history is untouched.
       </div>
-      <div class="dialog__actions">
+      <div class="app-modal__actions">
         <button type="button" class="btn-secondary" [disabled]="removingFromCrew()" (click)="closeRemoveCrewDialog()">Cancel</button>
         <button type="button" class="btn-danger-outline" [disabled]="removingFromCrew()" (click)="removeFromCrew()">
           {{ removingFromCrew() ? 'Removing…' : 'Yes, Remove' }}
         </button>
       </div>
-    </div>
+    </app-modal>
   }
 
 </div>

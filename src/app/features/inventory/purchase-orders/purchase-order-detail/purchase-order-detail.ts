@@ -11,6 +11,7 @@ import {
 } from '../../../../generated';
 import { CurrentUserService } from '../../../../core/services/current-user';
 import { Permission } from '../../../../core/constants/permissions';
+import { ModalComponent } from '../../../../shared/modal/modal';
 
 type Mode = 'view' | 'edit';
 
@@ -38,7 +39,7 @@ function emptyLine(): DraftLine {
 
 @Component({
   selector: 'app-purchase-order-detail',
-  imports: [DatePipe, RouterLink],
+  imports: [DatePipe, RouterLink, ModalComponent],
   templateUrl: './purchase-order-detail.html',
   styleUrl: './purchase-order-detail.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,

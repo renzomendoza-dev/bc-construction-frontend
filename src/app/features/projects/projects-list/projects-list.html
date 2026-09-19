@@ -34,7 +34,7 @@
       </div>
 
       @for (p of pageItems(); track p.id) {
-        <div class="projects-table__row" (click)="openProject(p.id)">
+        <div class="projects-table__row" (click)="openProject(p.id)" role="link" tabindex="0" (keydown.enter)="openProject(p.id)">
           <div class="projects-table__code">{{ p.code }}</div>
           <div class="projects-table__name">{{ p.name }}</div>
           <div>

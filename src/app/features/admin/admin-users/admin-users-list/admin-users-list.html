@@ -33,7 +33,7 @@
       </div>
 
       @for (user of pageItems(); track user.id) {
-        <div class="users-table__row" (click)="openUser(user)">
+        <div class="users-table__row" (click)="openUser(user)" role="button" tabindex="0" (keydown.enter)="openUser(user)" (keydown.space)="$event.preventDefault(); openUser(user)">
           <div class="users-table__name">{{ user.fullName || '—' }}</div>
           <div>
             <span class="status-badge" [class.status-badge--inactive]="!user.active">
@@ -77,13 +77,7 @@
   }
 
   @if (drawerOpen()) {
-    <div class="drawer-scrim" (click)="closeDrawer()"></div>
-    <div class="drawer">
-
-      <div class="drawer__header">
-        <div class="drawer__title">{{ detail()?.fullName || 'User' }}</div>
-        <button type="button" class="drawer__close" (click)="closeDrawer()" aria-label="Close">✕</button>
-      </div>
+    <app-modal variant="drawer" title="{{ detail()?.fullName || 'User' }}" (closed)="closeDrawer()">
 
       <div class="drawer__body">
         @if (detailError()) {
@@ -141,13 +135,14 @@
 
             <div class="assign-role-row">
               @if (rolesLoading()) {
-                <select disabled>
+                <select disabled aria-label="Role to assign">
                   <option>Loading roles…</option>
                 </select>
               } @else if (rolesError()) {
                 <div class="field-error">{{ rolesError() }}</div>
               } @else {
                 <select
+                  aria-label="Role to assign"
                   [value]="assignRoleName()"
                   (change)="onAssignRoleNameChange($any($event.target).value)"
                 >
@@ -171,7 +166,7 @@
         <button type="button" class="btn-secondary" (click)="closeDrawer()">Close</button>
       </div>
 
-    </div>
+    </app-modal>
   }
 
 </div>

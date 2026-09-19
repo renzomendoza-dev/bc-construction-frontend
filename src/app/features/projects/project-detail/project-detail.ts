@@ -1,5 +1,6 @@
 import { ChangeDetectionStrategy, Component, OnInit, computed, inject, signal } from '@angular/core';
 import { DatePipe } from '@angular/common';
+import { ModalComponent } from '../../../shared/modal/modal';
 import { ActivatedRoute, Router } from '@angular/router';
 import {
   ProjectExpenseCreateRequest,
@@ -30,7 +31,7 @@ const EXPENSES_FETCH_SIZE = 300;
 
 @Component({
   selector: 'app-project-detail',
-  imports: [DatePipe],
+  imports: [DatePipe, ModalComponent],
   templateUrl: './project-detail.html',
   styleUrl: './project-detail.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,

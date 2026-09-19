@@ -29,8 +29,8 @@
   <div class="card">
     <div class="form-grid">
       <div class="form-field">
-        <label>{{ direction() === 'RETURN' ? 'Destination Warehouse *' : 'Destination Site *' }}</label>
-        <select [value]="destinationWarehouseId()" (change)="onDestinationChange($any($event.target).value)">
+        <label for="eab-destination">{{ direction() === 'RETURN' ? 'Destination Warehouse *' : 'Destination Site *' }}</label>
+        <select id="eab-destination" [value]="destinationWarehouseId()" (change)="onDestinationChange($any($event.target).value)">
           <option value="">Select…</option>
           @for (w of destinationOptions(); track w.id) {
             <option [value]="w.id">{{ w.name }}</option>
@@ -39,8 +39,8 @@
       </div>
       @if (holderRequired()) {
         <div class="form-field">
-          <label>Holder *</label>
-          <select [value]="holderId()" (change)="onHolderChange($any($event.target).value)">
+          <label for="eab-holder">Holder *</label>
+          <select id="eab-holder" [value]="holderId()" (change)="onHolderChange($any($event.target).value)">
             <option value="">Select a user…</option>
             @for (u of users(); track u.id) {
               <option [value]="u.id">{{ u.fullName }}</option>

@@ -105,9 +105,9 @@
         <div class="card">
           <div class="card__title">Receipt Image</div>
           @if (r.imageUrl) {
-            <div class="image-preview" (click)="openImageViewer()">
+            <button type="button" class="image-preview" aria-label="View receipt scan full size" (click)="openImageViewer()">
               <img [src]="r.imageUrl" alt="Receipt scan" />
-            </div>
+            </button>
             <div class="image-preview__hint">Click to view full size</div>
           } @else {
             <label class="image-upload" [class.image-upload--busy]="uploadingImage()">
@@ -133,25 +133,23 @@
   }
 
   @if (confirmDialogOpen() && receipt(); as r) {
-    <div class="scrim" (click)="closeConfirmDialog()"></div>
-    <div class="dialog">
-      <div class="dialog__title">Confirm this receipt?</div>
-      <div class="dialog__body">
+    <app-modal title="Confirm this receipt?" (closed)="closeConfirmDialog()">
+      <div class="app-modal__body">
         This will apply stock movement for {{ (r.lines ?? []).length }} line item(s) to {{ r.warehouseName }}. This action cannot be undone.
       </div>
-      <div class="dialog__actions">
+      <div class="app-modal__actions">
         <button type="button" class="btn-secondary" [disabled]="confirming()" (click)="closeConfirmDialog()">Cancel</button>
         <button type="button" class="btn-confirm" [disabled]="confirming()" (click)="confirmReceipt()">
           {{ confirming() ? 'Confirming…' : 'Yes, Confirm Receipt' }}
         </button>
       </div>
-    </div>
+    </app-modal>
   }
 
   @if (imageViewerOpen() && receipt(); as r) {
-    <div class="image-scrim" (click)="closeImageViewer()">
-      <img [src]="r.imageUrl" alt="Receipt scan full size" class="image-scrim__img" (click)="$event.stopPropagation()" />
-    </div>
+    <app-modal title="Receipt scan" variant="lightbox" (closed)="closeImageViewer()">
+      <img [src]="r.imageUrl" alt="Receipt scan full size" class="receipt-image-full" />
+    </app-modal>
   }
 
 </div>

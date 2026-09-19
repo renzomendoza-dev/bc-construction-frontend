@@ -33,7 +33,7 @@
       </div>
 
       @for (b of pageItems(); track b.id) {
-        <div class="batches-table__row" (click)="openBatch(b.id)">
+        <div class="batches-table__row" (click)="openBatch(b.id)" role="link" tabindex="0" (keydown.enter)="openBatch(b.id)">
           <div class="batches-table__direction">{{ directionLabel(b) }}</div>
           <div class="batches-table__warehouse">{{ b.destinationWarehouseName }}</div>
           <div class="batches-table__by">{{ b.holderName || '—' }}</div>

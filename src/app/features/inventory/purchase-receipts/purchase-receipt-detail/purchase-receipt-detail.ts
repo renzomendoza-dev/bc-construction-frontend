@@ -5,11 +5,12 @@ import { PurchaseReceiptResponse, PurchaseReceiptsService } from '../../../../ge
 import { formatPeso } from '../../../../core/model.currency';
 import { CurrentUserService } from '../../../../core/services/current-user';
 import { Permission } from '../../../../core/constants/permissions';
+import { ModalComponent } from '../../../../shared/modal/modal';
 
 
 @Component({
   selector: 'app-purchase-receipt-detail',
-  imports: [DatePipe, RouterLink],
+  imports: [DatePipe, RouterLink, ModalComponent],
   templateUrl: './purchase-receipt-detail.html',
   styleUrl: './purchase-receipt-detail.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,

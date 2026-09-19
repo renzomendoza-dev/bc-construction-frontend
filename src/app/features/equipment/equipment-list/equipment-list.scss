@@ -344,45 +344,6 @@
 
 // ---- Modals ----
 
-.scrim {
-  position: fixed;
-  inset: 0;
-  background: rgba(20, 26, 28, 0.45);
-  z-index: 40;
-}
-
-.dialog {
-  position: fixed;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
-  background: var(--panel-bg);
-  border-radius: 14px;
-  padding: 26px;
-  width: 420px;
-  box-sizing: border-box;
-  box-shadow: 0 24px 60px rgba(20, 40, 35, 0.25);
-  z-index: 41;
-}
-
-.dialog--wide {
-  width: 460px;
-}
-
-.dialog__title {
-  font-family: 'Archivo', sans-serif;
-  font-weight: 700;
-  font-size: 17px;
-  color: var(--heading-text);
-  margin-bottom: 4px;
-}
-
-.dialog__subtitle {
-  font-size: 13px;
-  color: var(--sub-text);
-  margin-bottom: 18px;
-}
-
 .form-error {
   background: rgba(181, 73, 63, 0.1);
   color: #b5493f;
@@ -398,18 +359,6 @@
   height: 38px;
   display: flex;
   align-items: center;
-}
-
-.dialog-form {
-  display: flex;
-  flex-direction: column;
-  gap: 14px;
-}
-
-.dialog-form--grid {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 14px;
 }
 
 .form-field--full {
@@ -455,13 +404,6 @@
   }
 }
 
-.dialog__actions {
-  display: flex;
-  justify-content: flex-end;
-  gap: 10px;
-  margin-top: 20px;
-}
-
 @media (max-width: 640px) {
   .equipment-page {
     padding: 20px 16px 40px;
@@ -484,16 +426,6 @@
   .table__head--overdue,
   .table__row--overdue {
     min-width: 640px;
-  }
-
-  .dialog {
-    width: calc(100vw - 32px);
-    max-width: 460px;
-    padding: 20px;
-  }
-
-  .dialog-form--grid {
-    grid-template-columns: 1fr;
   }
 
   .form-field--full {

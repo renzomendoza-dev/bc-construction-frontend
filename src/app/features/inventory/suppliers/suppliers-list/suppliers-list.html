@@ -36,7 +36,7 @@
       </div>
 
       @for (sup of pageItems(); track sup.id) {
-        <div class="suppliers-table__row" (click)="openExisting(sup)">
+        <div class="suppliers-table__row" (click)="openExisting(sup)" role="button" tabindex="0" (keydown.enter)="openExisting(sup)" (keydown.space)="$event.preventDefault(); openExisting(sup)">
           <div class="suppliers-table__name">{{ sup.name }}</div>
           <div class="suppliers-table__contact">{{ sup.contactInfo || '—' }}</div>
           <div>
@@ -81,13 +81,7 @@
   }
 
   @if (drawerOpen()) {
-    <div class="drawer-scrim" (click)="closeDrawer()"></div>
-    <div class="drawer">
-
-      <div class="drawer__header">
-        <div class="drawer__title">{{ isEditingExisting() ? 'Edit Supplier' : 'New Supplier' }}</div>
-        <button type="button" class="drawer__close" (click)="closeDrawer()" aria-label="Close">✕</button>
-      </div>
+    <app-modal variant="drawer" title="{{ isEditingExisting() ? 'Edit Supplier' : 'New Supplier' }}" (closed)="closeDrawer()">
 
       <div class="drawer__body">
         @if (drawerError()) {
@@ -95,8 +89,9 @@
         }
 
         <div class="form-field">
-          <label>Name</label>
+          <label for="supplier-name">Name</label>
           <input
+            id="supplier-name"
             type="text"
             placeholder="Supplier name"
             [value]="form().name"
@@ -105,8 +100,9 @@
         </div>
 
         <div class="form-field">
-          <label>Contact Info</label>
+          <label for="supplier-contact">Contact Info</label>
           <textarea
+            id="supplier-contact"
             placeholder="Phone, email, or notes"
             [value]="form().contactInfo"
             (change)="onFormContactChange($any($event.target).value)"
@@ -138,7 +134,7 @@
         }
       </div>
 
-    </div>
+    </app-modal>
   }
 
 </div>

@@ -102,35 +102,31 @@
   }
 
   @if (deleteDialogOpen() && batch(); as b) {
-    <div class="scrim" (click)="closeDeleteDialog()"></div>
-    <div class="dialog">
-      <div class="dialog__title">Delete this draft?</div>
-      <div class="dialog__body">
+    <app-modal title="Delete this draft?" (closed)="closeDeleteDialog()">
+      <div class="app-modal__body">
         This will permanently remove this draft transfer from {{ b.originWarehouseName }} to {{ b.destinationWarehouseName }}. This action cannot be undone.
       </div>
-      <div class="dialog__actions">
+      <div class="app-modal__actions">
         <button type="button" class="btn-secondary" [disabled]="deleting()" (click)="closeDeleteDialog()">Cancel</button>
         <button type="button" class="btn-confirm" [disabled]="deleting()" (click)="deleteBatch()">
           {{ deleting() ? 'Deleting…' : 'Yes, Delete Draft' }}
         </button>
       </div>
-    </div>
+    </app-modal>
   }
 
   @if (confirmDialogOpen() && batch(); as b) {
-    <div class="scrim" (click)="closeConfirmDialog()"></div>
-    <div class="dialog">
-      <div class="dialog__title">Submit this transfer?</div>
-      <div class="dialog__body">
+    <app-modal title="Submit this transfer?" (closed)="closeConfirmDialog()">
+      <div class="app-modal__body">
         This will move stock for {{ (b.lines ?? []).length }} line item(s) from {{ b.originWarehouseName }} to {{ b.destinationWarehouseName }}. This action cannot be undone.
       </div>
-      <div class="dialog__actions">
+      <div class="app-modal__actions">
         <button type="button" class="btn-secondary" [disabled]="submitting()" (click)="closeConfirmDialog()">Cancel</button>
         <button type="button" class="btn-confirm" [disabled]="submitting()" (click)="submitBatch()">
           {{ submitting() ? 'Submitting…' : 'Yes, Submit Transfer' }}
         </button>
       </div>
-    </div>
+    </app-modal>
   }
 
 </div>

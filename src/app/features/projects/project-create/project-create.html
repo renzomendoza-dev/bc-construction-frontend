@@ -17,24 +17,24 @@
   <div class="card">
     <div class="form-grid">
       <div class="form-field">
-        <label>Code *</label>
-        <input type="text" placeholder="e.g. PRJ-2026-001" [value]="code()" (change)="onCodeChange($any($event.target).value)" />
+        <label for="project-code">Code *</label>
+        <input id="project-code" type="text" placeholder="e.g. PRJ-2026-001" [value]="code()" (change)="onCodeChange($any($event.target).value)" />
       </div>
       <div class="form-field">
-        <label>Name *</label>
-        <input type="text" placeholder="e.g. Sta. Maria Warehouse Expansion" [value]="name()" (change)="onNameChange($any($event.target).value)" />
+        <label for="project-name">Name *</label>
+        <input id="project-name" type="text" placeholder="e.g. Sta. Maria Warehouse Expansion" [value]="name()" (change)="onNameChange($any($event.target).value)" />
       </div>
       <div class="form-field">
-        <label>Budget</label>
-        <input type="text" placeholder="e.g. 2500000" [value]="budget()" (change)="onBudgetChange($any($event.target).value)" />
+        <label for="project-budget">Budget</label>
+        <input id="project-budget" type="text" placeholder="e.g. 2500000" [value]="budget()" (change)="onBudgetChange($any($event.target).value)" />
       </div>
       <div class="form-field">
-        <label>Start Date *</label>
-        <input type="date" [value]="startDate()" (change)="onStartDateChange($any($event.target).value)" />
+        <label for="project-start-date">Start Date *</label>
+        <input id="project-start-date" type="date" [value]="startDate()" (change)="onStartDateChange($any($event.target).value)" />
       </div>
       <div class="form-field">
-        <label>End Date</label>
-        <input type="date" [value]="endDate()" (change)="onEndDateChange($any($event.target).value)" />
+        <label for="project-end-date">End Date</label>
+        <input id="project-end-date" type="date" [value]="endDate()" (change)="onEndDateChange($any($event.target).value)" />
       </div>
     </div>
   </div>

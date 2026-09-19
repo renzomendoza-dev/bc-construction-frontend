@@ -51,16 +51,16 @@
         <div class="card__title">Edit Worker</div>
         <div class="form-grid">
           <div class="form-field">
-            <label>Name *</label>
-            <input type="text" [value]="editName()" (change)="onEditNameChange($any($event.target).value)" />
+            <label for="worker-name">Name *</label>
+            <input id="worker-name" type="text" [value]="editName()" (change)="onEditNameChange($any($event.target).value)" />
           </div>
           <div class="form-field">
-            <label>Position</label>
-            <input type="text" [value]="editPosition()" (change)="onEditPositionChange($any($event.target).value)" />
+            <label for="worker-position">Position</label>
+            <input id="worker-position" type="text" [value]="editPosition()" (change)="onEditPositionChange($any($event.target).value)" />
           </div>
           <div class="form-field">
-            <label>Daily Rate (PHP) *</label>
-            <input type="number" min="0" step="0.01" [value]="editDailyRate()" (change)="onEditDailyRateChange($any($event.target).value)" />
+            <label for="worker-daily-rate">Daily Rate (PHP) *</label>
+            <input id="worker-daily-rate" type="number" min="0" step="0.01" [value]="editDailyRate()" (change)="onEditDailyRateChange($any($event.target).value)" />
           </div>
         </div>
         <div class="form-actions">
@@ -111,34 +111,29 @@
   }
 
   @if (deactivateDialogOpen() && worker(); as w) {
-    <div class="scrim" (click)="closeDeactivateDialog()"></div>
-    <div class="dialog">
-      <div class="dialog__title">Deactivate "{{ w.name }}"?</div>
-      <div class="dialog__body">
+    <app-modal title='Deactivate "{{ w.name }}"?' (closed)="closeDeactivateDialog()">
+      <div class="app-modal__body">
         The worker's attendance history is preserved, not deleted — this only retires them from the active roster. They can still be viewed here afterward.
       </div>
-      <div class="dialog__actions">
+      <div class="app-modal__actions">
         <button type="button" class="btn-secondary" [disabled]="deactivating()" (click)="closeDeactivateDialog()">Cancel</button>
         <button type="button" class="btn-danger-outline" [disabled]="deactivating()" (click)="deactivateWorker()">
           {{ deactivating() ? 'Deactivating…' : 'Yes, Deactivate' }}
         </button>
       </div>
-    </div>
+    </app-modal>
   }
 
   @if (attendanceDialogOpen()) {
-    <div class="scrim" (click)="closeAttendanceDialog()"></div>
-    <div class="dialog">
-      <div class="dialog__title">Record Attendance</div>
-
+    <app-modal title="Record Attendance" (closed)="closeAttendanceDialog()">
       @if (attendanceFormError()) {
         <div class="form-error">{{ attendanceFormError() }}</div>
       }
 
-      <div class="dialog-form">
+      <div class="app-modal__form">
         <div class="form-field">
-          <label>Project *</label>
-          <select [value]="attendanceProjectId() ?? ''" (change)="onAttendanceProjectChange($any($event.target).value)">
+          <label for="attendance-project">Project *</label>
+          <select id="attendance-project" [value]="attendanceProjectId() ?? ''" (change)="onAttendanceProjectChange($any($event.target).value)">
             <option value="" disabled>Select a project…</option>
             @for (p of projectOptions(); track p.id) {
               <option [value]="p.id">{{ p.name }}</option>
@@ -146,42 +141,40 @@
           </select>
         </div>
         <div class="form-field">
-          <label>Date *</label>
-          <input type="date" [value]="attendanceDate()" (change)="onAttendanceDateChange($any($event.target).value)" />
+          <label for="attendance-date">Date *</label>
+          <input id="attendance-date" type="date" [value]="attendanceDate()" (change)="onAttendanceDateChange($any($event.target).value)" />
         </div>
         <div class="form-field">
-          <label>Days Present *</label>
-          <input type="number" min="0" max="1" step="0.5" [value]="attendanceDaysPresent()" (change)="onAttendanceDaysPresentChange($any($event.target).value)" />
+          <label for="attendance-days-present">Days Present *</label>
+          <input id="attendance-days-present" type="number" min="0" max="1" step="0.5" [value]="attendanceDaysPresent()" (change)="onAttendanceDaysPresentChange($any($event.target).value)" />
         </div>
         <div class="form-field">
-          <label>Notes</label>
-          <input type="text" placeholder="Optional, e.g. Rebar tying, Building A" [value]="attendanceNotes()" (change)="onAttendanceNotesChange($any($event.target).value)" />
+          <label for="attendance-notes">Notes</label>
+          <input id="attendance-notes" type="text" placeholder="Optional, e.g. Rebar tying, Building A" [value]="attendanceNotes()" (change)="onAttendanceNotesChange($any($event.target).value)" />
         </div>
       </div>
 
-      <div class="dialog__actions">
+      <div class="app-modal__actions">
         <button type="button" class="btn-secondary" [disabled]="attendanceSaving()" (click)="closeAttendanceDialog()">Cancel</button>
         <button type="button" class="btn-primary" [disabled]="attendanceSaving()" (click)="submitAttendance()">
           {{ attendanceSaving() ? 'Saving…' : 'Record Attendance' }}
         </button>
       </div>
-    </div>
+    </app-modal>
   }
 
   @if (deleteAttendanceTarget(); as target) {
-    <div class="scrim" (click)="closeDeleteAttendanceDialog()"></div>
-    <div class="dialog">
-      <div class="dialog__title">Delete this attendance record?</div>
-      <div class="dialog__body">
+    <app-modal title="Delete this attendance record?" (closed)="closeDeleteAttendanceDialog()">
+      <div class="app-modal__body">
         This also deletes the LABOR expense it generated on {{ target.projectName || 'that project' }}. This is the only fix path for a mis-entered record — there's no edit.
       </div>
-      <div class="dialog__actions">
+      <div class="app-modal__actions">
         <button type="button" class="btn-secondary" [disabled]="deletingAttendance()" (click)="closeDeleteAttendanceDialog()">Cancel</button>
         <button type="button" class="btn-danger-outline" [disabled]="deletingAttendance()" (click)="deleteAttendance()">
           {{ deletingAttendance() ? 'Deleting…' : 'Yes, Delete' }}
         </button>
       </div>
-    </div>
+    </app-modal>
   }
 
 </div>
