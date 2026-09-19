@@ -24,6 +24,7 @@ const ACTIVE_WORKERS_FETCH_SIZE = 300;
 import { formatPeso } from '../../../core/model.currency';
 import { CurrentUserService } from '../../../core/services/current-user';
 import { Permission } from '../../../core/constants/permissions';
+import { localDateString } from '../../../core/utils/local-date';
 
 type Mode = 'view' | 'edit';
 
@@ -90,7 +91,7 @@ export class ProjectDetailComponent implements OnInit {
   readonly expenseCategory = signal<ProjectExpenseResponse.CategoryEnum>(ProjectExpenseResponse.CategoryEnum.Material);
   readonly expenseDescription = signal('');
   readonly expenseAmount = signal('');
-  readonly expenseDate = signal(new Date().toISOString().slice(0, 10));
+  readonly expenseDate = signal(localDateString(new Date()));
   readonly expenseSaving = signal(false);
   readonly expenseError = signal<string | null>(null);
 
@@ -327,7 +328,7 @@ export class ProjectDetailComponent implements OnInit {
     this.expenseCategory.set(ProjectExpenseResponse.CategoryEnum.Material);
     this.expenseDescription.set('');
     this.expenseAmount.set('');
-    this.expenseDate.set(new Date().toISOString().slice(0, 10));
+    this.expenseDate.set(localDateString(new Date()));
     this.expenseError.set(null);
     this.expenseDialogOpen.set(true);
   }

@@ -17,6 +17,7 @@ import {
   WarehousesService,
 } from '../../../../generated';
 import { formatPeso } from '../../../../core/model.currency';
+import { localDateString } from '../../../../core/utils/local-date';
 
 interface DraftLine {
   itemId: number | null;
@@ -62,7 +63,7 @@ export class PurchaseReceiptCreateComponent implements OnInit {
   readonly supplierId = signal<number | null>(null);
   readonly warehouseId = signal<number | null>(null);
   readonly receiptNumber = signal('');
-  readonly purchaseDate = signal(new Date().toISOString().slice(0, 10));
+  readonly purchaseDate = signal(localDateString(new Date()));
   readonly notes = signal('');
   readonly lines = signal<DraftLine[]>([emptyLine()]);
 

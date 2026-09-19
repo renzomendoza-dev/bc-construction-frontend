@@ -1,6 +1,7 @@
 import { ChangeDetectionStrategy, Component, inject, signal } from '@angular/core';
 import { Router } from '@angular/router';
 import { ProjectCreateRequest, ProjectsService } from '../../../generated';
+import { localDateString } from '../../../core/utils/local-date';
 
 @Component({
   selector: 'app-project-create',
@@ -17,7 +18,7 @@ export class ProjectCreateComponent {
   readonly name = signal('');
   readonly description = signal('');
   readonly budget = signal('');
-  readonly startDate = signal(new Date().toISOString().slice(0, 10));
+  readonly startDate = signal(localDateString(new Date()));
   readonly endDate = signal('');
 
   readonly saving = signal(false);

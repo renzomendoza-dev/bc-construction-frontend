@@ -15,6 +15,7 @@ import { formatPeso } from '../../../core/model.currency';
 import { CurrentUserService } from '../../../core/services/current-user';
 import { Permission } from '../../../core/constants/permissions';
 import { ModalComponent } from '../../../shared/modal/modal';
+import { localDateString } from '../../../core/utils/local-date';
 
 type Mode = 'view' | 'edit';
 
@@ -73,7 +74,7 @@ export class WorkerDetailComponent implements OnInit {
   readonly attendanceDialogOpen = signal(false);
   readonly projectOptions = signal<ProjectResponse[]>([]);
   readonly attendanceProjectId = signal<number | null>(null);
-  readonly attendanceDate = signal(new Date().toISOString().slice(0, 10));
+  readonly attendanceDate = signal(localDateString(new Date()));
   readonly attendanceDaysPresent = signal('1');
   readonly attendanceNotes = signal('');
   readonly attendanceSaving = signal(false);
@@ -207,7 +208,7 @@ export class WorkerDetailComponent implements OnInit {
   // ---- Record attendance ----
   openAttendanceDialog(): void {
     this.attendanceProjectId.set(null);
-    this.attendanceDate.set(new Date().toISOString().slice(0, 10));
+    this.attendanceDate.set(localDateString(new Date()));
     this.attendanceDaysPresent.set('1');
     this.attendanceNotes.set('');
     this.attendanceFormError.set(null);

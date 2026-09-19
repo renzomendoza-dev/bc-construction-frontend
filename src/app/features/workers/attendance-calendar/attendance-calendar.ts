@@ -16,6 +16,7 @@ import {
 import { CurrentUserService } from '../../../core/services/current-user';
 import { Permission } from '../../../core/constants/permissions';
 import { ModalComponent } from '../../../shared/modal/modal';
+import { localDateString } from '../../../core/utils/local-date';
 
 const PROJECTS_FETCH_SIZE = 300;
 const CREW_FETCH_SIZE = 300;
@@ -37,10 +38,6 @@ interface DayLine {
 }
 
 const WEEKDAY_LABELS = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
-
-function pad2(n: number): string {
-  return String(n).padStart(2, '0');
-}
 
 @Component({
   selector: 'app-attendance-calendar',
@@ -83,7 +80,7 @@ export class AttendanceCalendarComponent implements OnInit {
     return map;
   });
 
-  readonly todayDateStr = `${this.today.getFullYear()}-${pad2(this.today.getMonth() + 1)}-${pad2(this.today.getDate())}`;
+  readonly todayDateStr = localDateString(this.today);
 
   readonly calendarCells = computed<CalendarCell[]>(() => {
     const year = this.viewYear();
@@ -97,7 +94,7 @@ export class AttendanceCalendarComponent implements OnInit {
       cells.push({ date: null, day: null, workerCount: null });
     }
     for (let day = 1; day <= daysInMonth; day++) {
-      const date = `${year}-${pad2(month + 1)}-${pad2(day)}`;
+      const date = localDateString(new Date(year, month, day));
       cells.push({ date, day, workerCount: byDate.get(date) ?? null });
     }
     while (cells.length % 7 !== 0) {
@@ -285,9 +282,9 @@ export class AttendanceCalendarComponent implements OnInit {
 
     const year = this.viewYear();
     const month = this.viewMonth();
-    const dateFrom = `${year}-${pad2(month + 1)}-01`;
+    const dateFrom = localDateString(new Date(year, month, 1));
     const lastDay = new Date(year, month + 1, 0).getDate();
-    const dateTo = `${year}-${pad2(month + 1)}-${pad2(lastDay)}`;
+    const dateTo = localDateString(new Date(year, month, lastDay));
 
     this.loading.set(true);
     this.errorMessage.set(null);

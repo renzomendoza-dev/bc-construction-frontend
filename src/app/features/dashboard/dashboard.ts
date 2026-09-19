@@ -19,6 +19,7 @@ import {
   WorkerAssignmentsService,
   WorkersService,
 } from '../../generated';
+import { localDateString } from '../../core/utils/local-date';
 
 interface InventoryStats {
   items: number;
@@ -237,11 +238,4 @@ export class Dashboard implements OnInit {
       this.overBudgetLoading.set(false);
     });
   }
-}
-
-// Local calendar date as YYYY-MM-DD. toISOString() would give the UTC date,
-// which in the Philippines (UTC+8) is still yesterday until 8 a.m.
-function localDateString(d: Date): string {
-  const pad = (n: number) => String(n).padStart(2, '0');
-  return `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}`;
 }
