@@ -101,61 +101,72 @@
               <button type="button" class="btn-danger-outline" [disabled]="toggling()" (click)="toggleActive()">
                 {{ toggling() ? 'Updating…' : deactivateLabel() }}
               </button>
-              <button type="button" class="btn-secondary" [disabled]="resyncing()" (click)="resync()">
-                {{ resyncing() ? 'Syncing…' : 'Resync from Keycloak' }}
-              </button>
+              @if (!rolesUnavailable()) {
+                <button type="button" class="btn-secondary" [disabled]="resyncing()" (click)="resync()">
+                  {{ resyncing() ? 'Syncing…' : 'Resync from Keycloak' }}
+                </button>
+              }
             </div>
           </div>
 
           <div class="drawer-section">
             <div class="drawer-section__title">Realm Roles</div>
 
-            @if ((user.realmRoles ?? []).length > 0) {
-              <div class="role-chips">
-                @for (role of user.realmRoles; track role) {
-                  <span class="role-chip">
-                    {{ role }}
-                    <button
-                      type="button"
-                      class="role-chip__remove"
-                      [disabled]="revokingRole() === role"
-                      (click)="revokeRole(role)"
-                      [attr.aria-label]="'Revoke ' + role"
-                    >✕</button>
-                  </span>
-                }
+            @if (rolesUnavailable()) {
+              <div class="drawer-section__empty">
+                Couldn't read this user's roles from Keycloak, so they can't be managed here. Either this user
+                has no Keycloak account (e.g. a placeholder or a user deleted in Keycloak), or Keycloak is
+                unreachable right now.
               </div>
             } @else {
-              <div class="drawer-section__empty">No roles assigned.</div>
-            }
 
-            @if (assignError()) {
-              <div class="drawer-error drawer-error--tight">{{ assignError() }}</div>
-            }
-
-            <div class="assign-role-row">
-              @if (rolesLoading()) {
-                <select disabled aria-label="Role to assign">
-                  <option>Loading roles…</option>
-                </select>
-              } @else if (rolesError()) {
-                <div class="field-error">{{ rolesError() }}</div>
-              } @else {
-                <select
-                  aria-label="Role to assign"
-                  [value]="assignRoleName()"
-                  (change)="onAssignRoleNameChange($any($event.target).value)"
-                >
-                  <option value="">Select a role…</option>
-                  @for (role of availableRolesToAssign(); track role.id) {
-                    <option [value]="role.name">{{ role.name }}</option>
+              @if ((user.realmRoles ?? []).length > 0) {
+                <div class="role-chips">
+                  @for (role of user.realmRoles; track role) {
+                    <span class="role-chip">
+                      {{ role }}
+                      <button
+                        type="button"
+                        class="role-chip__remove"
+                        [disabled]="revokingRole() === role"
+                        (click)="revokeRole(role)"
+                        [attr.aria-label]="'Revoke ' + role"
+                      >✕</button>
+                    </span>
                   }
-                </select>
+                </div>
+              } @else {
+                <div class="drawer-section__empty">No roles assigned.</div>
               }
-              <button type="button" class="btn-primary btn-small" [disabled]="assigning()" (click)="assignRole()">
-                {{ assigning() ? 'Assigning…' : 'Assign' }}
-              </button>
-            </div>
+
+              @if (assignError()) {
+                <div class="drawer-error drawer-error--tight">{{ assignError() }}</div>
+              }
+
+              <div class="assign-role-row">
+                @if (rolesLoading()) {
+                  <select disabled aria-label="Role to assign">
+                    <option>Loading roles…</option>
+                  </select>
+                } @else if (rolesError()) {
+                  <div class="field-error">{{ rolesError() }}</div>
+                } @else {
+                  <select
+                    aria-label="Role to assign"
+                    [value]="assignRoleName()"
+                    (change)="onAssignRoleNameChange($any($event.target).value)"
+                  >
+                    <option value="">Select a role…</option>
+                    @for (role of availableRolesToAssign(); track role.id) {
+                      <option [value]="role.name">{{ role.name }}</option>
+                    }
+                  </select>
+                }
+                <button type="button" class="btn-primary btn-small" [disabled]="assigning()" (click)="assignRole()">
+                  {{ assigning() ? 'Assigning…' : 'Assign' }}
+                </button>
+              </div>
+            }
           </div>
 
         }

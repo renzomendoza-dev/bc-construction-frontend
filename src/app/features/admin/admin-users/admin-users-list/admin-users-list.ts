@@ -78,6 +78,9 @@ export class AdminUsersListComponent implements OnInit {
   readonly detail = signal<AdminUserResponse | null>(null);
   readonly detailLoading = signal(false);
   readonly detailError = signal<string | null>(null);
+  // True when the drawer is showing the list-row fallback because the
+  // user's roles couldn't be read from Keycloak (see fetchDetail).
+  readonly rolesUnavailable = signal(false);
 
   readonly toggling = signal(false);
   readonly resyncing = signal(false);
@@ -121,6 +124,7 @@ export class AdminUsersListComponent implements OnInit {
     this.selectedId.set(user.id);
     this.detail.set(null);
     this.detailError.set(null);
+    this.rolesUnavailable.set(false);
     this.assignRoleName.set('');
     this.assignError.set(null);
     this.drawerOpen.set(true);
@@ -265,11 +269,24 @@ export class AdminUsersListComponent implements OnInit {
     this.adminUsersService.getUserDetail(userId).subscribe({
       next: (result) => {
         this.detail.set(result);
+        this.rolesUnavailable.set(false);
         this.detailLoading.set(false);
       },
-      error: () => {
-        this.detailError.set('Could not load this user. Please try again.');
+      error: (err) => {
         this.detailLoading.set(false);
+        // The detail endpoint only adds realm roles on top of the list row,
+        // read live from Keycloak — and it fails as a whole (502) when that
+        // lookup does, e.g. for an app user with no matching Keycloak account
+        // (the dev seed's placeholder users, or one deleted in Keycloak).
+        // Fall back to the list row so status/activation still work, and say
+        // plainly that roles can't be managed for this user.
+        const fromList = this.allUsers().find((u) => u.id === userId);
+        if (err?.status === 502 && fromList) {
+          this.detail.set({ ...fromList, realmRoles: [] });
+          this.rolesUnavailable.set(true);
+        } else {
+          this.detailError.set('Could not load this user. Please try again.');
+        }
       },
     });
   }

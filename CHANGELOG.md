@@ -3,6 +3,7 @@
 All notable changes to this project are documented here, newest first. Dates are when the change was committed.
 
 ## 2026-09-19
+- Fix Admin → Users showing "Could not load this user" for users without a matching Keycloak account (the dev seed's placeholder users, or someone deleted in Keycloak). The drawer now still shows the user's status and Activate/Deactivate, and explains that roles can't be managed instead of failing outright.
 - Replace the 22 hand-rolled dialogs, the Suppliers and Admin Users side drawers, and the receipt image viewer with one shared modal component: Escape closes, Tab stays inside the dialog, focus returns to what opened it, and screen readers announce it as a titled dialog. Removes the duplicated dialog/drawer styles from 12 pages.
 - Make clickable list rows keyboard-accessible (Tab to focus, Enter to open; Space too for rows that open a drawer or expand), with a visible focus ring; Escape now also closes the mobile sidebar.
 - Link every form label to its field, so clicking a label focuses the field and screen readers read the right name.
