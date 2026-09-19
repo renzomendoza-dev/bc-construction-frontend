@@ -75,6 +75,10 @@ ng lint
 
 The generated API client (`src/app/generated`) is excluded, since it's rewritten by `npm run generate:api`. Template accessibility rules are enforced as errors.
 
+## Shared styles
+
+Buttons (`.btn-primary`, `.btn-secondary`, `.btn-danger-outline`, `.btn-confirm`, `.btn-small`, …), `.form-field`, and `.form-error` live in `src/styles/_controls.scss` and apply app-wide — don't copy them into component stylesheets. A page that needs a different size overrides locally (component styles take precedence).
+
 ## Running end-to-end tests
 
 For end-to-end (e2e) testing, run:

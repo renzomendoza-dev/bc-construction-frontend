@@ -3,6 +3,7 @@
 All notable changes to this project are documented here, newest first. Dates are when the change was committed.
 
 ## 2026-09-19
+- Unify buttons and form fields across every page: one consistent button size (previously 36–40px depending on the page), the app font everywhere (some buttons had fallen back to the browser's default font), and a visible teal focus ring on inputs for keyboard users. Purchase Order's "Submit to Supplier" now matches the prominent Submit buttons on Transfers and Receipts.
 - Fix date fields pre-filling yesterday's date before 8 a.m. (Philippine time) — the attendance date on Worker detail, the expense date on Project detail, New Project's start date, and New Purchase Receipt's purchase date now default to the local date instead of the UTC one.
 - Add a Workers card to the Dashboard: Active Workers, workers currently On a Crew, and Attendance Today (all counted server-side, so they stay accurate as data grows).
 - Add Delete for project expenses on Project detail (with confirmation), for users with the Project Expense Delete permission while the project is Active or On Hold; totals refresh afterward. Expenses recorded automatically from worker attendance or transfers can't be deleted here — the page explains where to handle them instead.

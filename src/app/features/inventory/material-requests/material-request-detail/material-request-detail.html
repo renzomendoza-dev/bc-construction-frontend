@@ -21,13 +21,13 @@
         @if (mode() === 'view' && (canShowEdit(r) || canShowDelete(r) || canDispatch(r))) {
           <div class="request-header__actions">
             @if (canShowEdit(r)) {
-              <button type="button" class="btn-edit" (click)="enterEdit()">Edit</button>
+              <button type="button" class="btn-secondary btn-small" (click)="enterEdit()">Edit</button>
             }
             @if (canShowDelete(r)) {
-              <button type="button" class="btn-danger-outline" (click)="openDeleteDialog()">Delete</button>
+              <button type="button" class="btn-danger-outline btn-small" (click)="openDeleteDialog()">Delete</button>
             }
             @if (canDispatch(r)) {
-              <a class="btn-dispatch" [routerLink]="['/inventory/transfers/new']" [queryParams]="{ fromRequestId: r.id }">
+              <a class="btn-primary btn-small" [routerLink]="['/inventory/transfers/new']" [queryParams]="{ fromRequestId: r.id }">
                 Create Dispatch from this Request
               </a>
             }

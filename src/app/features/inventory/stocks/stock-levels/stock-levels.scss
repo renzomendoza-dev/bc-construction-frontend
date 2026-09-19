@@ -25,50 +25,6 @@
   color: var(--heading-text);
 }
 
-.btn-primary {
-  height: 38px;
-  padding: 0 16px;
-  border-radius: 8px;
-  border: none;
-  background: linear-gradient(180deg, #237e88, #1b6e76);
-  color: #ffffff;
-  font-family: 'Archivo', sans-serif;
-  font-weight: 700;
-  font-size: 13px;
-  cursor: pointer;
-
-  &:hover:not(:disabled) {
-    filter: brightness(1.08);
-  }
-
-  &:disabled {
-    opacity: 0.7;
-    cursor: default;
-  }
-}
-
-.btn-secondary {
-  height: 38px;
-  padding: 0 16px;
-  border-radius: 8px;
-  border: 1px solid var(--border);
-  background: var(--panel-bg);
-  color: var(--label-text);
-  font-family: 'IBM Plex Sans', sans-serif;
-  font-weight: 600;
-  font-size: 13px;
-  cursor: pointer;
-
-  &:hover:not(:disabled) {
-    background: var(--hover-bg);
-  }
-
-  &:disabled {
-    opacity: 0.7;
-    cursor: default;
-  }
-}
-
 // ---- Tabs ----
 
 .tabs {
@@ -651,71 +607,25 @@
 
 // ---- Modals ----
 
-.form-error {
-  background: rgba(181, 73, 63, 0.1);
-  color: #b5493f;
+// Read-only value shown in place of an input (the Adjust/Transfer dialogs'
+// Item and Location), styled like a disabled field.
+.form-field .frozen-field {
+  height: 38px;
+  display: flex;
+  align-items: center;
   border-radius: 8px;
-  padding: 10px 12px;
+  border: 1px solid var(--border);
+  background: var(--badge-bg);
+  color: var(--sub-text);
   font-size: 13px;
-  margin-bottom: 14px;
+  padding: 0 10px;
+  box-sizing: border-box;
 }
 
 .form-field-row {
   display: grid;
   grid-template-columns: 1fr 1fr;
   gap: 12px;
-}
-
-.form-field {
-  label {
-    font-size: 12px;
-    font-weight: 600;
-    color: var(--label-text);
-    display: block;
-    margin-bottom: 6px;
-  }
-
-  input,
-  select,
-  textarea {
-    width: 100%;
-    border-radius: 8px;
-    border: 1px solid var(--border);
-    background: var(--page-bg);
-    color: var(--heading-text);
-    font-size: 13px;
-    padding: 0 10px;
-    box-sizing: border-box;
-    font-family: 'IBM Plex Sans', sans-serif;
-
-    &:focus {
-      outline: none;
-    }
-  }
-
-  input,
-  select {
-    height: 38px;
-  }
-
-  .frozen-field {
-    height: 38px;
-    display: flex;
-    align-items: center;
-    border-radius: 8px;
-    border: 1px solid var(--border);
-    background: var(--badge-bg);
-    color: var(--sub-text);
-    font-size: 13px;
-    padding: 0 10px;
-    box-sizing: border-box;
-  }
-
-  textarea {
-    height: 66px;
-    padding: 10px;
-    resize: vertical;
-  }
 }
 
 @media (max-width: 640px) {

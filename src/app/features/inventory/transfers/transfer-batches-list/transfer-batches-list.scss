@@ -23,23 +23,6 @@
   color: var(--heading-text);
 }
 
-.btn-primary {
-  height: 38px;
-  padding: 0 18px;
-  border-radius: 8px;
-  border: none;
-  background: linear-gradient(180deg, #237e88, #1b6e76);
-  color: #ffffff;
-  font-family: 'Archivo', sans-serif;
-  font-weight: 700;
-  font-size: 13.5px;
-  cursor: pointer;
-
-  &:hover:not(:disabled) {
-    filter: brightness(1.08);
-  }
-}
-
 .transfers-page__filters {
   display: flex;
   gap: 12px;

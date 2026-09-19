@@ -106,15 +106,6 @@
   margin-bottom: 20px;
 }
 
-.form-error {
-  background: rgba(181, 73, 63, 0.1);
-  color: #b5493f;
-  border-radius: 8px;
-  padding: 10px 12px;
-  font-size: 13px;
-  margin-bottom: 16px;
-}
-
 // ---- Cards / edit form ----
 
 .card {
@@ -137,34 +128,6 @@
   display: grid;
   grid-template-columns: 1fr 1fr;
   gap: 16px;
-}
-
-.form-field {
-  label {
-    font-size: 12px;
-    font-weight: 600;
-    color: var(--label-text);
-    display: block;
-    margin-bottom: 6px;
-  }
-
-  input,
-  select {
-    width: 100%;
-    height: 38px;
-    border-radius: 8px;
-    border: 1px solid var(--border);
-    background: var(--page-bg);
-    color: var(--heading-text);
-    font-size: 13px;
-    padding: 0 10px;
-    box-sizing: border-box;
-    font-family: 'IBM Plex Sans', sans-serif;
-
-    &:focus {
-      outline: none;
-    }
-  }
 }
 
 .form-actions {
@@ -221,20 +184,6 @@
   color: var(--heading-text);
 }
 
-.btn-link-danger {
-  background: none;
-  border: none;
-  color: #b5493f;
-  font-size: 12.5px;
-  font-weight: 600;
-  cursor: pointer;
-  padding: 0;
-
-  &:hover {
-    text-decoration: underline;
-  }
-}
-
 .table-state {
   padding: 30px 16px;
   text-align: center;
@@ -248,74 +197,6 @@
 
 .align-right {
   text-align: right;
-}
-
-// ---- Buttons ----
-
-.btn-primary {
-  height: 40px;
-  padding: 0 20px;
-  border-radius: 8px;
-  border: none;
-  background: linear-gradient(180deg, #237e88, #1b6e76);
-  color: #fff;
-  font-family: 'Archivo', sans-serif;
-  font-weight: 700;
-  font-size: 13.5px;
-  cursor: pointer;
-
-  &:hover:not(:disabled) {
-    filter: brightness(1.08);
-  }
-
-  &:disabled {
-    opacity: 0.7;
-    cursor: default;
-  }
-}
-
-.btn-secondary {
-  height: 40px;
-  padding: 0 18px;
-  border-radius: 8px;
-  border: 1px solid var(--border);
-  background: var(--panel-bg);
-  color: var(--label-text);
-  font-family: 'IBM Plex Sans', sans-serif;
-  font-weight: 600;
-  font-size: 13.5px;
-  cursor: pointer;
-
-  &:hover:not(:disabled) {
-    background: var(--hover-bg);
-  }
-
-  &:disabled {
-    opacity: 0.7;
-    cursor: default;
-  }
-}
-
-.btn-danger-outline {
-  height: 40px;
-  padding: 0 18px;
-  border-radius: 8px;
-  border: 1px solid var(--border);
-  background: var(--panel-bg);
-  color: #b5493f;
-  font-family: 'IBM Plex Sans', sans-serif;
-  font-weight: 600;
-  font-size: 13.5px;
-  cursor: pointer;
-
-  &:hover:not(:disabled) {
-    background: var(--hover-bg);
-  }
-
-  &:disabled {
-    opacity: 0.7;
-    cursor: default;
-  }
 }
 
 @media (max-width: 640px) {

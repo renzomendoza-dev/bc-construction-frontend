@@ -23,28 +23,6 @@
   color: var(--heading-text);
 }
 
-.btn-primary {
-  height: 38px;
-  padding: 0 18px;
-  border-radius: 8px;
-  border: none;
-  background: linear-gradient(180deg, #237e88, #1b6e76);
-  color: #ffffff;
-  font-family: 'Archivo', sans-serif;
-  font-weight: 700;
-  font-size: 13.5px;
-  cursor: pointer;
-
-  &:hover:not(:disabled) {
-    filter: brightness(1.08);
-  }
-
-  &:disabled {
-    opacity: 0.7;
-    cursor: default;
-  }
-}
-
 .suppliers-page__filters {
   display: flex;
   gap: 12px;
@@ -265,49 +243,18 @@
   gap: 18px;
 }
 
+// Contact info is often several lines, so the drawer gives it more room
+// than the shared default.
+.form-field textarea {
+  height: 88px;
+}
+
 .drawer-error {
   background: rgba(181, 73, 63, 0.1);
   color: #b5493f;
   border-radius: 8px;
   padding: 10px 12px;
   font-size: 13px;
-}
-
-.form-field {
-  label {
-    font-size: 12px;
-    font-weight: 600;
-    color: var(--label-text);
-    display: block;
-    margin-bottom: 6px;
-  }
-
-  input,
-  textarea {
-    width: 100%;
-    border-radius: 8px;
-    border: 1px solid var(--border);
-    background: var(--page-bg);
-    color: var(--heading-text);
-    font-size: 13.5px;
-    padding: 0 12px;
-    box-sizing: border-box;
-    font-family: 'IBM Plex Sans', sans-serif;
-
-    &:focus {
-      outline: none;
-    }
-  }
-
-  input {
-    height: 40px;
-  }
-
-  textarea {
-    height: 88px;
-    padding: 10px 12px;
-    resize: vertical;
-  }
 }
 
 .drawer-meta {
@@ -330,27 +277,6 @@
   gap: 10px;
   padding: 18px 24px;
   border-top: 1px solid var(--border);
-}
-
-.btn-danger-outline {
-  height: 38px;
-  padding: 0 16px;
-  border-radius: 8px;
-  border: 1px solid var(--border);
-  background: var(--panel-bg);
-  color: #b5493f;
-  font-size: 13px;
-  font-weight: 600;
-  cursor: pointer;
-
-  &:hover:not(:disabled) {
-    background: var(--hover-bg);
-  }
-
-  &:disabled {
-    opacity: 0.7;
-    cursor: default;
-  }
 }
 
 @media (max-width: 640px) {

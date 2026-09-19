@@ -1,0 +1,192 @@
+// Shared buttons and form fields. These used to be copied into every
+// component stylesheet (27 copies of .btn-primary alone) and had drifted
+// apart. A page that genuinely needs a different size overrides locally —
+// component styles win over these because Angular's emulated encapsulation
+// adds an attribute selector to them.
+
+// ---- Buttons ----
+
+%btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  box-sizing: border-box;
+  height: 38px;
+  padding: 0 18px;
+  border-radius: 8px;
+  font-family: 'IBM Plex Sans', sans-serif;
+  font-size: 13.5px;
+  font-weight: 600;
+  text-decoration: none; // several of these are <a routerLink> buttons
+  cursor: pointer;
+
+  &:disabled {
+    opacity: 0.7;
+    cursor: default;
+  }
+}
+
+%btn-filled {
+  border: none;
+  background: linear-gradient(180deg, #237e88, #1b6e76);
+  color: #ffffff;
+  font-family: 'Archivo', sans-serif;
+  font-weight: 700;
+
+  &:hover:not(:disabled) {
+    filter: brightness(1.08);
+  }
+}
+
+%btn-outline {
+  border: 1px solid var(--border);
+  background: var(--panel-bg);
+
+  &:hover:not(:disabled) {
+    background: var(--hover-bg);
+  }
+}
+
+.btn-primary {
+  @extend %btn;
+  @extend %btn-filled;
+}
+
+.btn-secondary {
+  @extend %btn;
+  @extend %btn-outline;
+  color: var(--label-text);
+}
+
+.btn-danger-outline {
+  @extend %btn;
+  @extend %btn-outline;
+  color: #b5493f;
+}
+
+// The prominent call to action in a page's status banner (Submit Transfer,
+// Confirm Receipt, …) and its confirmation dialog.
+.btn-confirm {
+  @extend %btn;
+  @extend %btn-filled;
+  flex-shrink: 0;
+  height: 44px;
+  padding: 0 22px;
+  font-size: 14px;
+  box-shadow: 0 6px 16px rgba(27, 110, 118, 0.25);
+}
+
+// Size modifier, e.g. class="btn-secondary btn-small" in page headers.
+.btn-small {
+  height: 34px;
+  padding: 0 14px;
+  font-size: 12.5px;
+  white-space: nowrap;
+}
+
+// Text-only destructive action inside a list row.
+.btn-link-danger {
+  padding: 0;
+  border: none;
+  background: none;
+  color: #b5493f;
+  font-family: 'IBM Plex Sans', sans-serif;
+  font-size: 12.5px;
+  font-weight: 600;
+  cursor: pointer;
+
+  &:hover {
+    text-decoration: underline;
+  }
+}
+
+// "+ Add line" under a line-items form.
+.btn-add-line {
+  height: 34px;
+  margin-top: 8px;
+  padding: 0 14px;
+  border-radius: 7px;
+  border: 1px dashed var(--border);
+  background: transparent;
+  color: var(--sub-text);
+  font-family: 'IBM Plex Sans', sans-serif;
+  font-size: 12.5px;
+  font-weight: 600;
+  cursor: pointer;
+
+  &:hover {
+    border-color: var(--teal);
+    color: var(--teal);
+  }
+}
+
+// ---- Form fields ----
+
+.form-field {
+  label {
+    display: block;
+    margin-bottom: 6px;
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--label-text);
+  }
+
+  input,
+  select,
+  textarea {
+    width: 100%;
+    height: 38px;
+    box-sizing: border-box;
+    padding: 0 10px;
+    border-radius: 8px;
+    border: 1px solid var(--border);
+    background: var(--page-bg);
+    color: var(--heading-text);
+    font-family: 'IBM Plex Sans', sans-serif;
+    font-size: 13px;
+
+    // Replaces the old bare `outline: none`, which left keyboard users with
+    // no visible focus at all.
+    &:focus {
+      outline: none;
+      border-color: var(--teal);
+      box-shadow: 0 0 0 3px var(--teal-tint);
+    }
+
+    &:disabled {
+      background: var(--badge-bg);
+      color: var(--sub-text);
+      cursor: default;
+    }
+  }
+
+  textarea {
+    height: 66px;
+    padding: 10px;
+    resize: vertical;
+  }
+}
+
+// Spans both columns of a two-column form grid.
+.form-field--full {
+  grid-column: span 2;
+}
+
+.form-error {
+  margin-bottom: 16px;
+  padding: 10px 12px;
+  border-radius: 8px;
+  background: rgba(181, 73, 63, 0.1);
+  color: #b5493f;
+  font-size: 13px;
+}
+
+@media (max-width: 640px) {
+  .btn-confirm {
+    width: 100%;
+  }
+
+  .form-field--full {
+    grid-column: span 1;
+  }
+}
