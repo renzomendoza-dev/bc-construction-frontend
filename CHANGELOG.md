@@ -2,6 +2,9 @@
 
 All notable changes to this project are documented here, newest first. Dates are when the change was committed.
 
+## 2026-09-20
+- Fix the Purchase Receipts list always showing "No receipts match your filters" (and the Dashboard's Pending Receipts stat always reading 0) — both requests were missing an argument, so the app asked the backend for page 300 of a non-existent transfer batch instead of the first page of receipts. No data was ever lost.
+
 ## 2026-09-19
 - Unify buttons and form fields across every page: one consistent button size (previously 36–40px depending on the page), the app font everywhere (some buttons had fallen back to the browser's default font), and a visible teal focus ring on inputs for keyboard users. Purchase Order's "Submit to Supplier" now matches the prominent Submit buttons on Transfers and Receipts.
 - Fix date fields pre-filling yesterday's date before 8 a.m. (Philippine time) — the attendance date on Worker detail, the expense date on Project detail, New Project's start date, and New Purchase Receipt's purchase date now default to the local date instead of the UTC one.

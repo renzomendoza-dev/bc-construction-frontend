@@ -146,7 +146,8 @@ export class Dashboard implements OnInit {
         catchError(() => of([])),
       ),
       receipts: this.receiptsService
-        .listPurchaseReceipts(undefined, undefined, undefined, 0, RECEIPTS_FETCH_SIZE, undefined)
+        // (supplierId, fromDate, toDate, fulfillsTransferBatchId, page, size, sort)
+        .listPurchaseReceipts(undefined, undefined, undefined, undefined, 0, RECEIPTS_FETCH_SIZE, undefined)
         .pipe(catchError(() => of(null))),
       // Same totalElements-from-a-1-row-page trick as items — search()
       // supports server-side status filtering, so no need to fetch and

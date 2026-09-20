@@ -125,7 +125,12 @@ export class PurchaseReceiptsListComponent implements OnInit {
     this.loading.set(true);
     this.errorMessage.set(null);
 
-    this.receiptsService.listPurchaseReceipts(undefined, undefined, undefined, 0, FETCH_SIZE, undefined).subscribe({
+    // Args are (supplierId, fromDate, toDate, fulfillsTransferBatchId, page,
+    // size, sort) — the batch filter is easy to skip by accident, which
+    // silently shifts page/size and returns an empty list.
+    this.receiptsService
+      .listPurchaseReceipts(undefined, undefined, undefined, undefined, 0, FETCH_SIZE, undefined)
+      .subscribe({
       next: (result) => {
         this.allReceipts.set(result.content ?? []);
         this.loading.set(false);
